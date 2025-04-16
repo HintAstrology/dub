@@ -43,7 +43,7 @@ const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
             !!children && "text-neutral-900",
           )}
         />
-        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left text-neutral-900">
+        <span className="text-neutral flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left">
           {children ? (
             children
           ) : placeholder ? (

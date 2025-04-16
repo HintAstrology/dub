@@ -24,7 +24,8 @@ const cardListCardVariants = cva(
   },
 );
 
-const cardListCardInnerClassName = "w-full py-2.5 px-4";
+const cardListCardInnerClassName =
+  "w-full py-3.5 px-6 border-border-100 radius-md";
 
 export const CardContext = createContext<{
   hovered: boolean;

@@ -55,7 +55,7 @@ export default function LinkSort() {
         )}
       >
         <SortDesc className="h-4 w-4" />
-        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left text-neutral-900">
+        <span className="text-neutral flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left">
           {selectedSort.display || "Sort by"}
         </span>
         <ChevronDown className="h-4 w-4 flex-shrink-0 text-neutral-400 transition-transform duration-75 group-data-[state=open]:rotate-180" />

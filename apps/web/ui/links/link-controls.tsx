@@ -22,6 +22,7 @@ import {
   QRCode,
 } from "@dub/ui/icons";
 import { cn, isDubDomain, nanoid, punycode } from "@dub/utils";
+import { Icon } from "@iconify/react";
 import { CopyPlus, Delete, FolderInput } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useContext } from "react";
@@ -30,7 +31,6 @@ import { useLinkBuilder } from "../modals/link-builder";
 import { useLinkQRModal } from "../modals/link-qr-modal";
 import { useMoveLinkToFolderModal } from "../modals/move-link-to-folder-modal";
 import { useTransferLinkModal } from "../modals/transfer-link-modal";
-import { ThreeDots } from "../shared/icons";
 import { LinksListContext, ResponseLink } from "./links-container";
 
 export function LinkControls({ link }: { link: ResponseLink }) {
@@ -340,10 +340,11 @@ export function LinkControls({ link }: { link: ResponseLink }) {
         <Button
           variant="secondary"
           className={cn(
-            "h-8 px-1.5 outline-none transition-all duration-200",
-            "border-transparent data-[state=open]:border-neutral-500 sm:group-hover/card:data-[state=closed]:border-neutral-200",
+            "text-neutral h-9 w-9 rounded-lg p-2 text-xl outline-none transition-all duration-200",
+            "border-border-100 hover:text-primary hover:border-primary data-[state=open]:border-primary data-[state=open]:bg-primary-300 data-[state=open]:text-primary hover:bg-primary-300 data-[state=open]:ring-0",
           )}
-          icon={<ThreeDots className="h-5 w-5 shrink-0" />}
+          // icon={<ThreeDots className="h-5 w-5 shrink-0" />}
+          icon={<Icon icon="charm:menu-kebab" />}
           onClick={() => {
             setOpenPopover(!openPopover);
           }}

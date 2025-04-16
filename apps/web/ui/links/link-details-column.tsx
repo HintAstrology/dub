@@ -1,10 +1,10 @@
 import { useCheckFolderPermission } from "@/lib/swr/use-folder-permissions";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { TagProps } from "@/lib/types";
+import { LinkControls } from "@/ui/links/link-controls.tsx";
 import {
   Button,
   CardList,
-  CopyButton,
   CursorRays,
   InvoiceDollar,
   Tooltip,
@@ -13,15 +13,8 @@ import {
   useRouterStuff,
 } from "@dub/ui";
 import { ReferredVia } from "@dub/ui/icons";
-import {
-  APP_DOMAIN,
-  cn,
-  currencyFormatter,
-  INFINITY_NUMBER,
-  nFormatter,
-  pluralize,
-  timeAgo,
-} from "@dub/utils";
+import { cn, currencyFormatter, nFormatter } from "@dub/utils";
+import { Icon } from "@iconify/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -32,7 +25,6 @@ import {
   useState,
 } from "react";
 import { useShareDashboardModal } from "../modals/share-dashboard-modal";
-import { LinkControls } from "./link-controls";
 import { ResponseLink } from "./links-container";
 import { LinksDisplayContext } from "./links-display-provider";
 import TagBadge from "./tag-badge";
@@ -71,17 +63,50 @@ export function LinkDetailsColumn({ link }: { link: ResponseLink }) {
 
   const { primaryTag, additionalTags } = useOrganizedTags(tags);
 
+  const isLinkActive = !link.archived;
+
   return (
-    <div ref={ref} className="flex items-center justify-end gap-2 sm:gap-5">
+    <div
+      ref={ref}
+      className="flex shrink-0 items-center justify-end gap-[42px]"
+    >
       {displayProperties.includes("tags") && primaryTag && (
         <TagsTooltip additionalTags={additionalTags}>
           <TagButton tag={primaryTag} plus={additionalTags.length} />
         </TagsTooltip>
       )}
+      <div
+        className={cn("rounded-lg border px-2.5 py-1 text-xs font-medium", {
+          "border-[#30A46C99] bg-[#30A46C14] text-[#30A46C]": isLinkActive,
+          "text-neutral border-neutral-300 bg-neutral-100": !isLinkActive,
+        })}
+      >
+        {isLinkActive ? "Active" : "Archived"}
+      </div>
       {displayProperties.includes("analytics") && (
         <AnalyticsBadge link={link} />
       )}
-      <LinkControls link={link} />
+      {/*<div*/}
+      {/*  className={cn("rounded-lg border px-2.5 py-1 text-xs font-medium", {*/}
+      {/*    "border-[#30A46C99] bg-[#30A46C14] text-[#30A46C]": isLinkActive,*/}
+      {/*    "text-neutral border-neutral-300 bg-neutral-100": !isLinkActive,*/}
+      {/*  })}*/}
+      {/*>*/}
+      {/*  {isLinkActive ? "Active" : "Archived"}*/}
+      {/*</div>*/}
+      {/* @TODO: add download option */}
+      <div className="hidden flex-row items-center justify-between gap-4 md:flex">
+        <Button
+          variant="secondary"
+          className={cn(
+            "text-neutral h-9 w-9 rounded-lg p-2 text-xl outline-none transition-all duration-200",
+            "border-border-100 hover:border-primary hover:text-primary data-[state=open]:border-primary data-[state=open]:bg-primary-300 data-[state=open]:text-primary hover:bg-primary-300 data-[state=open]:ring-0",
+          )}
+          icon={<Icon icon="tabler:download" />}
+          onClick={() => {}}
+        />
+        <LinkControls link={link} />
+      </div>
     </div>
   );
 }
@@ -193,95 +218,107 @@ function AnalyticsBadge({ link }: { link: ResponseLink }) {
       className="flex items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-sm text-neutral-800"
     >
       <CursorRays className="h-4 w-4 text-neutral-600" />
-      {nFormatter(link.clicks)}
+      {nFormatter(link.clicks)} scans
     </Link>
   ) : (
     <>
       <ShareDashboardModal />
-      <Tooltip
-        key={modalShowCount}
-        side="top"
-        content={
-          <div className="flex flex-col gap-2.5 whitespace-nowrap p-3 text-neutral-600">
-            {stats.map(({ id: tab, value }) => (
-              <div key={tab} className="text-sm leading-none">
-                <span className="font-medium text-neutral-950">
-                  {tab === "sales"
-                    ? currencyFormatter(value / 100)
-                    : nFormatter(value, { full: value < INFINITY_NUMBER })}
-                </span>{" "}
-                {tab === "sales" ? "total " : ""}
-                {pluralize(tab.slice(0, -1), value)}
-              </div>
-            ))}
-            <p className="text-xs leading-none text-neutral-400">
-              {link.lastClicked
-                ? `Last clicked ${timeAgo(link.lastClicked, {
-                    withAgo: true,
-                  })}`
-                : "No clicks yet"}
-            </p>
+      {/*<Tooltip*/}
+      {/*  key={modalShowCount}*/}
+      {/*  side="top"*/}
+      {/*  content={*/}
+      {/*    <div className="flex flex-col gap-2.5 whitespace-nowrap p-3 text-neutral-600">*/}
+      {/*      {stats.map(({ id: tab, value }) => (*/}
+      {/*        <div key={tab} className="text-sm leading-none">*/}
+      {/*          <span className="font-medium text-neutral-950">*/}
+      {/*            {tab === "sales"*/}
+      {/*              ? currencyFormatter(value / 100)*/}
+      {/*              : nFormatter(value, { full: value < INFINITY_NUMBER })}*/}
+      {/*          </span>{" "}*/}
+      {/*          {tab === "sales" ? "total " : ""}*/}
+      {/*          {pluralize(tab.slice(0, -1), value)}*/}
+      {/*        </div>*/}
+      {/*      ))}*/}
+      {/*      <p className="text-xs leading-none text-neutral-400">*/}
+      {/*        {link.lastClicked*/}
+      {/*          ? `Last clicked ${timeAgo(link.lastClicked, {*/}
+      {/*              withAgo: true,*/}
+      {/*            })}`*/}
+      {/*          : "No clicks yet"}*/}
+      {/*      </p>*/}
 
-            <div className="inline-flex items-start justify-start gap-2">
-              <Button
-                text={link.dashboardId ? "Edit sharing" : "Share dashboard"}
-                className="h-7 w-full px-2"
-                onClick={() => {
-                  setShowShareDashboardModal(true);
-                  setModalShowCount((c) => c + 1);
-                }}
-                disabled={!canManageLink}
-              />
+      {/*      <div className="inline-flex items-start justify-start gap-2">*/}
+      {/*        <Button*/}
+      {/*          text={link.dashboardId ? "Edit sharing" : "Share dashboard"}*/}
+      {/*          className="h-7 w-full px-2"*/}
+      {/*          onClick={() => {*/}
+      {/*            setShowShareDashboardModal(true);*/}
+      {/*            setModalShowCount((c) => c + 1);*/}
+      {/*          }}*/}
+      {/*          disabled={!canManageLink}*/}
+      {/*        />*/}
 
-              {link.dashboardId && (
-                <CopyButton
-                  value={`${APP_DOMAIN}/share/${link.dashboardId}`}
-                  variant="neutral"
-                  className="h-7 items-center justify-center rounded-md border border-neutral-300 bg-white p-1.5 hover:bg-neutral-50 active:bg-neutral-100"
-                />
-              )}
-            </div>
-          </div>
-        }
+      {/*        {link.dashboardId && (*/}
+      {/*          <CopyButton*/}
+      {/*            value={`${APP_DOMAIN}/share/${link.dashboardId}`}*/}
+      {/*            variant="neutral"*/}
+      {/*            className="h-7 items-center justify-center rounded-md border border-neutral-300 bg-white p-1.5 hover:bg-neutral-50 active:bg-neutral-100"*/}
+      {/*          />*/}
+      {/*        )}*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*  }*/}
+      {/*>*/}
+      <Link
+        href={`/${slug}/analytics?domain=${domain}&key=${key}&interval=${plan === "free" ? "30d" : plan === "pro" ? "1y" : "all"}`}
+        className={cn(
+          "border-border-100 text-neutral overflow-hidden rounded-md border bg-neutral-50 p-0.5 text-sm transition-colors",
+          variant === "loose" ? "hover:bg-neutral-100" : "hover:bg-white",
+        )}
       >
-        <Link
-          href={`/${slug}/analytics?domain=${domain}&key=${key}&interval=${plan === "free" ? "30d" : plan === "pro" ? "1y" : "all"}`}
-          className={cn(
-            "overflow-hidden rounded-md border border-neutral-200 bg-neutral-50 p-0.5 text-sm text-neutral-600 transition-colors",
-            variant === "loose" ? "hover:bg-neutral-100" : "hover:bg-white",
-          )}
-        >
-          <div className="hidden items-center gap-0.5 sm:flex">
-            {stats.map(
-              ({ id: tab, icon: Icon, value, className, iconClassName }) => (
-                <div
-                  key={tab}
-                  className={cn(
-                    "flex items-center gap-1 whitespace-nowrap rounded-md px-1 py-px transition-colors",
-                    className,
-                  )}
-                >
+        <div className="hidden items-center gap-0.5 sm:flex">
+          {stats.map(
+            ({ id: tab, icon: Icon, value, className, iconClassName }) => (
+              <div
+                key={tab}
+                className={cn(
+                  "flex items-center gap-1 whitespace-nowrap rounded-md px-1 py-px transition-colors",
+                  className,
+                )}
+              >
+                {Icon && (
                   <Icon
                     data-active={value > 0}
                     className={cn("h-4 w-4 shrink-0", iconClassName)}
                   />
-                  <span>
-                    {tab === "sales"
-                      ? currencyFormatter(value / 100)
-                      : nFormatter(value)}
-                    {stats.length === 1 && " clicks"}
-                  </span>
-                </div>
-              ),
-            )}
-            {link.dashboardId && (
-              <div className="border-l border-neutral-200 px-1.5">
-                <ReferredVia className="h-4 w-4 shrink-0 text-neutral-600" />
+                )}
+                {/*<div className="flex flex-row-reverse items-center gap-1 md:flex-col">*/}
+                {/*  <p className="text-neutral text-center text-xl font-semibold">*/}
+                {/*    {tab === "sales"*/}
+                {/*      ? currencyFormatter(value / 100)*/}
+                {/*      : nFormatter(value)}*/}
+                {/*  </p>*/}
+                {/*  <p className="text-xs font-medium text-neutral-300">*/}
+                {/*    {stats.length === 1 && " clicks"}*/}
+                {/*  </p>*/}
+                {/*</div>*/}
+                <span>
+                  {tab === "sales"
+                    ? currencyFormatter(value / 100)
+                    : nFormatter(value)}
+                  {stats.length === 1 && " scans"}
+                </span>
               </div>
-            )}
-          </div>
-        </Link>
-      </Tooltip>
+            ),
+          )}
+          {link.dashboardId && (
+            <div className="border-l border-neutral-200 px-1.5">
+              <ReferredVia className="h-4 w-4 shrink-0 text-neutral-600" />
+            </div>
+          )}
+        </div>
+      </Link>
+      {/*</Tooltip>*/}
     </>
   );
 }

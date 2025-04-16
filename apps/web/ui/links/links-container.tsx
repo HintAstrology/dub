@@ -95,7 +95,11 @@ function LinksList({
           value={{ openMenuLinkId, setOpenMenuLinkId }}
         >
           {/* Cards */}
-          <CardList variant={compact ? "compact" : "loose"} loading={loading}>
+          <CardList
+            variant={compact ? "compact" : "loose"}
+            loading={loading}
+            className="[&_li]:border-border-100 [&_li]:radius-md [&_li>div]:px-6 [&_li>div]:py-3.5"
+          >
             {links?.length
               ? // Link cards
                 links.map((link) => <LinkCard key={link.id} link={link} />)

@@ -165,7 +165,7 @@ function LinkBuilderInner({
   });
 
   const saveDisabled = useMemo(() => {
-    /* 
+    /*
       Disable save if:
       - modal is not open
       - saving is in progress
@@ -597,6 +597,7 @@ export function CreateLinkButton({
   return (
     <Button
       text="Create QR code"
+      className="bg-secondary hover:bg-secondary/90 h-9 border-none font-medium hover:ring-0"
       // shortcut="C"
       disabledTooltip={
         exceededLinks ? (

@@ -15,6 +15,8 @@ export function PageContent({
   hasNavigation,
   // currentStep,
   asHeader = false,
+  isMainPage = false,
+  titleClassName,
   children,
 }: PropsWithChildren<{
   title?: ReactNode;
@@ -25,6 +27,8 @@ export function PageContent({
   hasNavigation?: boolean;
   currentStep?: number;
   asHeader?: boolean;
+  isMainPage?: boolean;
+  titleClassName?: string;
 }>) {
   const hasTitle = title !== undefined;
   // const hasDescription = description !== undefined;
@@ -34,8 +38,11 @@ export function PageContent({
       {/*<MaxWidthWrapper className="px-0 lg:px-0">*/}
       <div
         className={cn(
-          "border-b-border-200 flex w-full items-center justify-between gap-4 border-b px-3 py-[6px] md:px-8 md:pb-4 md:pt-8",
-          { "sticky top-0 z-10 bg-white shadow-sm": asHeader },
+          "flex w-full items-center justify-between gap-4 px-3 py-[6px] md:px-8 md:pb-4 md:pt-8",
+          {
+            "border-b-border-200 border-b md:hidden": isMainPage,
+            "sticky top-0 z-10 bg-white shadow-sm": asHeader,
+          },
         )}
       >
         <Logo className={cn("md:hidden", hasNavigation && "[&_div]:hidden")} />
@@ -82,7 +89,7 @@ export function PageContent({
         {/*    </p>*/}
         {/*  </MaxWidthWrapper>*/}
         {/*)}*/}
-        {hasTitle && <Title title={title} />}
+        {hasTitle && <Title title={title} className={titleClassName} />}
         {children}
       </MaxWidthWrapper>
     </div>

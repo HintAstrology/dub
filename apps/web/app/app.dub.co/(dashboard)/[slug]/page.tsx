@@ -4,7 +4,7 @@ import WorkspaceLinksClient from "./page-client";
 
 export default function WorkspaceLinks() {
   return (
-    <PageContent title={<LinksTitle />}>
+    <PageContent title={<LinksTitle />} titleClassName="md:px-8" isMainPage>
       <WorkspaceLinksClient />
     </PageContent>
   );

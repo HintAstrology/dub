@@ -1,6 +1,6 @@
 import { cn, truncate } from "@dub/utils";
+import { Icon } from "@iconify/react";
 import { Command, useCommandState } from "cmdk";
-import { ChevronDown, ListFilter } from "lucide-react";
 import {
   Fragment,
   PropsWithChildren,
@@ -284,13 +284,14 @@ export function FilterSelect({
         type="button"
         className={cn(
           "group flex h-10 cursor-pointer appearance-none items-center gap-x-2 truncate rounded-md border px-3 text-sm outline-none transition-all",
-          "border-neutral-200 bg-white text-neutral-900 placeholder-neutral-400",
-          "focus-visible:border-neutral-500 data-[state=open]:border-neutral-500 data-[state=open]:ring-4 data-[state=open]:ring-neutral-200",
+          "border-border-100 text-neutral placeholder-neutral bg-white",
+          "focus-visible:border-secondary data-[state=open]:border-neutral-500",
           className,
         )}
       >
-        <ListFilter className="size-4 shrink-0" />
-        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left text-neutral-900">
+        {/*<ListFilter className="size-4 shrink-0" />*/}
+        <Icon icon="mynaui:filter" className="text-neutral text-xl" />
+        <span className="text-neutral flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left font-medium">
           {children ?? "Filter"}
         </span>
         {activeFilters?.length ? (
@@ -298,8 +299,17 @@ export function FilterSelect({
             {activeFilters.length}
           </div>
         ) : (
-          <ChevronDown
-            className={`size-4 shrink-0 text-neutral-400 transition-transform duration-75 group-data-[state=open]:rotate-180`}
+          // <ChevronDown
+          //   className={`size-4 shrink-0 text-neutral-400 transition-transform duration-75 group-data-[state=open]:rotate-180`}
+          // />
+          <Icon
+            icon="line-md:chevron-down"
+            className={cn(
+              "text-xl text-neutral-200 transition-transform duration-300",
+              {
+                "rotate-180": isOpen,
+              },
+            )}
           />
         )}
       </button>

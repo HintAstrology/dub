@@ -7,25 +7,27 @@ import {
 import useLinks from "@/lib/swr/use-links";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { RequestFolderEditAccessButton } from "@/ui/folders/request-edit-button";
-import LinkDisplay from "@/ui/links/link-display";
-import LinksContainer from "@/ui/links/links-container";
+import LinksContainer from "@/ui/links/links-container.tsx";
 import { LinksDisplayProvider } from "@/ui/links/links-display-provider";
 import { useLinkFilters } from "@/ui/links/use-link-filters";
 import { useAddEditTagModal } from "@/ui/modals/add-edit-tag-modal";
 import { useExportLinksModal } from "@/ui/modals/export-links-modal";
 import { useLinkBuilder } from "@/ui/modals/link-builder";
-import { ThreeDots } from "@/ui/shared/icons";
 import { SearchBoxPersisted } from "@/ui/shared/search-box";
 import {
   Button,
   Filter,
+  Globe,
   IconMenu,
   MaxWidthWrapper,
   Popover,
+  Tag,
   Tooltip,
   TooltipContent,
 } from "@dub/ui";
-import { Download, Globe, TableIcon, Tag } from "@dub/ui/icons";
+import { Download, TableIcon } from "@dub/ui/icons";
+import { cn } from "@dub/utils";
+import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
@@ -87,7 +89,7 @@ function WorkspaceLinks() {
       <LinkBuilder />
       <AddEditTagModal />
       <div className="flex w-full items-center pt-2">
-        <MaxWidthWrapper className="flex flex-col gap-y-3">
+        <MaxWidthWrapper className="flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-2 lg:flex-nowrap">
             <div className="flex w-full grow gap-2 md:w-auto">
               <div className="grow basis-0 md:grow-0">
@@ -145,15 +147,15 @@ function WorkspaceLinks() {
                   }}
                 />
               </div>
-              <div className="grow basis-0 md:grow-0">
-                <LinkDisplay />
-              </div>
+              {/*<div className="grow basis-0 md:grow-0">*/}
+              {/*  <LinkDisplay />*/}
+              {/*</div>*/}
             </div>
             <div className="flex gap-x-2 max-md:w-full">
               <div className="w-full md:w-56 lg:w-64">
                 <SearchBoxPersisted
                   loading={isValidating}
-                  inputClassName="h-10"
+                  inputClassName="h-9 border-border-100 radius-md text-neutral-200 focus:ring-0 focus:border-secondary"
                 />
               </div>
 
@@ -189,7 +191,7 @@ function WorkspaceLinks() {
         </MaxWidthWrapper>
       </div>
 
-      <div className="mt-3">
+      <div className="-mt-2">
         <LinksContainer
           CreateLinkButton={canCreateLinks ? CreateLinkButton : () => <></>}
         />
@@ -313,8 +315,13 @@ const MoreLinkOptions = () => {
         <Button
           onClick={() => setOpenPopover(!openPopover)}
           variant="secondary"
-          className="w-auto px-1.5"
-          icon={<ThreeDots className="h-5 w-5 text-neutral-500" />}
+          // className="px-3 md:h-9 md:w-9 md:px-2"
+          className={cn(
+            "text-neutral h-9 w-9 rounded-lg p-2 text-xl outline-none transition-all duration-200",
+            "border-border-100 hover:text-primary hover:border-primary data-[state=open]:border-primary data-[state=open]:bg-primary-300 data-[state=open]:text-primary hover:bg-primary-300 data-[state=open]:ring-0",
+          )}
+          // icon={<ThreeDots className="h-5 w-5 text-neutral-500" />}
+          icon={<Icon icon="charm:menu-kebab" />}
         />
       </Popover>
     </>
