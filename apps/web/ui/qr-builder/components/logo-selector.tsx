@@ -1,5 +1,5 @@
 import { SUGGESTED_LOGOS } from "@/ui/qr-builder/constants/customization/logos.ts";
-import { Dispatch, FC, SetStateAction } from "react";
+import { FC } from "react";
 import { EQRType } from "../constants/get-qr-config.ts";
 import { FileCardContent } from "./file-card-content.tsx";
 import { StylePicker } from "./style-picker.tsx";
@@ -10,8 +10,7 @@ interface ILogoSelectorProps {
   uploadedLogo: File | null;
   onSuggestedLogoSelect: (type: string, iconSrc?: string) => void;
   onUploadLogo: (file: File | null) => void;
-  fileError: string;
-  setFileError: Dispatch<SetStateAction<string>>;
+  isMobile: boolean;
 }
 
 export const LogoSelector: FC<ILogoSelectorProps> = ({
@@ -20,8 +19,7 @@ export const LogoSelector: FC<ILogoSelectorProps> = ({
   uploadedLogo,
   onSuggestedLogoSelect,
   onUploadLogo,
-  fileError,
-  setFileError,
+  isMobile,
 }) => {
   return (
     <div className="border-border-500 flex max-w-[540px] flex-col gap-4 rounded-lg border p-3">
@@ -49,10 +47,11 @@ export const LogoSelector: FC<ILogoSelectorProps> = ({
           onUploadLogo(file);
           return file ? [file] : [];
         }}
-        fileError={fileError}
-        setFileError={setFileError}
         title="Upload your logo"
+        multiple={false}
+        minimumFlow
         isLogo
+        isMobile={isMobile}
       />
     </div>
   );

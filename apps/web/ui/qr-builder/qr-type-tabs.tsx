@@ -1,4 +1,5 @@
-// import { QrTabsCustomization } from "@/ui/qr-builder/qr-tabs-customization.tsx";
+import { QRCodeContentBuilder } from "@/ui/qr-builder/qr-code-content-builder.tsx";
+import { QrTabsCustomization } from "@/ui/qr-builder/qr-tabs-customization.tsx";
 import { cn } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -24,7 +25,6 @@ interface QrTypeTabsProps {
   setQRTypeActiveTab: Dispatch<SetStateAction<QRType["id"]>>;
   initialInputValues?: Record<string, string>;
   onRegistrationClick?: () => void;
-  isMobile?: boolean;
 }
 
 export const QrTypeTabs = ({
@@ -42,7 +42,6 @@ export const QrTypeTabs = ({
   setQRTypeActiveTab,
   initialInputValues = {},
   onRegistrationClick,
-  isMobile,
 }: QrTypeTabsProps) => {
   const [styleOptionActiveTab, setStyleOptionActiveActiveTab] =
     useState<string>("Frame");
@@ -58,9 +57,7 @@ export const QrTypeTabs = ({
       isHiddenNetwork: boolean;
       qrType: EQRType;
     }) => {
-      // QR name is not needed for QR code generation
-      const { qrName, ...filteredInputValues } = inputValues;
-      setData(qrTypeDataHandlers[qrType](filteredInputValues, isHiddenNetwork));
+      setData(qrTypeDataHandlers[qrType](inputValues, isHiddenNetwork));
     },
     [setData],
   );
@@ -89,16 +86,16 @@ export const QrTypeTabs = ({
               icon={type.icon}
               className={cn(
                 "h-5 w-5 flex-none",
-                idx === 4
+                idx === 1
                   ? "group-hover:[&>path]:fill-neutral [&>path]:fill-neutral-200"
                   : "group-hover:[&>g]:stroke-neutral group-hover:[&>path]:stroke-neutral [&>g]:stroke-neutral-200 [&>path]:stroke-neutral-200",
                 qrTypeActiveTab === type.id &&
-                  (idx === 4
+                  (idx === 1
                     ? "[&>path]:fill-secondary group-hover:[&>path]:fill-secondary"
                     : "[&>g]:stroke-secondary group-hover:[&>g]:stroke-secondary [&>path]:stroke-secondary group-hover:[&>path]:stroke-secondary"),
               )}
             />
-            <span className="whitespace-nowrap text-xs font-normal">
+            <span className="whitespace-nowrap text-base text-xs font-normal">
               {type.label}
             </span>
           </Tabs.Trigger>
@@ -124,30 +121,30 @@ export const QrTypeTabs = ({
                     title={"Complete the content"}
                   />
                   <div className="w-full">
-                    {/*<QRCodeContentBuilder*/}
-                    {/*  qrType={type.id}*/}
-                    {/*  handleContent={handleContent}*/}
-                    {/*  minimalFlow*/}
-                    {/*  initialInputValues={initialInputValues}*/}
-                    {/*/>*/}
+                    <QRCodeContentBuilder
+                      qrType={type.id}
+                      handleContent={handleContent}
+                      minimalFlow
+                      initialInputValues={initialInputValues}
+                    />
                   </div>
                 </div>
 
                 <div className="flex flex-col items-start justify-start gap-4 pt-4">
                   <QrTabsStepTitle stepNumber={2} title={"Customize your QR"} />
-                  {/*<QrTabsCustomization*/}
-                  {/*  styleOptionActiveTab={styleOptionActiveTab}*/}
-                  {/*  setStyleOptionActiveActiveTab={*/}
-                  {/*    setStyleOptionActiveActiveTab*/}
-                  {/*  }*/}
-                  {/*  selectedSuggestedFrame={selectedSuggestedFrame}*/}
-                  {/*  selectedSuggestedLogo={selectedSuggestedLogo}*/}
-                  {/*  uploadedLogo={uploadedLogo}*/}
-                  {/*  isQrDisabled={isQrDisabled}*/}
-                  {/*  isMobile={false}*/}
-                  {/*  options={options}*/}
-                  {/*  handlers={handlers}*/}
-                  {/*/>*/}
+                  <QrTabsCustomization
+                    styleOptionActiveTab={styleOptionActiveTab}
+                    setStyleOptionActiveActiveTab={
+                      setStyleOptionActiveActiveTab
+                    }
+                    selectedSuggestedFrame={selectedSuggestedFrame}
+                    selectedSuggestedLogo={selectedSuggestedLogo}
+                    uploadedLogo={uploadedLogo}
+                    isQrDisabled={isQrDisabled}
+                    isMobile={false}
+                    options={options}
+                    handlers={handlers}
+                  />
                 </div>
               </div>
 
@@ -157,17 +154,17 @@ export const QrTypeTabs = ({
                   { ["items-start"]: homepageDemo },
                 )}
               >
-                <div className="center sticky top-20 flex flex-col gap-6">
+                <div className="sticky top-8 flex flex-col gap-6">
+                  {homepageDemo && (
+                    <QrTabsStepTitle stepNumber={3} title="Download your QR" />
+                  )}
                   <div
                     className={cn("flex justify-center rounded-lg shadow-lg", {
                       "opacity-30": isQrDisabled,
                     })}
                   >
-                    <QRCanvas
-                      width={isMobile ? 200 : 300}
-                      height={isMobile ? 200 : 300}
-                      qrCode={qrCode}
-                    />
+                    <QRCanvas qrCode={qrCode} />
+                    {/*<QRPreview qrCode={qrCode} />*/}
                   </div>
                   {homepageDemo && (
                     <QrTabsDownloadButton

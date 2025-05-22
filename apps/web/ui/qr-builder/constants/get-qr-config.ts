@@ -24,7 +24,6 @@ export enum EQRType {
 export type QRType = {
   id: EQRType;
   label: string;
-  info: string;
   icon: string;
   img: StaticImageData;
   content: string;
@@ -34,7 +33,6 @@ export const QR_TYPES: QRType[] = [
   {
     id: EQRType.WEBSITE,
     label: "Website",
-    info: "Open a website or landing page",
     icon: "streamline:web",
     img: QrWebsiteFull,
     content:
@@ -43,7 +41,6 @@ export const QR_TYPES: QRType[] = [
   {
     id: EQRType.PDF,
     label: "PDF",
-    info: "Open a PDF document",
     icon: "hugeicons:pdf-02",
     img: QrPDFFull,
     content:
@@ -51,8 +48,7 @@ export const QR_TYPES: QRType[] = [
   },
   {
     id: EQRType.IMAGE,
-    label: "Image",
-    info: "Display an image or photo",
+    label: "Images",
     icon: "hugeicons:ai-image",
     img: QrImagesFull,
     content:
@@ -61,7 +57,6 @@ export const QR_TYPES: QRType[] = [
   {
     id: EQRType.VIDEO,
     label: "Video",
-    info: "Display a video with one scan",
     icon: "hugeicons:ai-video",
     img: QrVideosFull,
     content:
@@ -70,7 +65,6 @@ export const QR_TYPES: QRType[] = [
   {
     id: EQRType.WHATSAPP,
     label: "Whatsapp",
-    info: "Start a WhatsApp chat instantly",
     icon: "basil:whatsapp-outline",
     img: QrWhatsappFull,
     content:
@@ -79,7 +73,6 @@ export const QR_TYPES: QRType[] = [
   {
     id: EQRType.SOCIAL,
     label: "Social Media Link",
-    info: "Open a website or landing page",
     icon: "solar:add-circle-broken",
     img: QrSocialFull,
     content:
@@ -89,15 +82,13 @@ export const QR_TYPES: QRType[] = [
     id: EQRType.WIFI,
     label: "Wifi",
     icon: "streamline:wifi",
-    info: "Connect to a Wifi network",
     img: QrWifiFull,
     content:
-      "Instant Wifi access—no typing required! Use a QR code to let guests connect to your network effortlessly by scanning, making it perfect for homes, cafés, offices, and events.",
+      "Instant Wi-Fi access—no typing required! Use a QR code to let guests connect to your network effortlessly by scanning, making it perfect for homes, cafés, offices, and events.",
   },
   {
     id: EQRType.APP_LINK,
     label: "App Link",
-    info: "Open a website or landing page",
     icon: "meteor-icons:link",
     img: QrAppLinkFull,
     content:
@@ -106,7 +97,6 @@ export const QR_TYPES: QRType[] = [
   {
     id: EQRType.FEEDBACK,
     label: "Feedback Request",
-    info: "Open a website or landing page",
     icon: "hugeicons:bubble-chat-favourite",
     img: QrFeedbackFull,
     content:

@@ -1,121 +1,95 @@
-import {
-  DEFAULT_WEBSITE,
-  DEFAULT_WHATSAPP_MESSAGE,
-  DEFAULT_WIFI_NETWORK_NAME,
-} from "@/ui/qr-builder/constants/qr-type-inputs-placeholders.ts";
 import { EQRType, FILE_QR_TYPES } from "./get-qr-config.ts";
-
-export type QRInputType = "text" | "url" | "tel" | "password" | "textarea";
-
-export type QRInputConfig = {
-  id: string;
-  label: string;
-  type: QRInputType;
-  placeholder: string;
-  tooltip?: string;
-  initFromPlaceholder?: boolean;
-  maxLength?: number;
-  isNotRequired?: boolean;
-};
-
-export const QR_NAME_INPUT: QRInputConfig = {
-  id: "qrName",
-  label: "Name your QR Code",
-  type: "text",
-  placeholder: "My QR Code",
-  tooltip: "Only you can see this. It helps you recognize your QR codes later.",
-  initFromPlaceholder: true,
-} as const;
 
 export const QR_TYPE_INPUTS_CONFIG: Record<
   Exclude<EQRType, (typeof FILE_QR_TYPES)[number]>,
-  QRInputConfig[]
+  {
+    id: string;
+    label: string;
+    type: string;
+    placeholder?: string;
+    maxLength?: number;
+  }[]
 > = {
   [EQRType.WEBSITE]: [
-    QR_NAME_INPUT,
+    {
+      id: `qrName`,
+      label: "Enter Name of your QR Code",
+      type: "text",
+      placeholder: "Name of your QR Code",
+      isNotRequired: true,
+    },
     {
       id: `websiteLink`,
       label: "Enter your website",
       type: "url",
-      placeholder: DEFAULT_WEBSITE,
-      tooltip: "This is the link people will open when they scan your QR code.",
+      placeholder: "https://www.getqr.com/",
     },
   ],
-  // [EQRType.APP_LINK]: [
-  //   {
-  //     id: `qrName`,
-  //     label: "Enter Name of your QR Code",
-  //     type: "text",
-  //     placeholder: "Name of your QR Code",
-  //     isNotRequired: true,
-  //   },
-  //   {
-  //     id: `storeLink`,
-  //     label: "Store Link",
-  //     type: "url",
-  //     placeholder: "https://www.getqr.com/",
-  //   },
-  // ],
-  // [EQRType.SOCIAL]: [
-  //   {
-  //     id: `qrName`,
-  //     label: "Enter Name of your QR Code",
-  //     type: "text",
-  //     placeholder: "Name of your QR Code",
-  //     isNotRequired: true,
-  //   },
-  //   {
-  //     id: `socialLink`,
-  //     label: "Enter your Social Media Link",
-  //     type: "url",
-  //     placeholder: "https://www.getqr.com/",
-  //   },
-  // ],
-  // [EQRType.FEEDBACK]: [
-  //   {
-  //     id: `link`,
-  //     label: "Link",
-  //     type: "url",
-  //     placeholder: "https://www.getqr.com/",
-  //   },
-  // ],
+  [EQRType.APP_LINK]: [
+    {
+      id: `qrName`,
+      label: "Enter Name of your QR Code",
+      type: "text",
+      placeholder: "Name of your QR Code",
+      isNotRequired: true,
+    },
+    {
+      id: `storeLink`,
+      label: "Store Link",
+      type: "url",
+      placeholder: "https://www.getqr.com/",
+    },
+  ],
+  [EQRType.SOCIAL]: [
+    {
+      id: `qrName`,
+      label: "Enter Name of your QR Code",
+      type: "text",
+      placeholder: "Name of your QR Code",
+      isNotRequired: true,
+    },
+    {
+      id: `socialLink`,
+      label: "Enter your Social Media Link",
+      type: "url",
+      placeholder: "https://www.getqr.com/",
+    },
+  ],
+  [EQRType.FEEDBACK]: [
+    {
+      id: `link`,
+      label: "Link",
+      type: "url",
+      placeholder: "https://www.getqr.com/",
+    },
+  ],
   [EQRType.WHATSAPP]: [
-    QR_NAME_INPUT,
     {
       id: `number`,
-      label: "WhatsApp Number",
+      label: "Your number",
       type: "tel",
       placeholder: "Type your number",
-      tooltip:
-        "This is the number people will message on WhatsApp after scanning your QR code.",
     },
     {
       id: `message`,
-      label: "Pre-typed Message",
+      label: "Message",
       type: "textarea",
-      placeholder: DEFAULT_WHATSAPP_MESSAGE,
+      placeholder: "Type a welcome text...",
       maxLength: 160,
-      tooltip:
-        "This text will appear in the chat box — the user just needs to tap send.",
     },
   ],
   [EQRType.WIFI]: [
-    QR_NAME_INPUT,
     {
       id: `networkName`,
-      label: "Wifi Network Name",
+      label: "Network name (SSID)",
       type: "text",
-      placeholder: DEFAULT_WIFI_NETWORK_NAME,
-      tooltip:
-        "This is the name of the Wi-Fi network you want to share. You can usually find it on the back of your router.",
+      placeholder: "Enter network name",
     },
     {
       id: `networkPassword`,
       label: "Network password",
       type: "text",
-      placeholder: "ExtraToppings123",
-      tooltip:
-        "People will automatically connect using this password after scanning your QR code. Leave this blank if your network has no password.",
+      placeholder: "Enter password",
     },
   ],
 };
