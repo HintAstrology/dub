@@ -9,6 +9,8 @@ import {
   AccordionTrigger,
   useMediaQuery,
 } from "@dub/ui";
+import { cn } from "@dub/utils";
+import { Icon } from "@iconify/react";
 import { Heading } from "@radix-ui/themes";
 
 export const FAQSection = () => {
@@ -27,7 +29,14 @@ export const FAQSection = () => {
       <Accordion type="multiple" className="w-full">
         {FAQ_ITEMS.map((item, idx) => (
           <AccordionItem key={idx} value={idx.toString()}>
-            <AccordionTrigger className="justify-beetwen group gap-3 py-2 text-neutral-700">
+            <AccordionTrigger className="group justify-start gap-3 py-2 text-neutral-700 [&>svg:last-child]:hidden">
+              <Icon
+                icon={"line-md:chevron-down"}
+                className={cn(
+                  "transition-transform duration-200",
+                  "rotate-[-90deg] group-data-[state=open]:rotate-0",
+                )}
+              />
               <Heading
                 as="h3"
                 align="left"

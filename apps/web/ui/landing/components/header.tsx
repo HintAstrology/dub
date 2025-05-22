@@ -11,7 +11,7 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="ghost">
+          <Button className="!hover:bg-red" variant="ghost">
             <Link href="/login" className="text-neutral">
               <Text size="3" weight="medium">
                 Log In
