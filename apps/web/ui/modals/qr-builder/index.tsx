@@ -10,10 +10,10 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { Drawer } from "vaul";
 
 import useUser from "@/lib/swr/use-user.ts";
 import { UserProps } from "@/lib/types.ts";
+import { CustomMobileModal } from "@/ui/modals/custom-mobile-modal";
 import { DEFAULT_WEBSITE } from "@/ui/qr-builder/constants/qr-type-inputs-placeholders.ts";
 import { QrBuilder } from "@/ui/qr-builder/qr-builder";
 import { QRBuilderData, QrStorageData } from "@/ui/qr-builder/types/types.ts";
@@ -23,6 +23,7 @@ import QRIcon from "@/ui/shared/icons/qr.tsx";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface.ts";
 import { LoaderCircle } from "lucide-react";
+// import { IosScrollLock } from "react-ios-scroll-lock";
 
 type QRBuilderModalProps = {
   props?: QrStorageData;
@@ -110,19 +111,33 @@ export function QRBuilderModal({
 
   if (isMobile) {
     return (
-      <Drawer.Root
-        open={showQRBuilderModal}
-        onOpenChange={setShowQRBuilderModal}
-        dismissible={false}
-        repositionInputs={false}
+      // <IosScrollLock isOpen={showQRBuilderModal}>
+      <CustomMobileModal
+        isOpen={showQRBuilderModal}
+        onOpenChange={handleClose}
+        hideCloseButton={true}
+        // backdropClassName={`justify-end sm:justify-center items-center backdrop-blur-sm sm:bg-white/30 bg-black/40 bg-opacity-30 mt-14`}
+        // modalClassName={cn(
+        //   "w-full mx-3 p-5 px-4 rounded-xl rounded-b-none overflow-hidden",
+        // )}
+        // bodyClassName="overflow-x-hidden"
       >
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
-          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 flex !h-[100dvh] !max-h-[100dvh] !min-h-[100dvh] flex-col rounded-t-[10px] bg-white">
-            <div className="flex-1 overflow-y-auto">{modalContent}</div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+        {modalContent}
+      </CustomMobileModal>
+      // </IosScrollLock>
+      // <Drawer.Root
+      //   open={showQRBuilderModal}
+      //   onOpenChange={setShowQRBuilderModal}
+      //   dismissible={false}
+      //   repositionInputs={false}
+      // >
+      //   <Drawer.Portal>
+      //     <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
+      //     <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 flex !h-[100dvh] !max-h-[100dvh] !min-h-[100dvh] flex-col rounded-t-[10px] bg-white">
+      //       <div className="flex-1 overflow-y-auto">{modalContent}</div>
+      //     </Drawer.Content>
+      //   </Drawer.Portal>
+      // </Drawer.Root>
     );
   }
 
