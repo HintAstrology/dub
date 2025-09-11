@@ -36,7 +36,7 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
 
   try {
     const linkRows = await conn.execute(
-      `SELECT l.*, u.id as userId, u.email as userEmail,
+      `SELECT l.*, u.id as userId, u.email as userEmail, u.googleClickId as userGoogleClickId,
         (SELECT SUM(clicks) FROM Link WHERE userId = u.id) as totalUserClicks,
         qr.title as qrName
       FROM Link l 
@@ -51,7 +51,7 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
     console.log("Link", link);
 
     const featuresAccess = await checkFeaturesAccessAuthLess(link.userId, true);
-    
+
     const maxClicksForTest = 9;
     const maxClicksForRealFlow = 29;
     const maxClicks =
@@ -65,7 +65,7 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
         `${process.env.CUSTOMER_IO_SITE_ID}:${process.env.CUSTOMER_IO_TRACK_API_KEY}`,
       ).toString("base64");
 
-      const response = await fetch(
+      const customerIoResponse = await fetch(
         `https://track.customer.io/api/v1/customers/${link.userId}/events`,
         {
           method: "POST",
@@ -83,6 +83,22 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
         },
       );
 
+      const googleAdsResponse = await fetch(
+        `https://us-central1-getqr-data-dwh.cloudfunctions.net/getqr_googleads_capi?platform=production`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: link.userEmail,
+            user_id: link.userId,
+            scan_number: 30,
+            gclid: link?.userGoogleClickId,
+          }),
+        },
+      );
+
       // Send Mixpanel event via fetch
       const mixpanelResponse = await trackMixpanelApiService({
         event: EAnalyticEvents.TRIAL_EXPIRED,
@@ -94,15 +110,21 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
         },
       });
 
-      if (!response.ok) {
+      if (!customerIoResponse.ok) {
         throw new Error(
-          `CustomerIo request failed: ${response.status} ${await response.text()}`,
+          `CustomerIo request failed: ${customerIoResponse.status} ${await customerIoResponse.text()}`,
         );
       }
 
       if (!mixpanelResponse.ok) {
         throw new Error(
           `Mixpanel request failed: ${mixpanelResponse.status} ${await mixpanelResponse.text()}`,
+        );
+      }
+
+      if (!googleAdsResponse.ok) {
+        throw new Error(
+          `Google Ads request failed: ${googleAdsResponse.status} ${await googleAdsResponse.text()}`,
         );
       }
     }

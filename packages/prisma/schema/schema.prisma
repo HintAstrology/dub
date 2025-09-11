@@ -28,6 +28,7 @@ model User {
   defaultWorkspace String? // slug of the user's default workspace
   defaultPartnerId String? // the user's default partner ID
   dubPartnerId     String? // this user's dub partner ID
+  googleClickId    String? // Google Ads click identifier
 
   paymentData     Json?
 
