@@ -48,6 +48,9 @@ const CustomPrismaAdapter = (p: PrismaClient) => {
   return {
     ...PrismaAdapter(p),
     createUser: async (data: any) => {
+      const cookieStore = cookies();
+      const googleClickId = cookieStore.get("_gcl_aw")?.value;
+
       const { sessionId } = await getUserCookieService();
 
       const generatedUserId = sessionId ?? createId({ prefix: "user_" });
@@ -61,6 +64,7 @@ const CustomPrismaAdapter = (p: PrismaClient) => {
         email: data.email,
         name: data?.name,
         image: data?.image,
+        ...(googleClickId && { googleClickId }),
       });
 
       if (qrDataToCreate) {

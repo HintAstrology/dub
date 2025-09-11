@@ -14,6 +14,7 @@ import { waitUntil } from "@vercel/functions";
 import { CustomerIOClient } from "core/lib/customerio/customerio.config.ts";
 import { getUserCookieService } from "core/services/cookie/user-session.service.ts";
 import { flattenValidationErrors } from "next-safe-action";
+import { cookies } from "next/headers";
 import { EAnalyticEvents } from "../../core/integration/analytic/interfaces/analytic.interface.ts";
 import { trackMixpanelApiService } from "../../core/integration/analytic/services/track-mixpanel-api.service.ts";
 import { createQrWithLinkUniversal } from "../api/qrs/create-qr-with-link-universal";
@@ -80,6 +81,9 @@ export const createUserAccountAction = actionClient
       );
     }
 
+    const cookieStore = cookies();
+    const googleClickId = cookieStore.get("_gcl_aw")?.value;
+
     const { sessionId } = await getUserCookieService();
     const generatedUserId = sessionId ?? createId({ prefix: "user_" });
 
@@ -106,6 +110,7 @@ export const createUserAccountAction = actionClient
         email,
         code,
         password,
+        ...(googleClickId && { googleClickId }),
       });
       workspace = response.workspace;
       createdUser = response.user;
