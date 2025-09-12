@@ -83,22 +83,6 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
         },
       );
 
-      const googleAdsResponse = await fetch(
-        `https://us-central1-getqr-data-dwh.cloudfunctions.net/getqr_googleads_capi?platform=production`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: link.userEmail,
-            user_id: link.userId,
-            scan_number: 30,
-            gclid: link?.userGoogleClickId,
-          }),
-        },
-      );
-
       // Send Mixpanel event via fetch
       const mixpanelResponse = await trackMixpanelApiService({
         event: EAnalyticEvents.TRIAL_EXPIRED,
@@ -109,6 +93,23 @@ const sendScanLimitReachedEvent = async (linkId: string) => {
           timestamp: new Date().toISOString(),
         },
       });
+
+      const googleAdsResponse = await fetch(
+        `https://us-central1-getqr-data-dwh.cloudfunctions.net/getqr_googleads_capi?platform=production`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            event: EAnalyticEvents.TRIAL_EXPIRED,
+            email: link.userEmail,
+            user_id: link.userId,
+            scan_number: 30,
+            gclid: link?.userGoogleClickId,
+          }),
+        },
+      );
 
       if (!customerIoResponse.ok) {
         throw new Error(
