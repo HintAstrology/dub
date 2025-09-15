@@ -1,6 +1,9 @@
 "use client";
 
+import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
+import { Session } from "@/lib/auth/utils";
 import useQrs from "@/lib/swr/use-qrs.ts";
+import { UserProvider } from "@/ui/contexts/user";
 import { useQRBuilder } from "@/ui/modals/qr-builder";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal";
 import { useQrCustomization } from "@/ui/qr-builder/hooks/use-qr-customization.ts";
@@ -14,12 +17,10 @@ import { ShieldAlert } from "@dub/ui/icons";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Session } from '@/lib/auth/utils';
-import { UserProvider } from '@/ui/contexts/user';
 
 interface WorkspaceQRsClientProps {
   initialQrs: QrStorageData[];
-  featuresAccess: boolean;
+  featuresAccess: FeaturesAccess;
   user: Session["user"];
 }
 
@@ -39,19 +40,27 @@ export default function WorkspaceQRsClient({
   );
 }
 
-function WorkspaceQRs({ initialQrs, featuresAccess }: { initialQrs: QrStorageData[], featuresAccess: boolean }) {
+function WorkspaceQRs({
+  initialQrs,
+  featuresAccess,
+}: {
+  initialQrs: QrStorageData[];
+  featuresAccess: FeaturesAccess;
+}) {
   const router = useRouter();
   const { isValidating } = useQrs({}, {}, true); // listenOnly mode
 
   const { CreateQRButton, QRBuilderModal } = useQRBuilder();
-  
+
+  const { isTrialOver, existingSubscriptionNotPaid } = featuresAccess;
+
   return (
     <>
       <QRBuilderModal />
 
       <div className="flex w-full items-center pt-2">
         <MaxWidthWrapper className="flex flex-col gap-y-3">
-          {!featuresAccess && (
+          {!featuresAccess.featuresAccess && (
             <div className="w-full rounded-lg border border-red-200 bg-red-100">
               <div className="px-3 py-3 md:px-4">
                 <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -70,8 +79,9 @@ function WorkspaceQRs({ initialQrs, featuresAccess }: { initialQrs: QrStorageDat
                       <ShieldAlert className="h-5 w-5 shrink-0 text-red-500 md:h-6 md:w-6" />
                     </motion.div>
                     <p className="text-center text-sm font-medium text-red-700 md:text-left">
-                      Your dynamic QR codes are temporarily deactivated. To
-                      restore them, please upgrade to one of our plans.
+                      {isTrialOver && !existingSubscriptionNotPaid
+                        ? "Free trial expired.** Your dynamic QR codes are paused."
+                        : "Your dynamic QR codes are temporarily deactivated. To restore them, please upgrade to one of our plans."}
                     </p>
                   </div>
                   <motion.div
@@ -93,7 +103,7 @@ function WorkspaceQRs({ initialQrs, featuresAccess }: { initialQrs: QrStorageDat
               </div>
             </div>
           )}
-          {featuresAccess && (
+          {featuresAccess.featuresAccess && (
             <div className="flex flex-wrap items-center justify-between gap-2 lg:flex-nowrap">
               <div className="flex w-full grow gap-2 md:w-auto">
                 <div className="grow basis-0 md:grow-0">
@@ -119,8 +129,10 @@ function WorkspaceQRs({ initialQrs, featuresAccess }: { initialQrs: QrStorageDat
 
       <div className="mt-3">
         <QrCodesContainer
-          CreateQrCodeButton={featuresAccess ? CreateQRButton : () => <></>}
-          featuresAccess={featuresAccess}
+          CreateQrCodeButton={
+            featuresAccess.featuresAccess ? CreateQRButton : () => <></>
+          }
+          featuresAccess={featuresAccess.featuresAccess}
           initialQrs={initialQrs}
         />
       </div>

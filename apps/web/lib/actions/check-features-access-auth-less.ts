@@ -7,7 +7,7 @@ export type FeaturesAccess = {
   featuresAccess: boolean;
   isTrialOver: boolean;
   isSubscribed: boolean;
-  subscriptionNotPaid: boolean;
+  existingSubscriptionNotPaid: boolean;
 };
 
 export const checkFeaturesAccessAuthLess = async (
@@ -28,7 +28,7 @@ export const checkFeaturesAccessAuthLess = async (
       featuresAccess: false,
       isTrialOver: true,
       isSubscribed: false,
-      subscriptionNotPaid: true,
+      existingSubscriptionNotPaid: true,
     };
   }
 
@@ -56,6 +56,6 @@ export const checkFeaturesAccessAuthLess = async (
     featuresAccess: isSubscribed || !isTrialOver,
     isTrialOver,
     isSubscribed,
-    subscriptionNotPaid: !!subscriptionId && !isSubscribed,
+    existingSubscriptionNotPaid: !!subscriptionId && !isSubscribed,
   } as FeaturesAccess;
 };

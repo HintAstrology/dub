@@ -2,7 +2,7 @@
 
 import { useTrialStatus } from "@/lib/contexts/trial-status-context";
 import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal";
-import { useRouterStuff } from "@dub/ui";
+import { Button, useRouterStuff } from "@dub/ui";
 import { Gear2 } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { Icon, Icon as IconifyIcon } from "@iconify/react";
@@ -237,6 +237,14 @@ export function AppSidebarNav({
         toolContent={toolContent}
         newsContent={newsContent}
         switcher={<WorkspaceDropdown />}
+        bottom={
+          <div className="border-width-2 m-4 flex flex-col gap-2 border border-orange-600 bg-orange-100 px-4 py-4 text-center">
+            <span>[x] days remaining</span>
+            <Button className="text-bold text-white" text="Upgrade">
+              Upgrade
+            </Button>
+          </div>
+        }
       />
     </>
   );

@@ -21,8 +21,6 @@ import { compareDesc } from "date-fns/compareDesc";
 import { parseISO } from "date-fns/parseISO";
 import { IDataRes } from "../../../../interfaces/common.interface.ts";
 
-const activeStatuses = ["active", "trial", "scheduled_for_cancellation"];
-
 // create system token onboarding
 export const createSystemTokenOnboarding = async (
   body: ICreateSystemTokenOnboardingBody,
@@ -117,6 +115,15 @@ export const getSystemUserDataByEmail = async (
 export const checkSystemSubscriptionStatus = async (
   body: ICheckSystemSubscriptionStatusBody,
 ) => {
+  const activeStatuses = [
+    "active",
+    "trial",
+    "dunning",
+    "pre_active",
+    "pre_renew",
+    "scheduled_for_cancellation",
+  ];
+
   try {
     const data = await getSystemUserDataByEmail(body);
 
