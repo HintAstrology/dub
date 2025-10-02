@@ -1,9 +1,8 @@
 import QRCodeStyling, { Options } from "qr-code-styling";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BLACK_COLOR, WHITE_COLOR } from "../constants/customization/colors";
 import { FRAMES } from "../constants/customization/frames";
 import {
-  convertSvgUrlToBase64,
   getSuggestedLogoSrc,
   mapCustomizationToQROptions,
 } from "../helpers/qr-style-mappers";
@@ -16,7 +15,7 @@ interface UseQRCodeStylingOptions {
 
 export const useQRCodeStyling = ({
   customizationData,
-  defaultData = "https://getqr.com/qr-complete-setup"
+  defaultData = "https://getqr.com/qr-complete-setup",
 }: UseQRCodeStylingOptions) => {
   const [qrCode, setQrCode] = useState<QRCodeStyling | null>(null);
   const [options, setOptions] = useState<Options>(() => {
@@ -25,10 +24,10 @@ export const useQRCodeStyling = ({
       defaultData,
     );
 
-    return {
+    const finalOptions: Options = {
       width: 300,
       height: 300,
-      type: "svg",
+      type: "svg" as const,
       margin: 10,
       qrOptions: {
         typeNumber: 0,
@@ -43,17 +42,19 @@ export const useQRCodeStyling = ({
       },
       ...initialMappedOptions,
     };
+
+    return finalOptions;
   });
 
   // Create stable references to track deep changes in customization data
-  const customizationDataString = useMemo(() =>
-    JSON.stringify(customizationData),
-    [customizationData]
+  const customizationDataString = useMemo(
+    () => JSON.stringify(customizationData),
+    [customizationData],
   );
 
-  const frameDataString = useMemo(() =>
-    JSON.stringify(customizationData.frame),
-    [customizationData.frame]
+  const frameDataString = useMemo(
+    () => JSON.stringify(customizationData.frame),
+    [customizationData.frame],
   );
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export const useQRCodeStyling = ({
     const newOptions: Options = {
       width: 300,
       height: 300,
-      type: "svg",
+      type: "svg" as const,
       margin: 10,
       qrOptions: {
         typeNumber: 0,
@@ -88,39 +89,72 @@ export const useQRCodeStyling = ({
       ...mappedOptions,
     };
 
-    if (
-      customizationData.logo.type === "uploaded" &&
-      customizationData.logo.file
-    ) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result as string;
-        newOptions.image = base64;
-        setOptions(newOptions);
-        qrCode.update(newOptions);
-      };
-      reader.readAsDataURL(customizationData.logo.file);
-      return;
+    // Handle logo rendering
+    if (customizationData.logo.type === "uploaded") {
+      if (customizationData.logo.file) {
+        // Use blob URL for temporary preview (before upload completes)
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          newOptions.image = base64;
+          setOptions(newOptions);
+          qrCode.update(newOptions);
+        };
+        reader.readAsDataURL(customizationData.logo.file);
+        return;
+      } else if (customizationData.logo.fileId) {
+        // Construct full R2 URL for uploaded logo using fileId
+        // Use same pattern as QR content files: /qrs-content/{fileId}
+        const storageBaseUrl =
+          process.env.NEXT_PUBLIC_STORAGE_BASE_URL ||
+          "https://dev-assets.getqr.com";
+        newOptions.image = `${storageBaseUrl}/qrs-content/${customizationData.logo.fileId}`;
+      } else {
+        newOptions.image = "";
+      }
     } else if (
       customizationData.logo.type === "suggested" &&
       customizationData.logo.id &&
       customizationData.logo.id !== "logo-none"
     ) {
-      const logoSrc = getSuggestedLogoSrc(customizationData.logo.id);
+      // Use iconSrc if available (from logo selection), otherwise lookup from logo constant
+      const logoSrc =
+        customizationData.logo.iconSrc ||
+        getSuggestedLogoSrc(customizationData.logo.id);
+
       if (logoSrc) {
-        convertSvgUrlToBase64(logoSrc).then((base64) => {
-          if (base64) {
+        // Convert SVG to base64 to avoid CORS and 404 issues
+        fetch(logoSrc)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch logo: ${response.statusText}`);
+            }
+            return response.text();
+          })
+          .then((svgText) => {
+            // Convert SVG to base64 data URL
+            const base64 = `data:image/svg+xml;base64,${btoa(svgText)}`;
             newOptions.image = base64;
             setOptions(newOptions);
             qrCode.update(newOptions);
-          }
-        });
+          })
+          .catch((error) => {
+            // Logo failed to load, render QR without logo
+            console.warn(
+              `Logo failed to load: ${logoSrc}. Rendering QR code without logo.`,
+              error,
+            );
+            newOptions.image = "";
+            setOptions(newOptions);
+            qrCode.update(newOptions);
+          });
+        // Don't update yet, wait for fetch to complete
         return;
       } else {
-        newOptions.image = undefined;
+        newOptions.image = "";
       }
     } else {
-      newOptions.image = undefined;
+      newOptions.image = "";
     }
 
     setOptions(newOptions);

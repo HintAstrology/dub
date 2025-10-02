@@ -7,19 +7,19 @@ export type TDestinationData = string | null;
 export type TQrType = EQRType | null;
 
 // Import form data types
+import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step.tsx";
+import { RefObject } from "react";
 import {
+  TAppLinkQRFormData,
+  TFeedbackQRFormData,
+  TImageQRFormData,
+  TPdfQRFormData,
+  TSocialQRFormData,
+  TVideoQRFormData,
   TWebsiteQRFormData,
   TWhatsappQRFormData,
   TWifiQRFormData,
-  TPdfQRFormData,
-  TImageQRFormData,
-  TVideoQRFormData,
-  TSocialQRFormData,
-  TAppLinkQRFormData,
-  TFeedbackQRFormData,
 } from "../validation/schemas";
-import {RefObject} from "react";
-import {QRContentStepRef} from "@/ui/qr-builder-new/components/qr-content-step.tsx";
 import { IQRCustomizationData } from "./customization";
 
 export type TQRFormData =
@@ -44,6 +44,11 @@ export interface IQrBuilderContextType {
   formData: TQRFormData | null;
   currentFormValues: Record<string, any>;
 
+  // Processing states
+  isProcessing: boolean;
+  isFileUploading: boolean;
+  isFileProcessing: boolean;
+
   // Customization states
   customizationData: IQRCustomizationData;
   customizationActiveTab: string;
@@ -52,9 +57,12 @@ export interface IQrBuilderContextType {
   isTypeStep: boolean;
   isContentStep: boolean;
   isCustomizationStep: boolean;
+  isEditMode: boolean;
+  homepageDemo?: boolean;
 
   // Methods
-  onSave: () => void;
+  onSave: () => Promise<void>;
+  onDownload?: (data: any) => Promise<void>;
   handleNextStep: () => void;
   handleChangeStep: (step: number) => void;
   handleSelectQRType: (type: EQRType) => void;
@@ -70,12 +78,14 @@ export interface IQrBuilderContextType {
   setBuilderStep: (state: TStepState) => void;
   setDestinationData: (data: TDestinationData) => void;
   setSelectedQrType: (type: TQrType) => void;
+  setIsFileUploading: (uploading: boolean) => void;
+  setIsFileProcessing: (processing: boolean) => void;
 
   // Buttons
-  handleContinue: () => void;
+  handleContinue: () => Promise<void>;
   handleBack: () => void;
 
   // Refs
   contentStepRef: RefObject<QRContentStepRef>;
-  qrBuilderButtonsWrapperRef:RefObject<HTMLDivElement>
+  qrBuilderButtonsWrapperRef: RefObject<HTMLDivElement>;
 }

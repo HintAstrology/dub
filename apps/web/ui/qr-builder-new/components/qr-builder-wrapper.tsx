@@ -1,32 +1,29 @@
+import { QrBuilderButtons } from "@/ui/qr-builder-new/components/qr-builder-buttons.tsx";
 import { QRBuilderInner } from "@/ui/qr-builder-new/components/qr-builder-inner.tsx";
 import { QRBuilderSteps } from "@/ui/qr-builder-new/components/qr-builder-steps.tsx";
 import { QR_BUILDER_STEP_TITLES } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
-import { useQrBuilder } from "@/ui/qr-builder-new/context";
-import { useIsInViewport } from "@/ui/qr-builder-new/hooks/use-is-in-viewport";
-import { QrBuilderButtons } from "@/ui/qr-builder/components/qr-builder-buttons.tsx";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
 import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils/src";
 import { Heading } from "@radix-ui/themes";
-import React from "react";
 
 export const QRBuilderWrapper = () => {
   const {
     builderStep,
     handleBack,
     handleContinue,
-    isCustomizationStep,
-    handleChangeStep,
-    onSave,
-    qrBuilderButtonsWrapperRef,
     isTypeStep,
-  } = useQrBuilder();
+    homepageDemo,
+    isProcessing,
+    isFileUploading,
+    isFileProcessing,
+    currentFormValues,
+    customizationData,
+  } = useQrBuilderContext();
+
+  const logoData = customizationData.logo;
 
   const { isMobile } = useMediaQuery();
-
-  const navigationButtonsInViewport = useIsInViewport(
-    qrBuilderButtonsWrapperRef,
-    0.6,
-  );
 
   return (
     <div
@@ -50,20 +47,15 @@ export const QRBuilderWrapper = () => {
             onBack={handleBack}
             onContinue={handleContinue}
             isEdit={false}
-            isProcessing={false}
-            homePageDemo={isCustomizationStep}
+            isProcessing={isProcessing}
+            isFileUploading={isFileUploading}
+            isFileProcessing={isFileProcessing}
+            homepageDemo={homepageDemo}
+            currentFormValues={currentFormValues}
+            logoData={logoData}
           />
         </div>
       )}
-
-      {/*{!isMobile && !navigationButtonsInViewport && isCustomizationStep && (*/}
-      {/*  <div className="fixed bottom-6 right-6 z-50">*/}
-      {/*    <QrTabsDownloadButton*/}
-      {/*      onRegistrationClick={onSave}*/}
-      {/*      isQrDisabled={false}*/}
-      {/*    />*/}
-      {/*  </div>*/}
-      {/*)}*/}
     </div>
   );
 };

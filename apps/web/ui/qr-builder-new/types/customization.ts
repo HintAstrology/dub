@@ -9,10 +9,10 @@ export interface IQRCustomizationData {
   style: IStyleData;
 
   // QR Shape settings
-  shape: IShapeData
+  shape: IShapeData;
 
   // Logo settings
-  logo: ILogoData
+  logo: ILogoData;
 }
 
 // Individual section data types
@@ -36,8 +36,10 @@ export interface IShapeData {
 
 export interface ILogoData {
   type: "none" | "suggested" | "uploaded";
-  id?: string;
-  file?: File;
+  id?: string; // For suggested logos, this is the logo ID. For uploaded logos, this is the fileId from upload
+  iconSrc?: string; // For suggested logos, the src path from the imported SVG
+  fileId?: string; // File ID from upload service for uploaded logos
+  file?: File; // Temporary File object before upload (client-side only, not serialized)
 }
 
 // Style option interface for pickers
@@ -46,13 +48,16 @@ export interface IStyleOption {
   type: string;
   icon: any; // React component or image
   defaultTextColor?: string;
-  extension?: (qr: SVGSVGElement, options: {
-    width: number;
-    height: number;
-    frameColor: string;
-    frameTextColor: string;
-    frameText: string;
-  }) => Promise<void>;
+  extension?: (
+    qr: SVGSVGElement,
+    options: {
+      width: number;
+      height: number;
+      frameColor: string;
+      frameTextColor: string;
+      frameText: string;
+    },
+  ) => Promise<void>;
 }
 
 // Default values

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, forwardRef, useImperativeHandle, useEffect } from "react";
-import { useQrBuilder } from "../context/qr-builder-context";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { useQrBuilderContext } from "../context/qr-builder-context";
 import { QrFormResolver } from "../forms/qr-form-resolver.tsx";
 import { QRFormRef } from "../forms/types";
 
@@ -10,7 +10,12 @@ export interface QRContentStepRef {
 }
 
 export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
-  const { selectedQrType, handleFormSubmit, formData, updateCurrentFormValues } = useQrBuilder();
+  const {
+    selectedQrType,
+    handleFormSubmit,
+    formData,
+    updateCurrentFormValues,
+  } = useQrBuilderContext();
   const formRef = useRef<QRFormRef>(null);
 
   useImperativeHandle(ref, () => ({
@@ -22,13 +27,12 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
     },
   }));
 
-  // Watch form values and update context for real-time demo updates
   useEffect(() => {
     if (formRef.current?.form) {
       const subscription = formRef.current.form.watch((values) => {
         updateCurrentFormValues(values);
       });
-      
+
       return () => subscription.unsubscribe();
     }
   }, [selectedQrType, updateCurrentFormValues]);
@@ -42,11 +46,11 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
   }
 
   return (
-      <QrFormResolver
-        ref={formRef}
-        qrType={selectedQrType}
-        onSubmit={handleFormSubmit}
-        defaultValues={formData || undefined}
-      />
+    <QrFormResolver
+      ref={formRef}
+      qrType={selectedQrType}
+      onSubmit={handleFormSubmit}
+      defaultValues={formData || undefined}
+    />
   );
 });

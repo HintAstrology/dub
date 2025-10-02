@@ -4,7 +4,7 @@ import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { Session } from "@/lib/auth/utils";
 import useQrs from "@/lib/swr/use-qrs.ts";
 import { UserProvider } from "@/ui/contexts/user";
-import { useQRBuilder } from "@/ui/modals/qr-builder";
+import { CreateQRButton, QRBuilderModal } from "@/ui/modals/qr-builder-new";
 import { useTrialOfferWithQRPreviewModal } from "@/ui/modals/trial-offer-with-qr-preview";
 import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import QrCodeSort from "@/ui/qr-code/qr-code-sort.tsx";
@@ -18,7 +18,7 @@ import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.i
 import { ICustomerBody } from "core/integration/payment/config";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface WorkspaceQRsClientProps {
   initialQrs: QrStorageData[];
@@ -63,12 +63,14 @@ function WorkspaceQRs({
 }) {
   const router = useRouter();
   const { isValidating } = useQrs({}, {}, true); // listenOnly mode
-
-  const { CreateQRButton, QRBuilderModal } = useQRBuilder();
+  const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
 
   return (
     <>
-      <QRBuilderModal />
+      <QRBuilderModal
+        showModal={showQRBuilderModal}
+        setShowModal={setShowQRBuilderModal}
+      />
 
       <div className="flex w-full items-center pt-2">
         <MaxWidthWrapper className="flex flex-col gap-y-3">
@@ -130,7 +132,7 @@ function WorkspaceQRs({
                 </div>
 
                 <div className="grow-0">
-                  <CreateQRButton />
+                  <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
                 </div>
               </div>
             </div>
@@ -140,7 +142,13 @@ function WorkspaceQRs({
 
       <div className="mt-3">
         <QrCodesContainer
-          CreateQrCodeButton={featuresAccess ? CreateQRButton : () => <></>}
+          CreateQrCodeButton={
+            featuresAccess
+              ? () => (
+                  <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
+                )
+              : () => <></>
+          }
           featuresAccess={featuresAccess.featuresAccess}
           initialQrs={initialQrs}
           user={user}

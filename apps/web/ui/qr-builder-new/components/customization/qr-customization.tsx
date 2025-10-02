@@ -4,16 +4,16 @@ import { FC, useCallback } from "react";
 
 import { QR_STYLES_OPTIONS } from "../../constants/customization/qr-styles-options";
 import {
-  IQRCustomizationData,
   IFrameData,
-  IStyleData,
+  ILogoData,
+  IQRCustomizationData,
   IShapeData,
-  ILogoData
+  IStyleData,
 } from "../../types/customization";
 import { FrameSelector } from "./frame-selector";
-import { StyleSelector } from "./style-selector";
-import { ShapeSelector } from "./shape-selector";
 import { LogoSelector } from "./logo-selector";
+import { ShapeSelector } from "./shape-selector";
+import { StyleSelector } from "./style-selector";
 
 interface QRCustomizationProps {
   customizationData: IQRCustomizationData;
@@ -36,33 +36,47 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
 }) => {
   const isFrameSelected = customizationData.frame.id !== "frame-none";
 
-  const handleFrameChange = useCallback((frameData: IFrameData) => {
-    onCustomizationChange({
-      ...customizationData,
-      frame: frameData,
-    });
-  }, [customizationData, onCustomizationChange]);
+  const handleFrameChange = useCallback(
+    (frameData: IFrameData) => {
+      const updatedData = {
+        ...customizationData,
+        frame: frameData,
+      };
+      onCustomizationChange(updatedData);
+    },
+    [customizationData, onCustomizationChange],
+  );
 
-  const handleStyleChange = useCallback((styleData: IStyleData) => {
-    onCustomizationChange({
-      ...customizationData,
-      style: styleData,
-    });
-  }, [customizationData, onCustomizationChange]);
+  const handleStyleChange = useCallback(
+    (styleData: IStyleData) => {
+      onCustomizationChange({
+        ...customizationData,
+        style: styleData,
+      });
+    },
+    [customizationData, onCustomizationChange],
+  );
 
-  const handleShapeChange = useCallback((shapeData: IShapeData) => {
-    onCustomizationChange({
-      ...customizationData,
-      shape: shapeData,
-    });
-  }, [customizationData, onCustomizationChange]);
+  const handleShapeChange = useCallback(
+    (shapeData: IShapeData) => {
+      onCustomizationChange({
+        ...customizationData,
+        shape: shapeData,
+      });
+    },
+    [customizationData, onCustomizationChange],
+  );
 
-  const handleLogoChange = useCallback((logoData: ILogoData) => {
-    onCustomizationChange({
-      ...customizationData,
-      logo: logoData,
-    });
-  }, [customizationData, onCustomizationChange]);
+  const handleLogoChange = useCallback(
+    (logoData: ILogoData) => {
+      const updatedData = {
+        ...customizationData,
+        logo: logoData,
+      };
+      onCustomizationChange(updatedData);
+    },
+    [customizationData, onCustomizationChange],
+  );
 
   const frameSelector = (
     <FrameSelector
@@ -118,7 +132,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
               "data-[state=active]:bg-secondary-100 data-[state=active]:text-secondary",
               {
                 "cursor-not-allowed opacity-50": disabled,
-              }
+              },
             )}
             disabled={disabled}
           >

@@ -10,12 +10,18 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 import { EQRType } from "../constants/get-qr-config.ts";
 import {
+  convertServerQRToNewBuilder,
+  TNewQRBuilderData,
+  TQrServerData,
+} from "../helpers/data-converters";
+import {
   IQrBuilderContextType,
+  TDestinationData,
   TQRFormData,
   TQrType,
-  TDestinationData,
   TStepState,
 } from "../types/context";
 import {
@@ -31,24 +37,72 @@ const QrBuilderContext = createContext<IQrBuilderContextType | undefined>(
 // Provider props
 interface QrBuilderProviderProps {
   children: ReactNode;
+  initialQrData?: TQrServerData | null;
+  isEdit?: boolean;
+  homepageDemo?: boolean;
+  sessionId?: string;
+  onDownload?: (data: TNewQRBuilderData) => Promise<void>;
+  onSave?: (
+    builderData: TNewQRBuilderData,
+    originalQrData?: TQrServerData | null,
+  ) => Promise<any>;
 }
 
 // Provider component
-export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
+export function QrBuilderProvider({
+  children,
+  initialQrData,
+  isEdit = false,
+  homepageDemo = false,
+  sessionId,
+  onDownload,
+  onSave: onSaveProp,
+}: QrBuilderProviderProps) {
+  const getInitializedProps = useCallback(() => {
+    if (initialQrData) {
+      const builderData = convertServerQRToNewBuilder(initialQrData);
+      return {
+        qrTitle: builderData.title || "",
+        selectedQrType: builderData.qrType,
+        formData: builderData.formData,
+        customizationData: builderData.customizationData,
+        fileId: builderData.fileId,
+      };
+    }
+    return {
+      qrTitle: "",
+      selectedQrType: null,
+      formData: null,
+      customizationData: DEFAULT_QR_CUSTOMIZATION,
+      fileId: undefined,
+    };
+  }, [initialQrData]);
+
+  const initialState = getInitializedProps();
+
   const [builderStep, setBuilderStep] = useState<TStepState>(1);
   const [destinationData, setDestinationData] =
     useState<TDestinationData>(null);
-  const [selectedQrType, setSelectedQrType] = useState<TQrType>(null);
+  const [selectedQrType, setSelectedQrType] = useState<TQrType>(
+    initialState.selectedQrType,
+  );
   const [hoveredQRType, setHoveredQRType] = useState<EQRType | null>(null);
   const [typeSelectionError, setTypeSelectionError] = useState<string>("");
-  const [formData, setFormData] = useState<TQRFormData | null>(null);
+  const [formData, setFormData] = useState<TQRFormData | null>(
+    initialState.formData,
+  );
   const [currentFormValues, setCurrentFormValues] = useState<
     Record<string, any>
   >({});
 
+  // Processing states
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
+  const [isFileProcessing, setIsFileProcessing] = useState<boolean>(false);
+
   // Customization states
   const [customizationData, setCustomizationData] =
-    useState<IQRCustomizationData>(DEFAULT_QR_CUSTOMIZATION);
+    useState<IQRCustomizationData>(initialState.customizationData);
   const [customizationActiveTab, setCustomizationActiveTab] =
     useState<string>("Frame");
 
@@ -67,7 +121,6 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
       : selectedQrType;
   }, [isTypeStep, hoveredQRType, selectedQrType]);
 
-  // Step management methods
   const handleNextStep = useCallback(() => {
     // @ts-ignore
     setBuilderStep((prev) => Math.min(prev + 1, 3));
@@ -112,14 +165,104 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
     handleChangeStep(newStep);
   }, [builderStep, handleChangeStep]);
 
+  // Methods
+  const onSave = useCallback(async () => {
+    if (!selectedQrType || !formData) {
+      toast.error("Please complete all required fields");
+      return;
+    }
+
+    if (!onSaveProp) {
+      console.error("onSave prop not provided to QrBuilderProvider");
+      toast.error("Save functionality not configured");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const builderData: TNewQRBuilderData = {
+        qrType: selectedQrType,
+        formData,
+        customizationData,
+        title: initialState.qrTitle || `${selectedQrType} QR Code`,
+        fileId: (formData as any)?.fileId || initialState.fileId,
+      };
+
+      console.log("=== onSave in context ===");
+      console.log("customizationData being saved:", customizationData);
+      console.log("customizationData.logo:", customizationData.logo);
+
+      await onSaveProp(builderData, initialQrData);
+    } catch (error) {
+      console.error("Error saving QR:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [
+    selectedQrType,
+    formData,
+    customizationData,
+    initialState.qrTitle,
+    initialState.fileId,
+    initialQrData,
+    onSaveProp,
+  ]);
+
   const handleContinue = useCallback(async () => {
+    if (isCustomizationStep && homepageDemo && onDownload) {
+      if (!selectedQrType || !formData) {
+        toast.error("Please complete all required fields");
+        return;
+      }
+
+      const builderData: TNewQRBuilderData = {
+        qrType: selectedQrType,
+        formData,
+        customizationData,
+        title: initialState.qrTitle || `${selectedQrType} QR Code`,
+        fileId: (formData as any)?.fileId || initialState.fileId,
+      };
+
+      await onDownload(builderData);
+      return;
+    }
+
+    if (isCustomizationStep && !homepageDemo) {
+      await onSave();
+      return;
+    }
+
     if (isContentStep && contentStepRef.current) {
       const isValid = await contentStepRef.current.validateForm();
       if (!isValid) {
         return;
       }
+
+      // Save the current form values to formData state before moving to next step
+      if (currentFormValues && Object.keys(currentFormValues).length > 0) {
+        setFormData(currentFormValues as TQRFormData);
+        console.log(
+          "Saving form data before moving to customization step:",
+          currentFormValues,
+        );
+      }
     }
-  }, [isContentStep]);
+
+    // Move to next step
+    handleNextStep();
+  }, [
+    isContentStep,
+    isCustomizationStep,
+    homepageDemo,
+    onDownload,
+    selectedQrType,
+    formData,
+    customizationData,
+    onSave,
+    handleNextStep,
+    currentFormValues,
+  ]);
 
   const updateCurrentFormValues = useCallback((values: Record<string, any>) => {
     setCurrentFormValues(values);
@@ -130,18 +273,6 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
     setCustomizationData(data);
   }, []);
 
-  // Methods
-  const onSave = () => {
-    // TODO: Implement save logic
-    console.log("Save QR code:", {
-      builderStep,
-      destinationData,
-      selectedQrType,
-      formData,
-      customizationData,
-    });
-  };
-  console.log("NEW BUILDER - Customization Data:", customizationData);
   const contextValue: IQrBuilderContextType = {
     // States
     builderStep,
@@ -152,6 +283,10 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
     typeSelectionError,
     formData,
     currentFormValues,
+    // Processing states
+    isProcessing,
+    isFileUploading,
+    isFileProcessing,
 
     // Customization states
     customizationData,
@@ -161,9 +296,12 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
     isTypeStep,
     isContentStep,
     isCustomizationStep,
+    isEditMode: isEdit,
+    homepageDemo,
 
     // Methods
     onSave,
+    onDownload,
     handleNextStep,
     handleChangeStep,
     handleSelectQRType,
@@ -179,6 +317,8 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
     setBuilderStep,
     setDestinationData,
     setSelectedQrType,
+    setIsFileUploading,
+    setIsFileProcessing,
 
     //Buttons
     handleBack,
@@ -197,7 +337,7 @@ export function QrBuilderProvider({ children }: QrBuilderProviderProps) {
 }
 
 // Custom hook to use the context
-export function useQrBuilder(): IQrBuilderContextType {
+export function useQrBuilderContext(): IQrBuilderContextType {
   const context = useContext(QrBuilderContext);
 
   if (context === undefined) {
