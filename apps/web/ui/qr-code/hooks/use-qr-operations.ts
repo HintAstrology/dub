@@ -48,10 +48,16 @@ export const useQrOperations = () => {
         });
 
         if (res.status === 200) {
-          await mutatePrefix(["/api/qrs", "/api/links"]);
-
           const responseData = await res.json();
           const createdQrId = responseData?.createdQr?.id;
+
+          queryParams({
+            set: {
+              qrId: createdQrId,
+            },
+          });
+
+          await mutatePrefix(["/api/qrs", "/api/links"]);
 
           // Track QR created event
           const trackingParams = createQRTrackingParams(
@@ -85,7 +91,7 @@ export const useQrOperations = () => {
         return false;
       }
     },
-    [workspaceId, slug, user],
+    [workspaceId, slug, user, queryParams],
   );
 
   const updateQrWithOriginal = useCallback(

@@ -7,10 +7,11 @@ interface QRCanvasProps {
   height?: number;
   maxWidth?: number;
   minWidth?: number;
+  onCanvasReady?: () => void;
 }
 
 export const QRCanvas = forwardRef<HTMLCanvasElement, QRCanvasProps>(
-  ({ qrCode, width = 200, height = 200, maxWidth, minWidth = 100 }, ref) => {
+  ({ qrCode, width = 200, height = 200, maxWidth, minWidth = 100, onCanvasReady }, ref) => {
     const internalCanvasRef = useRef<HTMLCanvasElement>(null);
     const svgContainerRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +62,7 @@ export const QRCanvas = forwardRef<HTMLCanvasElement, QRCanvasProps>(
       svgContainerRef.current.style.display = "none";
 
       const renderSVGToCanvas = () => {
+        onCanvasReady?.();
         const svg = svgContainerRef.current?.querySelector("svg");
 
         if (!svg || !canvasRef.current) {
@@ -141,7 +143,7 @@ export const QRCanvas = forwardRef<HTMLCanvasElement, QRCanvasProps>(
         observer.disconnect();
         svgContainerRef.current?.replaceChildren();
       };
-    }, [qrCode, canvasRef, canvasSize.width, canvasSize.height]);
+    }, [qrCode, canvasRef, canvasSize.width, canvasSize.height, onCanvasReady]);
 
     return (
       <div ref={containerRef} className="flex w-full flex-col gap-4">

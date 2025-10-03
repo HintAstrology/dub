@@ -7,12 +7,14 @@ import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import { QRCardDetails } from "@/ui/qr-code/qr-code-card-details.tsx";
 import { QRCardTitle } from "@/ui/qr-code/qr-code-card-title.tsx";
 import { QrCardType } from "@/ui/qr-code/qr-code-card-type.tsx";
-import { Tooltip, useMediaQuery } from "@dub/ui";
+import { Tooltip, useMediaQuery, useRouterStuff } from "@dub/ui";
 import { cn, formatDateTime, timeAgo } from "@dub/utils";
 import { Text } from "@radix-ui/themes";
 import QRCodeStyling from "qr-code-styling";
-import { RefObject, useRef } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
+import { Session } from '@/lib/auth';
+import { useSearchParams } from 'next/navigation';
 
 interface QrCodeTitleColumnProps {
   user: Session["user"];
@@ -35,16 +37,37 @@ export function QrCodeTitleColumn({
 }: QrCodeTitleColumnProps) {
   const { domain, key, createdAt, shortLink, title } = qrCode?.link ?? {};
   const { isMobile, width } = useMediaQuery();
+  const searchParams = useSearchParams();
+  const { queryParams } = useRouterStuff();
+  const [readyCanvases, setReadyCanvases] = useState<number>(0);
+  
+  const handlePreviewCanvasReady = useCallback(() => {
+    setReadyCanvases((prev) => prev + 1);
+  }, []);
+
+  const handleTitleCanvasReady = useCallback(() => {
+    setReadyCanvases((prev) => prev + 1);
+  }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { QRPreviewModal, setShowQRPreviewModal } = useQRPreviewModal({
+  const { QRPreviewModal, setShowQRPreviewModal, handleOpenNewQr } = useQRPreviewModal({
     canvasRef,
     qrCode: builtQrCodeObject,
     qrCodeId: qrCode.id,
     width: isMobile ? 300 : 200,
     height: isMobile ? 300 : 200,
     user,
+    onCanvasReady: handlePreviewCanvasReady,
   });
+
+  useEffect(() => {
+    if (qrCode.id === searchParams.get("qrId") && readyCanvases === 2) {
+      handleOpenNewQr();
+      queryParams({
+        del: ["qrId"],
+      });
+    }
+  }, [qrCode.id, searchParams.get("qrId"), handleOpenNewQr, queryParams, readyCanvases]);
 
   return (
     <>
@@ -63,6 +86,7 @@ export function QrCodeTitleColumn({
               qrCode={builtQrCodeObject}
               width={100}
               height={100}
+              onCanvasReady={handleTitleCanvasReady}
             />
           </div>
           <QRStatusBadge
