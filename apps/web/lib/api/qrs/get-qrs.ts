@@ -18,7 +18,7 @@ export async function getQrs(
   }: {
     includeUser?: boolean;
     includeFile?: boolean;
-  } = {}
+  } = {},
 ) {
   // support legacy sort param
   if (sort && sort !== "createdAt") {
@@ -37,7 +37,7 @@ export async function getQrs(
   const needsLinkJoin = ["clicks", "lastClicked"].includes(actualSortBy);
 
   const dbStartTime = performance.now();
-  
+
   const qrs = await prisma.qr.findMany({
     where: {
       ...(search && {
@@ -62,6 +62,7 @@ export async function getQrs(
       archived: true,
       styles: true,
       frameOptions: true,
+      logoOptions: true,
       linkId: true,
       fileId: true,
       userId: true,
@@ -115,15 +116,15 @@ export async function getQrs(
 
   const dbEndTime = performance.now();
   const dbExecutionTime = Math.round(dbEndTime - dbStartTime);
-  
+
   console.log(`🗄️  Database Query Performance: ${dbExecutionTime}ms`);
   console.log(`📋 Query details:`, {
     userId,
-    search: search ? `"${search}"` : 'none',
+    search: search ? `"${search}"` : "none",
     sortBy: actualSortBy,
     page,
     pageSize,
-    resultsCount: qrs.length
+    resultsCount: qrs.length,
   });
 
   return qrs;
