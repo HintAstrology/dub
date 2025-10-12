@@ -17,11 +17,12 @@ import { BoxArchive, Download } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
-import { Delete, Palette, RefreshCw } from "lucide-react";
+import { Delete, Palette, RefreshCw, RotateCcw } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
 import { RefObject, useContext } from "react";
 import { ThreeDots } from "../shared/icons";
+import { useResetScansModal } from '../modals/reset-scans-modal';
 
 interface QrCodeControlsProps {
   qrCode: QrStorageData;
@@ -52,6 +53,9 @@ export function QrCodeControls({
     setOpenMenuQrCodeId(open ? qrCode.id : null);
   };
 
+  const { handleToggleModal: setShowResetScansModal, ResetScansModal } = useResetScansModal({
+    props: qrCode,
+  });
   const { setShowArchiveQRModal, ArchiveQRModal } = useArchiveQRModal({
     props: qrCode,
   });
@@ -171,6 +175,7 @@ export function QrCodeControls({
 
   return (
     <div className="flex flex-col-reverse items-end justify-end gap-2 lg:flex-row lg:items-center">
+      <ResetScansModal />
       <QRPreviewModal />
       <QRChangeTypeModal />
       <QRCustomizeModal />
@@ -236,6 +241,29 @@ export function QrCodeControls({
                   setShowQRCustomizeModal(true);
                 }}
                 icon={<Palette className="size-4" />}
+                className="h-9 w-full justify-start px-2 font-medium"
+                disabledTooltip={
+                  !canManageLink
+                    ? "You don't have permission to update this link."
+                    : undefined
+                }
+              />
+              <Button
+                text="Reset scans"
+                variant="outline"
+                onClick={() => {
+                  onActionClick("customize_qr");
+
+                  setOpenPopover(false);
+
+                  if (!featuresAccess) {
+                    setShowTrialExpiredModal?.(true);
+                    return;
+                  }
+
+                  setShowResetScansModal(true);
+                }}
+                icon={<RotateCcw className="size-4" />}
                 className="h-9 w-full justify-start px-2 font-medium"
                 disabledTooltip={
                   !canManageLink
