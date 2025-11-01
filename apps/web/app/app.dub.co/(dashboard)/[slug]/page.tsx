@@ -16,6 +16,9 @@ const WorkspaceQRsPage = async () => {
   const { user: authUser } = await getSession();
   const { sessionId, user } = await getUserCookieService();
 
+  console.log("NEXTAUTH_URL", process.env.NEXTAUTH_URL);
+  console.log("VERCEL_URL", process.env.VERCEL_URL);
+
   const qrs = await getQrs({
     userId: authUser.id,
     sort: "createdAt",
