@@ -8,6 +8,9 @@ import { NextPage } from "next";
 const MainPage: NextPage = async () => {
   const { sessionId } = await getUserCookieService();
 
+  console.log("NEXTAUTH_URL", process.env.NEXTAUTH_URL);
+  console.log("VERCEL_URL", process.env.VERCEL_URL);
+
   initRedis();
 
   return (
