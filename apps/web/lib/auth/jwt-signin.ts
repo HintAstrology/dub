@@ -113,6 +113,7 @@ export async function setServerAuthSession(userId: string): Promise<void> {
     console.log("nextAuthToken", nextAuthToken);
     console.log("user", user);
     console.log("VERCEL_DEPLOYMENT", VERCEL_DEPLOYMENT);
+    console.log("APP_URL", APP_URL);
 
     // Set the NextAuth session token cookie with EXACT same settings as NextAuth config
     cookieStore.set(
