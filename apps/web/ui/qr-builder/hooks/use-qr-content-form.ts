@@ -1,4 +1,4 @@
-import { EQRType } from "@/ui/qr-builder/constants/get-qr-config.ts";
+import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { getQRValidationSchema } from "@/ui/qr-builder/qr-validation-schema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";

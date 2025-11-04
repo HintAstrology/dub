@@ -3,7 +3,7 @@ import { isStored, storage } from "@/lib/storage";
 import { recordLink } from "@/lib/tinybird";
 import { ProcessedLinkProps } from "@/lib/types";
 import { propagateWebhookTriggerChanges } from "@/lib/webhook/update-webhook";
-import { EQRType } from "@/ui/qr-builder/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { prisma } from "@dub/prisma";
 import { Prisma } from "@dub/prisma/client";
 import {

@@ -2,10 +2,9 @@
 
 import { Session } from "@/lib/auth";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal";
+import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
-import { useQrCustomization } from "@/ui/qr-builder/hooks/use-qr-customization.ts";
-import { QRCanvas } from "@/ui/qr-builder/qr-canvas.tsx";
 import { QRCardDetails } from "@/ui/qr-code/qr-code-card-details.tsx";
 import { QRCardTitle } from "@/ui/qr-code/qr-code-card-title.tsx";
 import { QrCardType } from "@/ui/qr-code/qr-code-card-type.tsx";
@@ -15,13 +14,14 @@ import { Text } from "@radix-ui/themes";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeTitleColumnProps {
   user: Session["user"];
   qrCode: TQrStorageData;
-  builtQrCodeObject: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   currentQrTypeInfo: QRType;
   featuresAccess?: boolean;
   setShowTrialExpiredModal?: (show: boolean) => void;
@@ -30,33 +30,24 @@ interface IQrCodeTitleColumnProps {
 export function QrCodeTitleColumn({
   user,
   qrCode,
-  builtQrCodeObject,
+  qrCodeStylingInstance,
+  svgString,
   currentQrTypeInfo,
   featuresAccess,
   setShowTrialExpiredModal,
 }: IQrCodeTitleColumnProps) {
-  const { domain, key, createdAt, shortLink, title } = qrCode?.link ?? {};
-  const { isMobile, width } = useMediaQuery();
-  const [isPreviewCanvasReady, setIsPreviewCanvasReady] =
-    useState<boolean>(false);
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const modalCanvasRef = useRef<HTMLCanvasElement>(null);
+  const { createdAt } = qrCode?.link ?? {};
+  const { isMobile } = useMediaQuery();
+
   const { newQrId, setNewQrId } = useNewQrContext();
   const searchParams = useSearchParams();
   const { queryParams } = useRouterStuff();
 
-  const handleTitleCanvasReady = useCallback(() => {
-    setIsPreviewCanvasReady(true);
-  }, []);
-
-  // Create separate QRCodeStyling instance for the small preview canvas
-  const { qrCode: previewQrCodeObject } = useQrCustomization(qrCode);
-
   const containerRef = useRef<HTMLDivElement>(null);
   const { QRPreviewModal, setShowQRPreviewModal, handleOpenNewQr } =
     useQRPreviewModal({
-      canvasRef: modalCanvasRef,
-      qrCode: builtQrCodeObject,
+      qrCodeStylingInstance,
+      svgString,
       qrCodeId: qrCode.id,
       width: isMobile ? 300 : 200,
       height: isMobile ? 300 : 200,
@@ -73,28 +64,22 @@ export function QrCodeTitleColumn({
   }, [searchParams.get("onboarded"), handleOpenNewQr, queryParams]);
 
   useEffect(() => {
-    if (qrCode.id === searchParams.get("qrId") && isPreviewCanvasReady) {
+    if (qrCode.id === searchParams.get("qrId")) {
       handleOpenNewQr();
       queryParams({
         del: ["qrId"],
       });
     }
-  }, [
-    qrCode.id,
-    searchParams.get("qrId"),
-    handleOpenNewQr,
-    queryParams,
-    isPreviewCanvasReady,
-  ]);
+  }, [qrCode.id, searchParams.get("qrId"), handleOpenNewQr, queryParams]);
 
   useEffect(() => {
-    if (qrCode.id === newQrId && isPreviewCanvasReady) {
+    if (qrCode.id === newQrId) {
       setTimeout(() => {
         handleOpenNewQr();
         setNewQrId?.(null);
       }, 100);
     }
-  }, [qrCode.id, newQrId, setNewQrId, handleOpenNewQr, isPreviewCanvasReady]);
+  }, [qrCode.id, newQrId, setNewQrId, handleOpenNewQr]);
 
   return (
     <>
@@ -105,16 +90,14 @@ export function QrCodeTitleColumn({
       >
         <div className="flex flex-col gap-2">
           <div
-            className="cursor-pointer"
+            className="h-[100px] w-[100px] cursor-pointer"
             onClick={() => setShowQRPreviewModal(true)}
           >
             <QRCanvas
-              ref={previewCanvasRef}
-              qrCodeId={qrCode.id}
-              qrCode={previewQrCodeObject}
+              svgString={svgString}
               width={100}
               height={100}
-              onCanvasReady={handleTitleCanvasReady}
+              className="p-1"
             />
           </div>
           <QRStatusBadge

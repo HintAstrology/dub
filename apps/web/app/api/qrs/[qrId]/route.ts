@@ -10,7 +10,7 @@ import { updateQrBodySchema } from "@/lib/zod/schemas/qrs";
 import {
   EQRType,
   FILE_QR_TYPES,
-} from "@/ui/qr-builder/constants/get-qr-config";
+} from "@/ui/qr-builder-new/constants/get-qr-config";
 import { prisma } from "@dub/prisma";
 import { R2_URL } from "@dub/utils";
 import { NextResponse } from "next/server";

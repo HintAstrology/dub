@@ -32,11 +32,7 @@ export default function QrCodesContainer({
   initialQrs: TQrStorageData[];
   user: Session["user"];
 }) {
-  const {
-    viewMode,
-    sortBy,
-    // showArchived
-  } = useContext(QrCodesDisplayContext);
+  const { viewMode, sortBy } = useContext(QrCodesDisplayContext);
 
   const { qrs: clientQrs, isValidating } = useQrs(
     {
@@ -94,7 +90,6 @@ export const QrCodesListContext = createContext<{
 function QrCodesList({
   CreateQrCodeButton,
   qrCodes,
-  // count,
   loading,
   compact,
   featuresAccess,

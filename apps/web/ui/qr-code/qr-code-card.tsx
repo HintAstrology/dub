@@ -2,10 +2,9 @@ import { Session } from "@/lib/auth/utils";
 import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal.tsx";
 import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
-import { useQrCustomization } from "@/ui/qr-builder/hooks/use-qr-customization.ts";
 import { CardList } from "@dub/ui";
-import { useRef } from "react";
-import { QrCodeDetailsColumn } from "./qr-code-details-column.tsx";
+import { convertServerQRToNewBuilder } from "../qr-builder-new/helpers/data-converters.ts";
+import { useQRCodeStyling } from "../qr-builder-new/hooks/use-qr-code-styling.ts";
 import { QrCodeTitleColumn } from "./qr-code-title-column.tsx";
 
 export function QrCodeCard({
@@ -17,16 +16,17 @@ export function QrCodeCard({
   featuresAccess: boolean;
   user: Session["user"];
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { setShowTrialExpiredModal, TrialExpiredModalCallback } =
     useTrialExpiredModal();
 
-  const { qrCode: builtQrCodeObject, selectedQRType } =
-    useQrCustomization(qrCode);
+  const currentQrTypeInfo = QR_TYPES.find((item) => item.id === qrCode.qrType)!;
 
-  const currentQrTypeInfo = QR_TYPES.find(
-    (item) => item.id === selectedQRType,
-  )!;
+  const clientQrCode = convertServerQRToNewBuilder(qrCode);
+
+  const { qrCode: qrCodeInstance, svgString } = useQRCodeStyling({
+    customizationData: clientQrCode.customizationData,
+    defaultData: qrCode.link?.shortLink,
+  });
 
   return (
     <>
@@ -39,13 +39,14 @@ export function QrCodeCard({
           <QrCodeTitleColumn
             user={user}
             qrCode={qrCode}
-            builtQrCodeObject={builtQrCodeObject}
+            qrCodeStylingInstance={qrCodeInstance}
+            svgString={svgString}
             currentQrTypeInfo={currentQrTypeInfo}
             featuresAccess={featuresAccess}
             setShowTrialExpiredModal={setShowTrialExpiredModal}
           />
         </div>
-        <QrCodeDetailsColumn
+        {/* <QrCodeDetailsColumn
           user={user}
           qrCode={qrCode}
           canvasRef={canvasRef}
@@ -53,7 +54,7 @@ export function QrCodeCard({
           currentQrTypeInfo={currentQrTypeInfo}
           featuresAccess={featuresAccess}
           setShowTrialExpiredModal={setShowTrialExpiredModal}
-        />
+        /> */}
       </CardList.Card>
     </>
   );

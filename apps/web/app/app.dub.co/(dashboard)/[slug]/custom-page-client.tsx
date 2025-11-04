@@ -5,7 +5,6 @@ import { Session } from "@/lib/auth/utils";
 import useQrs from "@/lib/swr/use-qrs.ts";
 import { UserProvider } from "@/ui/contexts/user";
 import { CreateQRButton, QRBuilderModal } from "@/ui/modals/qr-builder-new";
-import { useTrialOfferWithQRPreviewModal } from "@/ui/modals/trial-offer-with-qr-preview";
 import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 import QrCodeSort from "@/ui/qr-code/qr-code-sort.tsx";
 import QrCodesContainer from "@/ui/qr-code/qr-codes-container.tsx";
@@ -13,12 +12,10 @@ import { QrCodesDisplayProvider } from "@/ui/qr-code/qr-codes-display-provider.t
 import { SearchBoxPersisted } from "@/ui/shared/search-box";
 import { Button, MaxWidthWrapper } from "@dub/ui";
 import { ShieldAlert } from "@dub/ui/icons";
-import { trackClientEvents } from "core/integration/analytic";
-import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import { ICustomerBody } from "core/integration/payment/config";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NewQrProvider } from "./helpers/new-qr-context";
 
 interface WorkspaceQRsClientProps {
@@ -153,43 +150,44 @@ function WorkspaceQRs({
     </>
   );
 }
-function TrialOfferWithQRPreviewWrapper({
-  initialQrs,
-  featuresAccess,
-  user,
-}: {
-  initialQrs: TQrStorageData[];
-  featuresAccess: FeaturesAccess;
-  user: ICustomerBody | null;
-}) {
-  const firstQr = initialQrs?.[0] || null;
-  const { isSubscribed } = featuresAccess;
 
-  const { TrialOfferWithQRPreviewModal, setShowTrialOfferModal } =
-    useTrialOfferWithQRPreviewModal({
-      user,
-      firstQr,
-    });
+// function TrialOfferWithQRPreviewWrapper({
+//   initialQrs,
+//   featuresAccess,
+//   user,
+// }: {
+//   initialQrs: TQrStorageData[];
+//   featuresAccess: FeaturesAccess;
+//   user: ICustomerBody | null;
+// }) {
+//   const firstQr = initialQrs?.[0] || null;
+//   const { isSubscribed } = featuresAccess;
 
-  useEffect(() => {
-    if (!isSubscribed) {
-      // TODO: uncomment this when we will prepare subscription for old users
-      // && !featuresAccess.subscriptionId,
+//   const { TrialOfferWithQRPreviewModal, setShowTrialOfferModal } =
+//     useTrialOfferWithQRPreviewModal({
+//       user,
+//       firstQr,
+//     });
 
-      setShowTrialOfferModal(true);
-    } else {
-      trackClientEvents({
-        event: EAnalyticEvents.PAGE_VIEWED,
-        params: {
-          page_name: "dashboard",
-          content_group: "my_qr_codes",
-          event_category: "Authorized",
-          email: user?.email,
-        },
-        sessionId: user?.id,
-      });
-    }
-  }, [isSubscribed]);
+//   useEffect(() => {
+//     if (!isSubscribed) {
+//       // TODO: uncomment this when we will prepare subscription for old users
+//       // && !featuresAccess.subscriptionId,
 
-  return <TrialOfferWithQRPreviewModal />;
-}
+//       setShowTrialOfferModal(true);
+//     } else {
+//       trackClientEvents({
+//         event: EAnalyticEvents.PAGE_VIEWED,
+//         params: {
+//           page_name: "dashboard",
+//           content_group: "my_qr_codes",
+//           event_category: "Authorized",
+//           email: user?.email,
+//         },
+//         sessionId: user?.id,
+//       });
+//     }
+//   }, [isSubscribed]);
+
+//   return <TrialOfferWithQRPreviewModal />;
+// }
