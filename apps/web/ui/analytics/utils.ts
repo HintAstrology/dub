@@ -59,3 +59,41 @@ export function useAnalyticsFilterOption(
     loading: !data || isLoading,
   };
 }
+
+export function useDownloadAnalyticsFiltered() {
+  const { cache } = useSWRConfig();
+  const { baseApiPath, queryString } =
+    useContext(AnalyticsContext);
+
+  const download = async (
+    fileFormat: 'csv' | 'xlsx',
+    options?: { cacheOnly?: boolean; filterKey?: string },
+  ): Promise<void> => {
+    const params = new URLSearchParams(
+      editQueryString(queryString, { groupBy: 'download' }),
+    );
+
+    if (options?.filterKey) {
+      params.delete(options.filterKey);
+    }
+
+    const cachePath = `${baseApiPath}/export_v2?${params.toString()}`;
+    const enabled = !options?.cacheOnly || [...cache.keys()].includes(cachePath);
+
+    if (!enabled) return;
+
+    const url = `${cachePath}&format=${fileFormat}`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Download failed');
+    const blob = await res.blob();
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `analytics.${fileFormat}`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  return { download };
+}

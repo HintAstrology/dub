@@ -223,6 +223,7 @@ export const analyticsQuerySchema = z
       .describe(
         "If true (clicks only), return 1 event per unique identity_hash.",
       ),
+      format: z.enum(["csv", "xlsx"]).optional()
   })
   .merge(utmTagsSchema);
 

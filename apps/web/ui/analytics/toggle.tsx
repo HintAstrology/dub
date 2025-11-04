@@ -62,7 +62,7 @@ import { AnalyticsContext } from "./analytics-provider";
 import ContinentIcon from "./continent-icon";
 import DeviceIcon from "./device-icon";
 import { useAnalyticsFilterOption } from "./utils";
-import { Switch } from '@radix-ui/themes';
+import AnalyticsExport from "./analytics-export";
 
 export default function Toggle({
   page = "analytics",
@@ -699,6 +699,7 @@ export default function Toggle({
                 <label htmlFor="unique">Unique Scans</label>
               </div>
             </div>
+            <AnalyticsExport />
           </div>
         </div>
       </div>
