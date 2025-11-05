@@ -21,10 +21,10 @@ export function QrCodeCard({
 
   const currentQrTypeInfo = QR_TYPES.find((item) => item.id === qrCode.qrType)!;
 
-  const clientQrCode = convertServerQRToNewBuilder(qrCode);
+  const qrBuilderData = convertServerQRToNewBuilder(qrCode);
 
   const { qrCode: qrCodeInstance, svgString } = useQRCodeStyling({
-    customizationData: clientQrCode.customizationData,
+    customizationData: qrBuilderData.customizationData,
     defaultData: qrCode.link?.shortLink,
   });
 

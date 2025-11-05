@@ -32,6 +32,7 @@ export const QRCardTitle: FC<IQRCardTitle> = ({
   return (
     <>
       <QRRenameModal />
+
       <Flex direction="row" gap="1" align="center" className="h-[26px] min-w-0">
         <span className="text-neutral min-w-0 truncate font-bold lg:font-medium lg:text-neutral-500">
           {displayValue}

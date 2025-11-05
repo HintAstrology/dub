@@ -84,6 +84,7 @@ export function QrCodeTitleColumn({
   return (
     <>
       <QRPreviewModal />
+
       <div
         ref={containerRef}
         className="flex h-full min-w-0 flex-row items-start gap-4"
