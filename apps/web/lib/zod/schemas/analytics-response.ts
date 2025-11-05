@@ -1,5 +1,6 @@
 import { TRIGGER_TYPES } from "@/lib/analytics/constants";
 import z from "@/lib/zod";
+import { EQRType } from "@/ui/qr-builder/constants/get-qr-config";
 import { CONTINENT_CODES, COUNTRY_CODES } from "@dub/utils";
 
 const analyticsTriggersResponse = z
@@ -359,6 +360,15 @@ export const analyticsResponse = {
         .default(0),
     })
     .openapi({ ref: "AnalyticsTopUrls" }),
+  top_types: z.object({
+    qr_type: z
+      .enum(Object.values(EQRType) as [string, ...string[]])
+      .describe("The type of QR code"),
+    clicks: z
+      .number()
+      .describe("The number of scans of this QR")
+      .default(0),
+  }),
 
   utm_sources: z
     .object({

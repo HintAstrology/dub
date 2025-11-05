@@ -69,7 +69,7 @@ export const AnalyticsContext = createContext<{
   basePath: "",
   baseApiPath: "",
   eventsApiPath: "",
-  selectedTab: "clicks",
+  selectedTab: "types",
   saleUnit: "saleAmount",
   view: "timeseries",
   domain: "",

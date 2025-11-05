@@ -31,6 +31,7 @@ type Endpoint =
   | "referer_urls"
   | "top_links"
   | "top_urls"
+  | "top_types"
   | "utm_sources"
   | "utm_mediums"
   | "utm_campaigns"
@@ -72,7 +73,7 @@ export const GET = withWorkspace(
     } = parsedParams;
 
     let link: Link | null = null;
-
+    
     event = (oldEvent || event) as EventType;
     groupBy = (oldType || groupBy) as EventType;
 
