@@ -15,6 +15,7 @@ import { SignUpEmail } from "./signup-email";
 import { SignUpOAuth } from "./signup-oauth";
 import { signIn } from 'next-auth/react';
 import { showMessage } from '../helpers';
+import slugify from "@sindresorhus/slugify";
 
 interface ISignUpFormProps {
   sessionId: string;
@@ -117,6 +118,14 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
 
         if (error === "email-exists") {
           if (signupMethod !== "email") {
+            const response = await signIn("credentials", {
+              email: email,
+              password: "defaultPassword12Secret",
+              redirect: false,
+            });
+            if (response?.ok) {
+              router.push(`/${slugify(email)}`);
+            }
             return;
           }
           const response = await signIn("email", {
