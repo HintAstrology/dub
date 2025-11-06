@@ -1,61 +1,38 @@
 import { Session } from "@/lib/auth/utils";
-import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal.tsx";
-import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 import { CardList } from "@dub/ui";
-import { convertServerQRToNewBuilder } from "../qr-builder-new/helpers/data-converters.ts";
-import { useQRCodeStyling } from "../qr-builder-new/hooks/use-qr-code-styling.ts";
-import { QrCodeTitleColumn } from "./qr-code-title-column.tsx";
+import { FC } from "react";
+import { QrBuilderProvider } from "../qr-builder-new/context/qr-builder-context.tsx";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters.ts";
+import { QrCodeCardInner } from "./qr-code-card-inner.tsx";
 
-export function QrCodeCard({
+interface IQrCodeCardProps {
+  qrCode: TQrServerData;
+  featuresAccess: boolean;
+  user: Session["user"];
+  setShowTrialExpiredModal: (show: boolean) => void;
+}
+
+export const QrCodeCard: FC<Readonly<IQrCodeCardProps>> = ({
   qrCode,
   featuresAccess,
   user,
-}: {
-  qrCode: TQrStorageData;
-  featuresAccess: boolean;
-  user: Session["user"];
-}) {
-  const { setShowTrialExpiredModal, TrialExpiredModalCallback } =
-    useTrialExpiredModal();
-
-  const currentQrTypeInfo = QR_TYPES.find((item) => item.id === qrCode.qrType)!;
-
-  const qrBuilderData = convertServerQRToNewBuilder(qrCode);
-
-  const { qrCode: qrCodeInstance, svgString } = useQRCodeStyling({
-    customizationData: qrBuilderData.customizationData,
-    defaultData: qrCode.link?.shortLink,
-  });
-
+  setShowTrialExpiredModal,
+}) => {
   return (
     <>
-      <TrialExpiredModalCallback />
       <CardList.Card
         key={qrCode.id}
         innerClassName="h-full flex items-center gap-5 sm:gap-8 text-sm"
       >
-        <div className="h-full min-w-0 grow">
-          <QrCodeTitleColumn
-            user={user}
+        <QrBuilderProvider initialQrData={qrCode} isEdit={true}>
+          <QrCodeCardInner
             qrCode={qrCode}
-            qrCodeStylingInstance={qrCodeInstance}
-            svgString={svgString}
-            currentQrTypeInfo={currentQrTypeInfo}
+            user={user}
             featuresAccess={featuresAccess}
             setShowTrialExpiredModal={setShowTrialExpiredModal}
           />
-        </div>
-        {/* <QrCodeDetailsColumn
-          user={user}
-          qrCode={qrCode}
-          canvasRef={canvasRef}
-          builtQrCodeObject={builtQrCodeObject}
-          currentQrTypeInfo={currentQrTypeInfo}
-          featuresAccess={featuresAccess}
-          setShowTrialExpiredModal={setShowTrialExpiredModal}
-        /> */}
+        </QrBuilderProvider>
       </CardList.Card>
     </>
   );
-}
+};

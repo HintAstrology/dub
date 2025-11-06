@@ -17,7 +17,7 @@ import {
   QR_NAME_PLACEHOLDERS,
 } from "../../constants/qr-type-inputs-placeholders";
 import { useQrBuilderContext } from "../../context";
-import { useQRFormData } from "../../hooks/use-qr-form-data";
+import { encodeQRData } from "../../helpers/qr-data-handlers.ts";
 import { TVideoQRFormData, videoQRSchema } from "../../validation/schemas";
 import { BaseFormField } from "./base-form-field.tsx";
 import { FileUploadField } from "./file-upload-field";
@@ -29,32 +29,26 @@ export interface VideoFormRef {
 }
 
 interface VideoFormProps {
-  onSubmit: (data: TVideoQRFormData & { encodedData: string; fileId?: string }) => void;
+  onSubmit: (
+    data: TVideoQRFormData & { encodedData: string; fileId?: string },
+  ) => void;
   defaultValues?: Partial<TVideoQRFormData>;
-  initialData?: {
-    qrType: EQRType;
-    data: string;
-    link?: { url: string; title?: string };
-    fileId?: string;
-  };
+  contentOnly?: boolean;
 }
 
 export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
-  ({ onSubmit, defaultValues, initialData }, ref) => {
-    const [fileId, setFileId] = useState<string>(initialData?.fileId!);
+  ({ onSubmit, defaultValues, contentOnly }, ref) => {
+    const { setIsFileUploading, setIsFileProcessing, initialQrData } =
+      useQrBuilderContext();
+
+    const [fileId, setFileId] = useState<string>(initialQrData?.fileId!);
     const openAccordion = "details";
-    const { setIsFileUploading, setIsFileProcessing } = useQrBuilderContext();
 
-    const { getDefaultValues, encodeFormData } = useQRFormData({
-      qrType: EQRType.VIDEO,
-      initialData,
-    });
-
-    const formDefaults = getDefaultValues({
+    const formDefaults = {
       qrName: "",
       filesVideo: [],
       ...defaultValues,
-    });
+    };
 
     const form = useForm<TVideoQRFormData>({
       resolver: zodResolver(videoQRSchema),
@@ -66,21 +60,21 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
       if (fileId) {
         form.setValue("fileId" as any, fileId);
       }
-    }, [fileId, form]);
+    }, [fileId]);
 
     useImperativeHandle(ref, () => ({
       validate: async () => {
         const result = await form.trigger();
         if (result) {
           const formData = form.getValues();
-          const encodedData = encodeFormData(formData, fileId);
+          const encodedData = encodeQRData(EQRType.VIDEO, formData, fileId);
           onSubmit({ ...formData, encodedData, fileId });
         }
         return result;
       },
       getValues: () => {
         const formData = form.getValues();
-        const encodedData = encodeFormData(formData, fileId);
+        const encodedData = encodeQRData(EQRType.VIDEO, formData, fileId);
         return { ...formData, encodedData, fileId };
       },
       form,
@@ -96,25 +90,29 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
           >
             <AccordionItem
               value="details"
-              className="border-none rounded-[20px] px-4 bg-[#fbfbfb]"
+              className="rounded-[20px] border-none bg-[#fbfbfb] px-4"
             >
-              <AccordionTrigger className="hover:no-underline pointer-events-none [&>svg]:hidden">
-                <div className="flex w-full items-center gap-3 text-left">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <VideoIcon className="h-5 w-5 text-primary" />
+              {!contentOnly && (
+                <AccordionTrigger className="pointer-events-none hover:no-underline [&>svg]:hidden">
+                  <div className="flex w-full items-center gap-3 text-left">
+                    <div className="bg-primary/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
+                      <VideoIcon className="text-primary h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-foreground text-base font-medium">
+                        Video
+                      </span>
+                      <span className="text-muted-foreground text-sm font-normal">
+                        Upload your video file and give a memorable name
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-foreground text-base font-medium">
-                      Video
-                    </span>
-                    <span className="text-muted-foreground text-sm font-normal">
-                      Upload your video file and give a memorable name
-                    </span>
-                  </div>
-                </div>
-              </AccordionTrigger>
-              {openAccordion === "details" && <Separator className="mb-3" />}
-              <AccordionContent className="pt-2 space-y-4">
+                </AccordionTrigger>
+              )}
+              {openAccordion === "details" && !contentOnly && (
+                <Separator className="mb-3" />
+              )}
+              <AccordionContent className="space-y-4 pt-2">
                 <FileUploadField
                   title="Video"
                   name="filesVideo"
@@ -125,15 +123,17 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
                   onUploadStateChange={setIsFileUploading}
                   onProcessingStateChange={setIsFileProcessing}
                 />
-                
-                <BaseFormField
-                  name="qrName"
-                  label="Name your QR Code"
-                  placeholder={QR_NAME_PLACEHOLDERS.VIDEO}
-                  tooltip="Only you can see this. It helps you recognize your QR codes later."
-                  initFromPlaceholder
-                  required={false}
-                />
+
+                {!contentOnly && (
+                  <BaseFormField
+                    name="qrName"
+                    label="Name your QR Code"
+                    placeholder={QR_NAME_PLACEHOLDERS.VIDEO}
+                    tooltip="Only you can see this. It helps you recognize your QR codes later."
+                    initFromPlaceholder
+                    required={false}
+                  />
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

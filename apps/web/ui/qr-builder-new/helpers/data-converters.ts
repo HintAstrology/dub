@@ -4,7 +4,6 @@ import { FRAMES } from "../constants/customization/frames";
 import { EQRType } from "../constants/get-qr-config";
 import { TQRFormData } from "../types/context";
 import { IFrameData, IQRCustomizationData } from "../types/customization";
-import { TQrStorageData } from "../types/database";
 import { encodeQRData, parseQRData } from "./qr-data-handlers";
 import {
   getCornerDotType,
@@ -53,6 +52,8 @@ export type TQRBuilderDataForStorage = {
  * Server response format - QR data from API
  */
 export type TQrServerData = {
+  createdAt?: string;
+  archived?: boolean;
   id: string;
   title: string;
   qrType: EQRType;
@@ -70,13 +71,15 @@ export type TQrServerData = {
     fileId?: string;
   };
   fileId?: string;
-  link?: {
+  file?: File;
+  link: {
     url: string;
     key: string;
     domain: string;
     tagId?: string | null;
     webhookIds?: string[];
     shortLink?: string;
+    clicks?: number;
   };
 };
 
@@ -398,7 +401,7 @@ export async function convertNewQRBuilderDataToServer(
  * Convert server QR data back to new builder format
  */
 export function convertServerQRToNewBuilder(
-  serverData: TQrServerData | TQrStorageData,
+  serverData: TQrServerData,
 ): TNewQRBuilderData {
   // Parse QR data to form data using qr-data-handlers
   const sourceData = serverData.link?.url || serverData.data;
@@ -473,7 +476,7 @@ import { TQRUpdateResult } from "../types/update";
  * Used for determining what changed and building the update request
  */
 export async function convertNewQRForUpdate(
-  originalQR: TQrStorageData,
+  originalQR: TQrServerData,
   newBuilderData: TNewQRBuilderData,
   options: {
     domain: string;

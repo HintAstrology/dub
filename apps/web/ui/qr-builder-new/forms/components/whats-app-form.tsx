@@ -11,13 +11,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { MessageCircle } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
-import { EQRType } from "../../constants/get-qr-config";
+import { EQRType } from "../../constants/get-qr-config.ts";
 import {
   QR_INPUT_PLACEHOLDERS,
   QR_NAME_PLACEHOLDERS,
 } from "../../constants/qr-type-inputs-placeholders";
-import { useQRFormData } from "../../hooks/use-qr-form-data";
-import { TWhatsappQRFormData, whatsappQRSchema } from "../../validation/schemas";
+import { encodeQRData } from "../../helpers/qr-data-handlers.ts";
+import {
+  TWhatsappQRFormData,
+  whatsappQRSchema,
+} from "../../validation/schemas";
 import { BaseFormField } from "./base-form-field.tsx";
 
 export interface WhatsAppFormRef {
@@ -29,28 +32,19 @@ export interface WhatsAppFormRef {
 interface WhatsAppFormProps {
   onSubmit: (data: TWhatsappQRFormData & { encodedData: string }) => void;
   defaultValues?: Partial<TWhatsappQRFormData>;
-  initialData?: {
-    qrType: EQRType;
-    data: string;
-    link?: { url: string; title?: string };
-  };
+  contentOnly?: boolean;
 }
 
 export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
-  ({ onSubmit, defaultValues, initialData }, ref) => {
+  ({ onSubmit, defaultValues, contentOnly }, ref) => {
     const openAccordion = "details";
 
-    const { getDefaultValues, encodeFormData } = useQRFormData({
-      qrType: EQRType.WHATSAPP,
-      initialData,
-    });
-
-    const formDefaults = getDefaultValues({
+    const formDefaults = {
       qrName: "",
       number: "",
       message: "",
       ...defaultValues,
-    });
+    };
 
     const form = useForm<TWhatsappQRFormData>({
       resolver: zodResolver(whatsappQRSchema),
@@ -62,14 +56,14 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
         const result = await form.trigger();
         if (result) {
           const formData = form.getValues();
-          const encodedData = encodeFormData(formData);
+          const encodedData = encodeQRData(EQRType.WEBSITE, formData);
           onSubmit({ ...formData, encodedData });
         }
         return result;
       },
       getValues: () => {
         const formData = form.getValues();
-        const encodedData = encodeFormData(formData);
+        const encodedData = encodeQRData(EQRType.WEBSITE, formData);
         return { ...formData, encodedData };
       },
       form,
@@ -85,24 +79,28 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
           >
             <AccordionItem
               value="details"
-              className="border-none rounded-[20px] px-4 bg-[#fbfbfb]"
+              className="rounded-[20px] border-none bg-[#fbfbfb] px-4"
             >
-              <AccordionTrigger className="hover:no-underline pointer-events-none [&>svg]:hidden">
-                <div className="flex w-full items-center gap-3 text-left">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/80 p-3 transition-all hover:bg-white hover:shadow-md">
-                    <MessageCircle className="h-5 w-5 text-primary" />
+              {!contentOnly && (
+                <AccordionTrigger className="pointer-events-none hover:no-underline [&>svg]:hidden">
+                  <div className="flex w-full items-center gap-3 text-left">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/80 p-3 transition-all hover:bg-white hover:shadow-md">
+                      <MessageCircle className="text-primary h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-foreground text-base font-medium">
+                        WhatsApp
+                      </span>
+                      <span className="text-muted-foreground text-sm font-normal">
+                        Provide your WhatsApp details and give a memorable name
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-foreground text-base font-medium">
-                      WhatsApp
-                    </span>
-                    <span className="text-muted-foreground text-sm font-normal">
-                      Provide your WhatsApp details and give a memorable name
-                    </span>
-                  </div>
-                </div>
-              </AccordionTrigger>
-              {openAccordion === "details" && <Separator className="mb-3" />}
+                </AccordionTrigger>
+              )}
+              {openAccordion === "details" && !contentOnly && (
+                <Separator className="mb-3" />
+              )}
               <AccordionContent className="pt-2">
                 <BaseFormField
                   name="number"
@@ -122,15 +120,16 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
                   required={false}
                 />
 
-                
-                <BaseFormField
-                  name="qrName"
-                  label="Name your QR Code"
-                  placeholder={QR_NAME_PLACEHOLDERS.WHATSAPP}
-                  tooltip="Only you can see this. It helps you recognize your QR codes later."
-                  initFromPlaceholder
-                  required={false}
-                />
+                {!contentOnly && (
+                  <BaseFormField
+                    name="qrName"
+                    label="Name your QR Code"
+                    placeholder={QR_NAME_PLACEHOLDERS.WHATSAPP}
+                    tooltip="Only you can see this. It helps you recognize your QR codes later."
+                    initFromPlaceholder
+                    required={false}
+                  />
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

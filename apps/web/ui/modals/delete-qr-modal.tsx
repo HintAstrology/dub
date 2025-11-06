@@ -1,4 +1,3 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
@@ -11,11 +10,12 @@ import {
   useMemo,
   useState,
 } from "react";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
 type DeleteQRModalProps = {
   showDeleteQRModal: boolean;
   setShowDeleteQRModal: Dispatch<SetStateAction<boolean>>;
-  props: QrStorageData;
+  props: TQrServerData;
 };
 
 function DeleteQRModal({
@@ -113,7 +113,7 @@ function DeleteQRModal({
   );
 }
 
-export function useDeleteQRModal({ props }: { props?: QrStorageData }) {
+export function useDeleteQRModal({ props }: { props?: TQrServerData }) {
   const [showDeleteQRModal, setShowDeleteQRModal] = useState(false);
 
   const DeleteLinkModalCallback = useCallback(() => {

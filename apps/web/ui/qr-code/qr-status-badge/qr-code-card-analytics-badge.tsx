@@ -1,6 +1,6 @@
 import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useShareDashboardModal } from "@/ui/modals/share-dashboard-modal.tsx";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { CardList, CursorRays, useMediaQuery } from "@dub/ui";
 import { cn, currencyFormatter, nFormatter } from "@dub/utils";
 import { Icon } from "@iconify/react";
@@ -11,11 +11,11 @@ export function QRCardAnalyticsBadge({
   qrCode,
   className,
 }: {
-  qrCode: TQrStorageData;
+  qrCode: TQrServerData;
   className?: string;
 }) {
   const { slug, plan } = useWorkspace();
-  const { domain, key, clicks } = qrCode.link;
+  const { domain, key, clicks } = qrCode.link ?? {};
 
   const { isMobile } = useMediaQuery();
   const { variant } = useContext(CardList.Context);

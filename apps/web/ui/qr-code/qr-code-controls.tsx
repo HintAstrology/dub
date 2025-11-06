@@ -2,9 +2,7 @@ import { Session } from "@/lib/auth/utils";
 import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useArchiveQRModal } from "@/ui/modals/archive-qr-modal.tsx";
 import { useDeleteQRModal } from "@/ui/modals/delete-qr-modal.tsx";
-import { useQRBuilder } from "@/ui/modals/qr-builder";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal.tsx";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import { QrCodesListContext } from "@/ui/qr-code/qr-codes-container.tsx";
 import { Button, Popover, useMediaQuery } from "@dub/ui";
 import { Download } from "@dub/ui/icons";
@@ -24,10 +22,11 @@ import { useRouter } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
 import { RefObject, useContext } from "react";
 import { useDuplicateQRModal } from "../modals/duplicate-qr-modal";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { ThreeDots } from "../shared/icons";
 
 interface QrCodeControlsProps {
-  qrCode: QrStorageData;
+  qrCode: TQrServerData;
   canvasRef: RefObject<HTMLCanvasElement>;
   builtQrCodeObject: QRCodeStyling | null;
   featuresAccess?: boolean;
@@ -67,29 +66,28 @@ export function QrCodeControls({
     props: qrCode,
   });
   const { QRPreviewModal, setShowQRPreviewModal } = useQRPreviewModal({
-    canvasRef,
-    qrCode: builtQrCodeObject,
+    qrCodeStylingInstance: builtQrCodeObject,
     width: isMobile ? 300 : 200,
     height: isMobile ? 300 : 200,
     qrCodeId: qrCode.id,
     user,
   });
 
-  const {
-    setShowQRBuilderModal: setShowQRTypeModal,
-    QRBuilderModal: QRChangeTypeModal,
-  } = useQRBuilder({
-    props: qrCode,
-    initialStep: 1,
-  });
+  // const {
+  //   setShowQRBuilderModal: setShowQRTypeModal,
+  //   QRBuilderModal: QRChangeTypeModal,
+  // } = useQRBuilder({
+  //   props: qrCode,
+  //   initialStep: 1,
+  // });
 
-  const {
-    setShowQRBuilderModal: setShowQRCustomizeModal,
-    QRBuilderModal: QRCustomizeModal,
-  } = useQRBuilder({
-    props: qrCode,
-    initialStep: 3, // design customization
-  });
+  // const {
+  //   setShowQRBuilderModal: setShowQRCustomizeModal,
+  //   QRBuilderModal: QRCustomizeModal,
+  // } = useQRBuilder({
+  //   props: qrCode,
+  //   initialStep: 3, // design customization
+  // });
 
   const onDownloadButtonClick = () => {
     trackClientEvents({
@@ -156,8 +154,8 @@ export function QrCodeControls({
     <div className="flex flex-col-reverse items-end justify-end gap-2 lg:flex-row lg:items-center">
       <DuplicateQRModal />
       <QRPreviewModal />
-      <QRChangeTypeModal />
-      <QRCustomizeModal />
+      {/* <QRChangeTypeModal />
+      <QRCustomizeModal /> */}
       <ArchiveQRModal />
       <DeleteLinkModal />
       {canvasRef && (
@@ -248,7 +246,7 @@ export function QrCodeControls({
                     setShowTrialExpiredModal?.(true);
                     return;
                   }
-                  setShowQRTypeModal(true);
+                  // setShowQRTypeModal(true);
                 }}
                 icon={<ArrowRightLeft className="size-4" />}
                 className="h-9 w-full justify-start px-2 font-medium"
@@ -266,7 +264,7 @@ export function QrCodeControls({
                     return;
                   }
 
-                  setShowQRCustomizeModal(true);
+                  // setShowQRCustomizeModal(true);
                 }}
                 icon={<Palette className="size-4" />}
                 className="h-9 w-full justify-start px-2 font-medium"

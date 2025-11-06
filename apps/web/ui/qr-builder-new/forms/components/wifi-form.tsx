@@ -14,7 +14,7 @@ import { WIFI_ENCRYPTION_TYPES } from "@/ui/qr-builder-new/constants/wifi-encryp
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Flex, Text } from "@radix-ui/themes";
 import { Info, Wifi } from "lucide-react";
-import { forwardRef, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import {
   Controller,
   FormProvider,
@@ -26,7 +26,7 @@ import {
   QR_INPUT_PLACEHOLDERS,
   QR_NAME_PLACEHOLDERS,
 } from "../../constants/qr-type-inputs-placeholders";
-import { useQRFormData } from "../../hooks/use-qr-form-data";
+import { encodeQRData } from "../../helpers/qr-data-handlers.ts";
 import { TWifiQRFormData, wifiQRSchema } from "../../validation/schemas";
 import { BaseFormField } from "./base-form-field.tsx";
 
@@ -39,30 +39,21 @@ export interface WiFiFormRef {
 interface WiFiFormProps {
   onSubmit: (data: TWifiQRFormData & { encodedData: string }) => void;
   defaultValues?: Partial<TWifiQRFormData>;
-  initialData?: {
-    qrType: EQRType;
-    data: string;
-    link?: { url: string; title?: string };
-  };
+  contentOnly?: boolean;
 }
 
 export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
-  ({ onSubmit, defaultValues, initialData }, ref) => {
+  ({ onSubmit, defaultValues, contentOnly }, ref) => {
     const openAccordion = "details";
 
-    const { getDefaultValues, encodeFormData } = useQRFormData({
-      qrType: EQRType.WIFI,
-      initialData,
-    });
-
-    const formDefaults = getDefaultValues({
+    const formDefaults: Partial<TWifiQRFormData> = {
       qrName: "",
       networkName: "",
       networkPassword: "",
       networkEncryption: "WPA",
       isHiddenNetwork: false,
       ...defaultValues,
-    });
+    };
 
     const form = useForm<TWifiQRFormData>({
       resolver: zodResolver(wifiQRSchema),
@@ -78,14 +69,14 @@ export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
         const result = await form.trigger();
         if (result) {
           const formData = form.getValues();
-          const encodedData = encodeFormData(formData);
+          const encodedData = encodeQRData(EQRType.WIFI, formData);
           onSubmit({ ...formData, encodedData });
         }
         return result;
       },
       getValues: () => {
         const formData = form.getValues();
-        const encodedData = encodeFormData(formData);
+        const encodedData = encodeQRData(EQRType.WIFI, formData);
         return { ...formData, encodedData };
       },
       form,
@@ -101,24 +92,28 @@ export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
           >
             <AccordionItem
               value="details"
-              className="border-none rounded-[20px] px-4 bg-[#fbfbfb]"
+              className="rounded-[20px] border-none bg-[#fbfbfb] px-4"
             >
-              <AccordionTrigger className="hover:no-underline pointer-events-none [&>svg]:hidden">
-                <div className="flex w-full items-center gap-3 text-left">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <Wifi className="h-5 w-5 text-primary" />
+              {!contentOnly && (
+                <AccordionTrigger className="pointer-events-none hover:no-underline [&>svg]:hidden">
+                  <div className="flex w-full items-center gap-3 text-left">
+                    <div className="bg-primary/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
+                      <Wifi className="text-primary h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-foreground text-base font-medium">
+                        Wi-Fi
+                      </span>
+                      <span className="text-muted-foreground text-sm font-normal">
+                        Provide your Wi-Fi details and give a memorable name
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-foreground text-base font-medium">
-                      Wi-Fi
-                    </span>
-                    <span className="text-muted-foreground text-sm font-normal">
-                      Provide your Wi-Fi details and give a memorable name
-                    </span>
-                  </div>
-                </div>
-              </AccordionTrigger>
-              {openAccordion === "details" && <Separator className="mb-3" />}
+                </AccordionTrigger>
+              )}
+              {openAccordion === "details" && !contentOnly && (
+                <Separator className="mb-3" />
+              )}
               <AccordionContent className="pt-2">
                 <BaseFormField
                   name="networkName"
@@ -179,24 +174,29 @@ export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
                 </div>
 
                 {/* Info box */}
-                <div className="p-3">
-                  <div className="bg-secondary-50 border-secondary-200 flex items-start gap-3 rounded-lg border p-3">
-                    <Info className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
-                    <Text size="2" className="text-primary">
-                      Not sure where to find this info? Look at the label on your router
-                      — it usually lists your WiFi name, password, and security type.
-                    </Text>
+                {!contentOnly && (
+                  <div className="p-3">
+                    <div className="bg-secondary-50 border-secondary-200 flex items-start gap-3 rounded-lg border p-3">
+                      <Info className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <Text size="2" className="text-primary">
+                        Not sure where to find this info? Look at the label on
+                        your router — it usually lists your WiFi name, password,
+                        and security type.
+                      </Text>
+                    </div>
                   </div>
-                </div>
-                
-                <BaseFormField
-                  name="qrName"
-                  label="Name your QR Code"
-                  placeholder={QR_NAME_PLACEHOLDERS.WIFI}
-                  tooltip="Only you can see this. It helps you recognize your QR codes later."
-                  initFromPlaceholder
-                  required={false}
-                />
+                )}
+
+                {!contentOnly && (
+                  <BaseFormField
+                    name="qrName"
+                    label="Name your QR Code"
+                    placeholder={QR_NAME_PLACEHOLDERS.WIFI}
+                    tooltip="Only you can see this. It helps you recognize your QR codes later."
+                    initFromPlaceholder
+                    required={false}
+                  />
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

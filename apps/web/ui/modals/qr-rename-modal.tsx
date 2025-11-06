@@ -1,7 +1,9 @@
 "use client";
 
-import { convertServerQRToNewBuilder } from "@/ui/qr-builder-new/helpers/data-converters";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
+import {
+  convertServerQRToNewBuilder,
+  TQrServerData,
+} from "@/ui/qr-builder-new/helpers/data-converters";
 import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr";
@@ -17,7 +19,7 @@ import {
 import { toast } from "sonner";
 
 interface QRRenameModalProps {
-  qrCode: TQrStorageData;
+  qrCode: TQrServerData;
   showQRRenameModal: boolean;
   setShowQRRenameModal: Dispatch<SetStateAction<boolean>>;
 }
@@ -134,7 +136,7 @@ function QRRenameModal({
   );
 }
 
-export function useQRRenameModal(data: { qrCode: TQrStorageData }) {
+export function useQRRenameModal(data: { qrCode: TQrServerData }) {
   const { qrCode } = data;
   const [showQRRenameModal, setShowQRRenameModal] = useState(false);
 

@@ -1,4 +1,3 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
@@ -12,11 +11,12 @@ import {
   useMemo,
   useState,
 } from "react";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
 type ArchiveQRModalProps = {
   showArchiveQRModal: boolean;
   setShowArchiveQRModal: Dispatch<SetStateAction<boolean>>;
-  props: QrStorageData;
+  props: TQrServerData;
 };
 
 function ArchiveQRModal({
@@ -183,7 +183,7 @@ function ArchiveQRModal({
   );
 }
 
-export function useArchiveQRModal({ props }: { props: QrStorageData }) {
+export function useArchiveQRModal({ props }: { props: TQrServerData }) {
   const [showArchiveQRModal, setShowArchiveQRModal] = useState(false);
 
   const ArchiveQRModalCallback = useCallback(() => {

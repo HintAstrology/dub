@@ -3,9 +3,9 @@ import {
   compressImage,
   createCompressedImageFile,
 } from "@/ui/utils/compress-image.ts";
-import { TQrStorageData } from "../qr-builder-new/types/database";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
-export const compressImagesInBackground = async (qrs: TQrStorageData[]) => {
+export const compressImagesInBackground = async (qrs: TQrServerData[]) => {
   try {
     const updatedQrs = await Promise.all(
       qrs.map(async (qr) => {
@@ -28,7 +28,7 @@ export const compressImagesInBackground = async (qrs: TQrStorageData[]) => {
   }
 };
 
-const handleImageCompression = async (qr: TQrStorageData) => {
+const handleImageCompression = async (qr: TQrServerData) => {
   try {
     const result = await getFileContent(qr.fileId!);
     if (!result.success) return { ...qr };
@@ -53,7 +53,7 @@ const handleImageCompression = async (qr: TQrStorageData) => {
   }
 };
 
-const handleMediaPlaceholder = (qr: TQrStorageData) => {
+const handleMediaPlaceholder = (qr: TQrServerData) => {
   const typeMap = {
     pdf: "application/pdf",
     video: "video/mp4",

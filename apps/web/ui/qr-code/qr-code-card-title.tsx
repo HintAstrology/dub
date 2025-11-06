@@ -1,12 +1,12 @@
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 import { Tooltip } from "@dub/ui";
 import { Icon } from "@iconify/react";
 import { Flex } from "@radix-ui/themes";
 import { FC } from "react";
 import { useQRRenameModal } from "../modals/qr-rename-modal";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
 interface IQRCardTitle {
-  qrCode: TQrStorageData;
+  qrCode: TQrServerData;
   featuresAccess?: boolean;
   setShowTrialExpiredModal?: (show: boolean) => void;
 }

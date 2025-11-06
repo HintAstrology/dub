@@ -4,19 +4,19 @@ import {
   LINKED_QR_TYPES,
 } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { unescapeWiFiValue } from "@/ui/qr-builder-new/helpers/wifi-helpers";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 import { Tooltip } from "@dub/ui";
 import { cn, getPrettyUrl } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
 import { memo } from "react";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
-const getDisplayContent = (qrCode: TQrStorageData): string => {
+const getDisplayContent = (qrCode: TQrServerData): string => {
   const { data, qrType } = qrCode;
 
   switch (qrType as EQRType) {
     case EQRType.WHATSAPP:
       try {
-        const url = new URL(qrCode.link.url);
+        const url = new URL(qrCode?.link?.url || "");
         let number = "";
 
         if (url.hostname === "wa.me") {
@@ -52,7 +52,7 @@ const getDisplayContent = (qrCode: TQrStorageData): string => {
     case EQRType.PDF:
     case EQRType.IMAGE:
     case EQRType.VIDEO:
-      if (qrCode.file?.name) {
+      if (qrCode?.file?.name) {
         return qrCode.file.name;
       }
 
@@ -80,12 +80,10 @@ const getDisplayContent = (qrCode: TQrStorageData): string => {
 export const QRCardDetails = memo(
   ({
     qrCode,
-    compact,
     featuresAccess,
     setShowTrialExpiredModal,
   }: {
-    qrCode: TQrStorageData;
-    compact?: boolean;
+    qrCode: TQrServerData;
     featuresAccess?: boolean;
     setShowTrialExpiredModal?: (show: boolean) => void;
   }) => {
@@ -93,9 +91,7 @@ export const QRCardDetails = memo(
     const qrType = qrCode.qrType as EQRType;
 
     const { setShowQRContentEditorModal, QRContentEditorModal } =
-      useQRContentEditor({
-        qrCode: qrCode,
-      });
+      useQRContentEditor();
 
     const onEditClick = (e: React.MouseEvent<SVGSVGElement>) => {
       e.stopPropagation();
@@ -111,15 +107,11 @@ export const QRCardDetails = memo(
     return (
       <>
         <QRContentEditorModal />
+
         <div
           className={cn(
             "flex min-w-0 items-center whitespace-nowrap text-sm transition-[opacity,display] delay-[0s,150ms] duration-[150ms,0s]",
-            compact
-              ? [
-                  "gap-2.5 opacity-100",
-                  "xs:min-w-[40px] xs:basis-[40px] min-w-0 shrink-0 basis-0 sm:min-w-[120px] sm:basis-[120px] md:grow",
-                ]
-              : "gap-1.5 opacity-100 md:gap-3",
+            "gap-1.5 opacity-100 md:gap-3",
           )}
         >
           <div className="flex min-w-0 items-center gap-1">

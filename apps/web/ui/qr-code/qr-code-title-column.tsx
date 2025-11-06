@@ -4,7 +4,6 @@ import { Session } from "@/lib/auth";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal";
 import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 import { QRCardDetails } from "@/ui/qr-code/qr-code-card-details.tsx";
 import { QRCardTitle } from "@/ui/qr-code/qr-code-card-title.tsx";
 import { QrCardType } from "@/ui/qr-code/qr-code-card-type.tsx";
@@ -15,11 +14,12 @@ import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-q
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
 import { useEffect, useRef } from "react";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeTitleColumnProps {
   user: Session["user"];
-  qrCode: TQrStorageData;
+  qrCode: TQrServerData;
   qrCodeStylingInstance: QRCodeStyling | null;
   svgString: string;
   currentQrTypeInfo: QRType;
@@ -36,7 +36,7 @@ export function QrCodeTitleColumn({
   featuresAccess,
   setShowTrialExpiredModal,
 }: IQrCodeTitleColumnProps) {
-  const { createdAt } = qrCode?.link ?? {};
+  const { createdAt } = qrCode ?? {};
   const { isMobile } = useMediaQuery();
 
   const { newQrId, setNewQrId } = useNewQrContext();
@@ -162,9 +162,16 @@ export function QrCodeTitleColumn({
               >
                 Created
               </Text>
-              <Tooltip content={formatDateTime(createdAt)} delayDuration={150}>
-                <span className="text-neutral-500">{timeAgo(createdAt)}</span>
-              </Tooltip>
+              {createdAt && (
+                <Tooltip
+                  content={formatDateTime(createdAt)}
+                  delayDuration={150}
+                >
+                  <span className="text-neutral-500">
+                    {timeAgo(new Date(createdAt))}
+                  </span>
+                </Tooltip>
+              )}
             </>
           </div>
         </div>

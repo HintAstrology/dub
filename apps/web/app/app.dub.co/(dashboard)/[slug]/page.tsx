@@ -2,7 +2,7 @@ import { checkFeaturesAccessAuthLess } from "@/lib/actions/check-features-access
 import { getQrs } from "@/lib/api/qrs/get-qrs";
 import { getSession } from "@/lib/auth";
 import { PageContent } from "@/ui/layout/page-content";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { getUserCookieService } from "core/services/cookie/user-session.service";
 import { Viewport } from "next";
@@ -39,7 +39,7 @@ const WorkspaceQRsPage = async () => {
     <>
       <PageContent title={<LinksTitle />}>
         <WorkspaceQRsClient
-          initialQrs={qrs as TQrStorageData[]}
+          initialQrs={qrs as unknown as TQrServerData[]}
           featuresAccess={featuresAccess}
           user={authUser}
           cookieUser={user}

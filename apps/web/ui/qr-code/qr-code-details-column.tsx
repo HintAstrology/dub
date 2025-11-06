@@ -1,14 +1,14 @@
 import { Session } from "@/lib/auth/utils";
 import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 import { QrCardType } from "@/ui/qr-code/qr-code-card-type.tsx";
 import { QrCodeControls } from "@/ui/qr-code/qr-code-controls.tsx";
 import QRCodeStyling from "qr-code-styling";
 import { RefObject, useRef } from "react";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeDetailsColumnProps {
-  qrCode: TQrStorageData;
+  qrCode: TQrServerData;
   canvasRef: RefObject<HTMLCanvasElement>;
   builtQrCodeObject: QRCodeStyling | null;
   currentQrTypeInfo: QRType;

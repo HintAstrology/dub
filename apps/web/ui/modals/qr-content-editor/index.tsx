@@ -1,34 +1,25 @@
 "use client";
 
+import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
+import { QrFormResolver } from "@/ui/qr-builder-new/forms/qr-form-resolver.tsx";
+import { QRFormRef } from "@/ui/qr-builder-new/forms/types";
+import { TQRFormData, TQrType } from "@/ui/qr-builder-new/types/context";
 import { EQRType } from "@/ui/qr-builder/constants/get-qr-config.ts";
-import { convertQrStorageDataToBuilderWithPartialUpdate } from "@/ui/qr-builder/helpers/data-converters.ts";
-import { qrTypeDataHandlers } from "@/ui/qr-builder/helpers/qr-type-data-handlers.ts";
-import { useQrCustomization } from "@/ui/qr-builder/hooks/use-qr-customization.ts";
-import { QRCodeContentBuilder } from "@/ui/qr-builder/qr-code-content-builder.tsx";
-import { getQRValidationSchema } from "@/ui/qr-builder/qr-validation-schema.ts";
-import {
-  QRPartialUpdateData,
-  QrStorageData,
-} from "@/ui/qr-builder/types/types.ts";
-import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr.tsx";
 import { Button, Modal } from "@dub/ui";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Theme } from "@radix-ui/themes";
 import { LoaderCircle } from "lucide-react";
 import {
   Dispatch,
   SetStateAction,
   useCallback,
-  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 
-const getModalTitle = (qrType: EQRType): string => {
+const getModalTitle = (qrType: TQrType): string => {
   switch (qrType) {
     case EQRType.WEBSITE:
       return "Edit Website URL";
@@ -54,136 +45,47 @@ const getModalTitle = (qrType: EQRType): string => {
 export type QRContentEditorData = Record<string, string | File[] | undefined>;
 
 type QRContentEditorModalProps = {
-  qrCode?: QrStorageData;
   showQRContentEditorModal: boolean;
   setShowQRContentEditorModal: Dispatch<SetStateAction<boolean>>;
-  isProcessing: boolean;
-  setIsProcessing: Dispatch<SetStateAction<boolean>>;
 };
 
 export function QRContentEditorModal({
-  qrCode,
   showQRContentEditorModal,
   setShowQRContentEditorModal,
-  isProcessing,
-  setIsProcessing,
 }: QRContentEditorModalProps) {
-  const selectedQRType = (qrCode?.qrType as EQRType) || EQRType.WEBSITE;
-  const [isFileUploading, setIsFileUploading] = useState<boolean>(false);
-  const [isFileProcessing, setIsFileProcessing] = useState<boolean>(false);
-  const isLoading = isProcessing || isFileUploading || isFileProcessing;
+  const {
+    isFileUploading,
+    isFileProcessing,
+    selectedQrType,
+    formData,
+    initialQrData,
+  } = useQrBuilderContext();
 
-  const { parsedInputValues } = useQrCustomization(qrCode);
-  const { updateQrWithOriginal } = useQrOperations();
+  const formRef = useRef<QRFormRef>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const validationSchema = getQRValidationSchema(selectedQRType);
+  // Custom form submit handler
+  const handleFormSubmit = useCallback(
+    async (data: TQRFormData) => {
+      setIsSaving(true);
+      try {
+        console.log("Form submitted with data:", data);
+        console.log("QR Type:", selectedQrType);
+        console.log("QR Code:", initialQrData);
 
-  const methods = useForm<QRContentEditorData>({
-    defaultValues: {},
-    resolver: zodResolver(validationSchema),
-    mode: "onBlur",
-  });
+        // TODO: Implement actual save logic here
+        // For now, just logging to console
 
-  useEffect(() => {
-    const valuesWithQrName = {
-      ...parsedInputValues,
-      [`qrName-${selectedQRType}`]: qrCode?.title || "QR Code",
-    };
-
-    methods.reset(valuesWithQrName);
-  }, [parsedInputValues, methods, qrCode, selectedQRType]);
-
-  const [isHiddenNetwork, setIsHiddenNetwork] = useState(false);
-
-  useEffect(() => {
-    if (parsedInputValues?.isHiddenNetwork) {
-      setIsHiddenNetwork(parsedInputValues.isHiddenNetwork === "true");
-    }
-  }, [parsedInputValues?.isHiddenNetwork]);
-
-  const handleSaveQR = async (formData: QRContentEditorData) => {
-    if (!qrCode?.id) {
-      toast.error("QR Code ID not found");
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const { qrName, ...filteredFormData } = formData;
-
-      if (selectedQRType === EQRType.WHATSAPP && filteredFormData.number) {
-        filteredFormData.number = (filteredFormData.number as string).replace(
-          /^\+/,
-          "",
-        );
+        // After successful save, close modal:
+        // handleClose();
+      } catch (error) {
+        console.error("Error saving QR content:", error);
+      } finally {
+        setIsSaving(false);
       }
-
-      const qrDataString = qrTypeDataHandlers[selectedQRType]?.(
-        filteredFormData as Record<string, string>,
-        isHiddenNetwork,
-      );
-
-      if (!qrDataString) {
-        toast.error("Failed to generate QR data");
-        return;
-      }
-
-      const partialUpdate: QRPartialUpdateData = {
-        title: formData.qrName as string,
-        data: qrDataString,
-        fileId: formData.fileId as string,
-      };
-
-      const qrBuilderData = convertQrStorageDataToBuilderWithPartialUpdate(
-        qrCode,
-        partialUpdate,
-      );
-
-      const success = await updateQrWithOriginal(qrCode, qrBuilderData);
-
-      if (success) {
-        setShowQRContentEditorModal(false);
-      }
-    } catch (error) {
-      console.error("Failed to update QR code:", error);
-      toast.error("Failed to update QR code");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleClose = () => {
-    if (!isProcessing) {
-      setShowQRContentEditorModal(false);
-      methods.reset({});
-      setIsHiddenNetwork(false);
-    }
-  };
-
-  const validateFields = async () => {
-    console.log("Validating form...");
-    const isValid = await methods.trigger();
-    console.log("Form validation result:", isValid);
-
-    if (isValid) {
-      const formData = methods.getValues();
-      console.log("Form data to save:", formData);
-      handleSaveQR(formData);
-    } else {
-      const errors = methods.formState.errors;
-      console.log("Validation errors:", errors);
-
-      const firstError = Object.values(errors)[0];
-      if (firstError?.message) {
-        toast.error(firstError.message as string);
-      }
-    }
-  };
-
-  const handleHiddenNetworkChange = (checked: boolean) => {
-    setIsHiddenNetwork(checked);
-  };
+    },
+    [selectedQrType, initialQrData],
+  );
 
   const getSaveButtonText = () => {
     if (isFileUploading) {
@@ -194,8 +96,33 @@ export function QRContentEditorModal({
       return "Processing...";
     }
 
+    if (isSaving) {
+      return "Saving...";
+    }
+
     return "Save Changes";
   };
+
+  const isProcessing = isFileUploading || isFileProcessing || isSaving;
+
+  const handleClose = () => {
+    setShowQRContentEditorModal(false);
+  };
+
+  const handleSaveClick = useCallback(async () => {
+    if (formRef.current) {
+      try {
+        // validate() will call onSubmit (handleFormSubmit) if valid
+        await formRef.current.validate();
+      } catch (error) {
+        console.error("Error validating form:", error);
+      }
+    }
+  }, []);
+
+  if (!selectedQrType) {
+    return null;
+  }
 
   return (
     <Modal
@@ -218,7 +145,7 @@ export function QRContentEditorModal({
             <div className="flex items-center gap-2">
               <QRIcon className="text-primary h-5 w-5" />
               <h3 className="!mt-0 max-w-xs truncate text-lg font-medium">
-                {getModalTitle(selectedQRType)}
+                {getModalTitle(selectedQrType)}
               </h3>
             </div>
             <button
@@ -233,39 +160,31 @@ export function QRContentEditorModal({
 
           {/* Content */}
           <div className="px-6 pb-6">
-            <FormProvider {...methods}>
-              {/* QR Content Builder */}
-              <QRCodeContentBuilder
-                qrType={selectedQRType}
-                isHiddenNetwork={isHiddenNetwork}
-                onHiddenNetworkChange={handleHiddenNetworkChange}
-                validateFields={validateFields}
-                homePageDemo
-                hideNameField
-                isEdit
-                isFileUploading={isFileUploading}
-                setIsFileUploading={setIsFileUploading}
-                isFileProcessing={isFileProcessing}
-                setIsFileProcessing={setIsFileProcessing}
-              />
+            <QrFormResolver
+              ref={formRef}
+              qrType={selectedQrType}
+              onSubmit={handleFormSubmit}
+              defaultValues={formData || undefined}
+              contentOnly
+              isEdit={!!initialQrData}
+            />
 
-              {/* Actions */}
-              <div className="flex justify-end gap-3 pt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  text="Cancel"
-                />
-                <Button
-                  type="button"
-                  onClick={() => validateFields()}
-                  loading={isLoading}
-                  text={getSaveButtonText()}
-                />
-              </div>
-            </FormProvider>
+            {/* Actions */}
+            <div className="flex justify-end gap-3 pt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isProcessing}
+                text="Cancel"
+              />
+              <Button
+                type="button"
+                onClick={handleSaveClick}
+                loading={isProcessing}
+                text={getSaveButtonText()}
+              />
+            </div>
           </div>
         </div>
       </Theme>
@@ -273,37 +192,24 @@ export function QRContentEditorModal({
   );
 }
 
-export function useQRContentEditor(data?: { qrCode?: QrStorageData }) {
-  const { qrCode } = data ?? {};
-
-  const [isProcessing, setIsProcessing] = useState(false);
+export function useQRContentEditor() {
   const [showQRContentEditorModal, setShowQRContentEditorModal] =
     useState(false);
 
   const QRContentEditorModalCallback = useCallback(() => {
     return (
       <QRContentEditorModal
-        qrCode={qrCode}
         showQRContentEditorModal={showQRContentEditorModal}
         setShowQRContentEditorModal={setShowQRContentEditorModal}
-        isProcessing={isProcessing}
-        setIsProcessing={setIsProcessing}
       />
     );
-  }, [
-    qrCode,
-    showQRContentEditorModal,
-    setShowQRContentEditorModal,
-    isProcessing,
-    setIsProcessing,
-  ]);
+  }, [showQRContentEditorModal, setShowQRContentEditorModal]);
 
   return useMemo(
     () => ({
       QRContentEditorModal: QRContentEditorModalCallback,
       setShowQRContentEditorModal,
-      isProcessing,
     }),
-    [QRContentEditorModalCallback, setShowQRContentEditorModal, isProcessing],
+    [QRContentEditorModalCallback, setShowQRContentEditorModal],
   );
 }
