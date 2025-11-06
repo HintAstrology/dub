@@ -3,6 +3,7 @@
 import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
 import { QrFormResolver } from "@/ui/qr-builder-new/forms/qr-form-resolver.tsx";
 import { QRFormRef } from "@/ui/qr-builder-new/forms/types";
+import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { TQRFormData, TQrType } from "@/ui/qr-builder-new/types/context";
 import { EQRType } from "@/ui/qr-builder/constants/get-qr-config.ts";
 import { X } from "@/ui/shared/icons";
@@ -61,6 +62,8 @@ export function QRContentEditorModal({
     initialQrData,
   } = useQrBuilderContext();
 
+  const { updateQRDestination } = useNewQrOperations();
+
   const formRef = useRef<QRFormRef>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -70,14 +73,13 @@ export function QRContentEditorModal({
       setIsSaving(true);
       try {
         console.log("Form submitted with data:", data);
-        console.log("QR Type:", selectedQrType);
         console.log("QR Code:", initialQrData);
 
-        // TODO: Implement actual save logic here
-        // For now, just logging to console
+        await updateQRDestination(
+          data as TQRFormData & { encodedData: string; fileId?: string },
+        );
 
-        // After successful save, close modal:
-        // handleClose();
+        handleClose();
       } catch (error) {
         console.error("Error saving QR content:", error);
       } finally {

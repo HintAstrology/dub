@@ -8,7 +8,6 @@ import { Drawer } from "vaul";
 import { useUser } from "@/ui/contexts/user";
 import { QRBuilderNew } from "@/ui/qr-builder-new";
 import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
-import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr.tsx";
 import { Modal } from "@dub/ui";
@@ -27,7 +26,7 @@ export function QRBuilderModal({
   showModal,
   setShowModal,
 }: QRBuilderModalProps) {
-  const { createQr, updateQr } = useNewQrOperations();
+  // const { createQr, updateQr } = useNewQrOperations();
   const { isMobile } = useMediaQuery();
   const user = useUser();
 
@@ -54,9 +53,9 @@ export function QRBuilderModal({
 
     try {
       if (qrData) {
-        await updateQr(qrData, data);
+        // await updateQr(qrData, data);
       } else {
-        await createQr(data);
+        // await createQr(data);
       }
       setShowModal(false);
     } catch (error) {

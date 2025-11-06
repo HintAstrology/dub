@@ -4,6 +4,7 @@ import { QR_TYPES } from "../qr-builder-new/constants/get-qr-config";
 import { useQrBuilderContext } from "../qr-builder-new/context";
 import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { useQRCodeStyling } from "../qr-builder-new/hooks/use-qr-code-styling";
+import { QrCodeDetailsColumn } from "./qr-code-details-column";
 import { QrCodeTitleColumn } from "./qr-code-title-column";
 
 interface IQrCodeCardInnerProps {
@@ -44,15 +45,15 @@ export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
           setShowTrialExpiredModal={setShowTrialExpiredModal}
         />
       </div>
-      {/* <QrCodeDetailsColumn
-          user={user}
-          qrCode={qrCode}
-          canvasRef={canvasRef}
-          builtQrCodeObject={builtQrCodeObject}
-          currentQrTypeInfo={currentQrTypeInfo}
-          featuresAccess={featuresAccess}
-          setShowTrialExpiredModal={setShowTrialExpiredModal}
-        /> */}
+      <QrCodeDetailsColumn
+        user={user}
+        qrCode={qrCode}
+        qrCodeStylingInstance={qrCodeStylingInstance}
+        svgString={svgString}
+        currentQrTypeInfo={currentQrTypeInfo}
+        featuresAccess={featuresAccess}
+        setShowTrialExpiredModal={setShowTrialExpiredModal}
+      />
     </>
   );
 };

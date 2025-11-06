@@ -53,7 +53,9 @@ export type TQRBuilderDataForStorage = {
  */
 export type TQrServerData = {
   createdAt?: string;
+  updatedAt?: string;
   archived?: boolean;
+  description?: string | null;
   id: string;
   title: string;
   qrType: EQRType;

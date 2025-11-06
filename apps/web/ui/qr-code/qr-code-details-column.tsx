@@ -3,14 +3,14 @@ import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { QrCardType } from "@/ui/qr-code/qr-code-card-type.tsx";
 import { QrCodeControls } from "@/ui/qr-code/qr-code-controls.tsx";
 import QRCodeStyling from "qr-code-styling";
-import { RefObject, useRef } from "react";
+import { useRef } from "react";
 import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeDetailsColumnProps {
   qrCode: TQrServerData;
-  canvasRef: RefObject<HTMLCanvasElement>;
-  builtQrCodeObject: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   currentQrTypeInfo: QRType;
   featuresAccess?: boolean;
   setShowTrialExpiredModal?: (show: boolean) => void;
@@ -20,8 +20,8 @@ interface IQrCodeDetailsColumnProps {
 export function QrCodeDetailsColumn({
   user,
   qrCode,
-  canvasRef,
-  builtQrCodeObject,
+  qrCodeStylingInstance,
+  svgString,
   currentQrTypeInfo,
   featuresAccess,
   setShowTrialExpiredModal,
@@ -41,8 +41,8 @@ export function QrCodeDetailsColumn({
       <QrCodeControls
         user={user}
         qrCode={qrCode}
-        canvasRef={canvasRef}
-        builtQrCodeObject={builtQrCodeObject}
+        qrCodeStylingInstance={qrCodeStylingInstance}
+        svgString={svgString}
         featuresAccess={featuresAccess}
         setShowTrialExpiredModal={setShowTrialExpiredModal}
       />

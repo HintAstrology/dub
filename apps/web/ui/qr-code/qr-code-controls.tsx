@@ -20,15 +20,15 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { RefObject, useContext } from "react";
+import { useContext } from "react";
 import { useDuplicateQRModal } from "../modals/duplicate-qr-modal";
 import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { ThreeDots } from "../shared/icons";
 
 interface QrCodeControlsProps {
   qrCode: TQrServerData;
-  canvasRef: RefObject<HTMLCanvasElement>;
-  builtQrCodeObject: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   featuresAccess?: boolean;
   setShowTrialExpiredModal?: (show: boolean) => void;
   user: Session["user"];
@@ -36,8 +36,8 @@ interface QrCodeControlsProps {
 
 export function QrCodeControls({
   qrCode,
-  canvasRef,
-  builtQrCodeObject,
+  qrCodeStylingInstance,
+  svgString,
   featuresAccess,
   setShowTrialExpiredModal,
   user,
@@ -57,16 +57,17 @@ export function QrCodeControls({
 
   const { handleToggleModal: setShowDuplicateQRModal, DuplicateQRModal } =
     useDuplicateQRModal({
-      props: qrCode,
+      qrCode,
     });
   const { setShowArchiveQRModal, ArchiveQRModal } = useArchiveQRModal({
-    props: qrCode,
+    qrCode,
   });
   const { setShowDeleteQRModal, DeleteLinkModal } = useDeleteQRModal({
-    props: qrCode,
+    qrCode,
   });
   const { QRPreviewModal, setShowQRPreviewModal } = useQRPreviewModal({
-    qrCodeStylingInstance: builtQrCodeObject,
+    qrCodeStylingInstance,
+    svgString,
     width: isMobile ? 300 : 200,
     height: isMobile ? 300 : 200,
     qrCodeId: qrCode.id,
@@ -158,18 +159,17 @@ export function QrCodeControls({
       <QRCustomizeModal /> */}
       <ArchiveQRModal />
       <DeleteLinkModal />
-      {canvasRef && (
-        <Button
-          onClick={onDownloadButtonClick}
-          variant="secondary"
-          className={cn(
-            "h-8 w-8 px-1.5 outline-none transition-all duration-200",
-            "border-transparent data-[state=open]:border-neutral-200/40 data-[state=open]:ring-neutral-200/40 sm:group-hover/card:data-[state=closed]:border-neutral-200/10",
-            "border-border-500 border lg:border-none",
-          )}
-          icon={<Download className="h-5 w-5 shrink-0" />}
-        />
-      )}
+
+      <Button
+        onClick={onDownloadButtonClick}
+        variant="secondary"
+        className={cn(
+          "h-8 w-8 px-1.5 outline-none transition-all duration-200",
+          "border-transparent data-[state=open]:border-neutral-200/40 data-[state=open]:ring-neutral-200/40 sm:group-hover/card:data-[state=closed]:border-neutral-200/10",
+          "border-border-500 border lg:border-none",
+        )}
+        icon={<Download className="h-5 w-5 shrink-0" />}
+      />
       <Popover
         content={
           <div className="w-full sm:w-48">

@@ -39,7 +39,7 @@ interface IQRPreviewModalProps {
   setIsNewQr: Dispatch<SetStateAction<boolean>>;
   isNewQr?: boolean;
   qrCodeStylingInstance: QRCodeStyling | null;
-  svgString?: string;
+  svgString: string;
   qrCodeId?: string;
   width?: number;
   height?: number;
@@ -336,7 +336,7 @@ function QRPreviewModal({
 
 export function useQRPreviewModal(data: {
   qrCodeStylingInstance: QRCodeStyling | null;
-  svgString?: string;
+  svgString: string;
   qrCodeId?: string;
   width?: number;
   height?: number;

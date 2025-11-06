@@ -1,4 +1,3 @@
-import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Flex, Text, Theme } from "@radix-ui/themes";
@@ -12,26 +11,27 @@ import {
   useState,
 } from "react";
 import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
+import { useNewQrOperations } from "../qr-builder-new/hooks/use-qr-operations";
 
 type ArchiveQRModalProps = {
   showArchiveQRModal: boolean;
   setShowArchiveQRModal: Dispatch<SetStateAction<boolean>>;
-  props: TQrServerData;
+  qrCode: TQrServerData;
 };
 
 function ArchiveQRModal({
   showArchiveQRModal,
   setShowArchiveQRModal,
-  props,
+  qrCode,
 }: ArchiveQRModalProps) {
-  const { archiveQr } = useQrOperations();
+  const { archiveQR } = useNewQrOperations();
   const [archiving, setArchiving] = useState(false);
 
   const handleArchiveRequest = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     setArchiving(true);
-    const success = await archiveQr(props.id, !props.archived);
+    const success = await archiveQR();
     setArchiving(false);
 
     if (success) {
@@ -56,10 +56,10 @@ function ArchiveQRModal({
         <div className="flex flex-col gap-2">
           <div className="relative flex w-full items-center justify-center px-2 py-4">
             <h3 className="!mt-0 max-w-xs text-center text-lg font-semibold">
-              {props.archived
+              {qrCode.archived
                 ? "Are you sure you want to activate"
                 : "Are you sure you want to pause"}
-              <br />"{props.title}"?
+              <br />"{qrCode.title}"?
             </h3>
             <button
               disabled={archiving}
@@ -73,7 +73,7 @@ function ArchiveQRModal({
 
           <div className="px-6 pb-6">
             <div className="flex flex-col gap-6">
-              {!props.archived ? (
+              {!qrCode.archived ? (
                 <div className="flex flex-col gap-2">
                   <Flex
                     direction="row"
@@ -169,10 +169,12 @@ function ArchiveQRModal({
                 />
                 <Button
                   type="button"
-                  variant={props.archived ? "primary" : "warning"}
+                  variant={qrCode.archived ? "primary" : "warning"}
                   onClick={handleArchiveRequest}
                   loading={archiving}
-                  text={props.archived ? "Confirm activation" : "Confirm pause"}
+                  text={
+                    qrCode.archived ? "Confirm activation" : "Confirm pause"
+                  }
                 />
               </div>
             </div>
@@ -183,17 +185,17 @@ function ArchiveQRModal({
   );
 }
 
-export function useArchiveQRModal({ props }: { props: TQrServerData }) {
+export function useArchiveQRModal({ qrCode }: { qrCode: TQrServerData }) {
   const [showArchiveQRModal, setShowArchiveQRModal] = useState(false);
 
   const ArchiveQRModalCallback = useCallback(() => {
-    return props ? (
+    return (
       <ArchiveQRModal
         showArchiveQRModal={showArchiveQRModal}
         setShowArchiveQRModal={setShowArchiveQRModal}
-        props={props}
+        qrCode={qrCode}
       />
-    ) : null;
+    );
   }, [showArchiveQRModal, setShowArchiveQRModal]);
 
   return useMemo(
