@@ -4,7 +4,7 @@ import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { Flex } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { QRCodeDemoPlaceholder } from "../constants/qr-code-demo-placeholder.tsx";
 import { useQRCodeStyling } from "../hooks/use-qr-code-styling";
@@ -52,6 +52,13 @@ export const QRBuilderInner = () => {
   const { isMobile } = useMediaQuery();
 
   const shouldUseDialog = isMobile && homepageDemo && !isTypeStep;
+
+  const handleDialogOpenChange = useCallback((open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open && !isTypeStep) {
+      setBuilderStep(1);
+    }
+  }, [setIsDialogOpen, isTypeStep, setBuilderStep]);
 
   const qrCode = useQRCodeStyling({
     customizationData,
@@ -223,7 +230,7 @@ export const QRBuilderInner = () => {
       </Flex>
 
       {shouldUseDialog && (
-        <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog.Root open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 z-[99] bg-white data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
             <Dialog.Content
