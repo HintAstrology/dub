@@ -5,6 +5,8 @@ import { ERegistrationStep } from "@/ui/auth/register/constants";
 import { SignUpContent } from "@/ui/auth/register/signup-content";
 import AuthLines from "@/ui/shared/icons/auth-lines";
 import { Logo } from "@/ui/shared/logo";
+import { useMediaQuery } from "@dub/ui";
+import { cn } from "@dub/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
@@ -40,6 +42,8 @@ export function AuthModal({
   authType,
   setAuthType,
 }: AuthModalProps) {
+  const { isMobile } = useMediaQuery();
+  
   const handleClose = useCallback(() => {
     setShowAuthModal(false);
   }, [setShowAuthModal]);
@@ -112,37 +116,59 @@ export function AuthModal({
           onEscapeKeyDown={(e) => {
             e.preventDefault();
           }}
-          className="border-border-500 fixed left-[50%] top-[50%] z-[10001] flex w-[90%] max-w-[420px] -translate-x-[50%] -translate-y-[50%] flex-col overflow-hidden rounded-xl border bg-neutral-50 p-0 pt-4 shadow-xl focus:outline-none"
+          className={cn(
+            "fixed z-[10001] flex flex-col overflow-hidden bg-neutral-50 focus:outline-none",
+            isMobile
+              ? "inset-0 h-dvh w-full p-0 pt-4 [&_input]:!text-[16px] [&_textarea]:!text-[16px]"
+              : "border-border-500 left-[50%] top-[50%] w-[90%] max-w-[420px] -translate-x-[50%] -translate-y-[50%] rounded-xl border p-0 pt-4 shadow-xl"
+          )}
         >
-          {/* Decorative gradient background */}
-          <div className="to-primary/10 pointer-events-none absolute top-0 h-52 w-full rounded-t-xl bg-gradient-to-t from-transparent" />
+          <div className={cn("flex w-full flex-col", isMobile && "h-full")}>
+            {/* Decorative gradient background */}
+            <div className="to-primary/10 pointer-events-none absolute top-0 h-52 w-full rounded-t-xl bg-gradient-to-t from-transparent" />
 
-          {/* Decorative lines */}
-          <AuthLines className="pointer-events-none absolute inset-x-0 -top-4" />
+            {/* Decorative lines */}
+            <AuthLines className="pointer-events-none absolute inset-x-0 -top-4" />
 
-          <VisuallyHidden.Root>
-            <Dialog.Title>
-              {authType === "login" ? "Log In" : "Create account"}
-            </Dialog.Title>
-          </VisuallyHidden.Root>
+            <VisuallyHidden.Root>
+              <Dialog.Title>
+                {authType === "login" ? "Log In" : "Create account"}
+              </Dialog.Title>
+            </VisuallyHidden.Root>
 
-          {/* Header with logo and close button */}
-          <div className="relative flex items-center justify-center px-8 pb-8">
-            <Logo className="justify-center gap-3" />
-            
-            <Dialog.Close asChild>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="group absolute right-8 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none active:bg-neutral-200"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </Dialog.Close>
-          </div>
+            {/* Close button - positioned at top on mobile */}
+            {isMobile && (
+              <Dialog.Close asChild>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="group absolute right-4 top-4 z-10 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none active:bg-neutral-200"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </Dialog.Close>
+            )}
 
-          {/* Title and subtitle */}
-          <div className="relative px-8 pb-8 text-center">
+            <div className={cn("flex flex-col", isMobile && "flex-1 justify-center")}>
+              {/* Header with logo and close button */}
+              <div className={cn("relative flex items-center justify-center pb-8", isMobile ? "px-4" : "px-8")}>
+                <Logo className="justify-center gap-3" />
+                
+                {!isMobile && (
+                  <Dialog.Close asChild>
+                    <button
+                      type="button"
+                      onClick={handleClose}
+                      className="group absolute right-8 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none active:bg-neutral-200"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </Dialog.Close>
+                )}
+              </div>
+
+              {/* Title and subtitle */}
+              <div className={cn("relative pb-8 text-center", isMobile ? "px-4" : "px-8")}>
             <motion.div
               key={authType}
               initial={{ opacity: 0, y: -10 }}
@@ -158,36 +184,38 @@ export function AuthModal({
                   : "Download your QR code instantly"}
               </p>
             </motion.div>
-          </div>
+              </div>
 
-          <AnimatePresence>
-            {message && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className={`mx-8 mb-2 rounded-md px-3 py-2 text-sm ${
-                  messageType === "success"
-                    ? "text-primary bg-primary-300 border-primary border"
-                    : "border border-red-100 bg-red-50 text-red-700"
-                }`}
-              >
-                <div className="flex items-center">
-                  <div className="mr-2 flex-shrink-0">
-                    {messageType === "success" ? (
-                      <CheckCircle className="text-primary h-4 w-4" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-500" />
+              <AnimatePresence>
+                {message && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className={cn(
+                      "mb-2 rounded-md px-3 py-2 text-sm",
+                      isMobile ? "mx-4" : "mx-8",
+                      messageType === "success"
+                        ? "text-primary bg-primary-300 border-primary border"
+                        : "border border-red-100 bg-red-50 text-red-700"
                     )}
-                  </div>
-                  <p>{message}</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  >
+                    <div className="flex items-center">
+                      <div className="mr-2 flex-shrink-0">
+                        {messageType === "success" ? (
+                          <CheckCircle className="text-primary h-4 w-4" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <p>{message}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-          <div className="relative px-8 pb-8 pt-0">
+              <div className={cn("relative pb-8 pt-0", isMobile ? "px-4" : "px-8")}>
             <AnimatePresence mode="wait">
               {authType === "login" ? (
                 <motion.div
@@ -223,14 +251,16 @@ export function AuthModal({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+              </div>
 
-          <AnimatePresence>
-            {authType === "signup" &&
-              registrationStep === ERegistrationStep.SIGNUP && (
-                <ConsentNotice key="consent-notice" />
-              )}
-          </AnimatePresence>
+              <AnimatePresence>
+                {authType === "signup" &&
+                  registrationStep === ERegistrationStep.SIGNUP && (
+                    <ConsentNotice key="consent-notice" />
+                  )}
+              </AnimatePresence>
+            </div>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
