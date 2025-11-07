@@ -73,7 +73,7 @@ export function QRBuilderModal({
           <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
         </div>
       )}
-      <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
+      <div className="sticky top-0 z-[60] flex w-full items-center justify-between gap-2 border-b bg-white px-6 py-4">
         <div className="flex items-center gap-2">
           <QRIcon className="text-primary h-5 w-5" />
           <h3 className="!mt-0 max-w-xs truncate text-lg font-medium">
@@ -81,17 +81,22 @@ export function QRBuilderModal({
           </h3>
         </div>
         <button
-          onClick={() => setShowModal(false)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowModal(false);
+          }}
           disabled={isProcessing}
           type="button"
-          className="active:bg-border-500 group relative -right-2 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
+          className="active:bg-border-500 group relative -right-2 z-[60] rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
-      <Theme>
-        <QRBuilderNew initialQrData={qrData} onSave={handleSaveQR} />
-      </Theme>
+      <div className="px-6 pb-6">
+        <Theme>
+          <QRBuilderNew initialQrData={qrData} onSave={handleSaveQR} />
+        </Theme>
+      </div>
     </div>
   );
 

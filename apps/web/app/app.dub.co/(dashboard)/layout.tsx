@@ -1,11 +1,12 @@
 import { TrialStatusProvider } from "@/lib/contexts/trial-status-context";
-import { MainNav } from "@/ui/layout/main-nav";
-import { AppSidebarNav } from "@/ui/layout/sidebar/app-sidebar-nav";
+import { AppSidebar } from "@/ui/layout/sidebar/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { constructMetadata } from "@dub/utils";
 import { OauthTrackerComponent } from "core/integration/analytic/components/oauth-tracker.component.tsx";
 import { ECookieArg } from "core/interfaces/cookie.interface.ts";
 import { cookies } from "next/headers";
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties } from "react";
+import { Card } from "@/components/ui/card";
 
 // export const dynamic = "force-static";
 export const metadata = constructMetadata();
@@ -18,20 +19,33 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   return (
     <TrialStatusProvider>
-      <div className="min-h-screen w-full bg-white">
-        <MainNav
-          sidebar={AppSidebarNav}
-          //* @USEFUL_FEATURE: navbar config *//
-          // toolContent={
-          //   <HelpButtonRSC />
-          //   //   <>
-          //   //     <ReferButton />
-          //   //   </>
-          // }
-          // newsContent={<NewsRSC />}
+      <div className="before:bg-primary relative flex min-h-dvh w-full before:fixed before:inset-x-0 before:top-0 before:h-105">
+        <SidebarProvider
+          style={
+            {
+              "--sidebar": "var(--card)",
+              "--sidebar-width": "17.5rem",
+              "--sidebar-width-icon": "3.5rem",
+            } as CSSProperties
+          }
         >
-          {children}
-        </MainNav>
+          <AppSidebar />
+          <div className="z-1 mx-auto flex size-full flex-1 flex-col px-4 py-6 sm:px-6">
+            <header className="bg-card mb-6 flex items-center rounded-[20px] border border-border px-6 py-3.5 shadow-sm">
+              <SidebarTrigger className="text-secondary hover:bg-secondary/10 [&_svg]:!size-5" />
+            </header>
+            <main className="mb-6 size-full flex-1">
+              <Card className="h-full rounded-[20px] border-border shadow-sm">
+                {children}
+              </Card>
+            </main>
+            <footer className="bg-card rounded-[20px] border border-border p-3 shadow-sm">
+              <div className="flex items-center justify-center text-sm text-muted-foreground">
+                © 2024 GetQR. All rights reserved.
+              </div>
+            </footer>
+          </div>
+        </SidebarProvider>
       </div>
       {oauthFlowCookie && (
         <OauthTrackerComponent oauthData={parsedOauthFlowInfo} />

@@ -68,75 +68,73 @@ function WorkspaceQRs({
         setShowModal={setShowQRBuilderModal}
       />
 
-      <div className="flex w-full items-center pt-2">
-        <MaxWidthWrapper className="flex flex-col gap-y-3">
-          {!featuresAccess.isSubscribed && (
-            <div className="w-full rounded-lg border border-red-200 bg-red-100">
-              <div className="px-3 py-3 md:px-4">
-                <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-3">
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 2,
-                        ease: "easeInOut",
-                      }}
-                      className="flex items-center justify-center"
-                    >
-                      <ShieldAlert className="h-5 w-5 shrink-0 text-red-500 md:h-6 md:w-6" />
-                    </motion.div>
-                    <p className="text-center text-sm font-medium text-red-700 md:text-left">
-                      Your dynamic QR codes are temporarily deactivated. To
-                      restore them, please upgrade to one of our plans.
-                    </p>
-                  </div>
+      <div className="flex w-full flex-col gap-y-3">
+        {!featuresAccess.isSubscribed && (
+          <div className="w-full rounded-lg border border-red-200 bg-red-100">
+            <div className="px-3 py-3 md:px-4">
+              <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-3">
                   <motion.div
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="w-full md:w-auto"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 2,
+                      ease: "easeInOut",
+                    }}
+                    className="flex items-center justify-center"
                   >
-                    <Button
-                      variant="primary"
-                      className="bg-secondary hover:bg-secondary-800 w-full whitespace-nowrap text-sm font-medium text-white md:w-auto"
-                      onClick={() => {
-                        router.push(`/account/plans`);
-                        router.refresh();
-                      }}
-                      text="Restore Access"
-                    />
+                    <ShieldAlert className="h-5 w-5 shrink-0 text-red-500 md:h-6 md:w-6" />
                   </motion.div>
+                  <p className="text-center text-sm font-medium text-red-700 md:text-left">
+                    Your dynamic QR codes are temporarily deactivated. To
+                    restore them, please upgrade to one of our plans.
+                  </p>
                 </div>
-              </div>
-            </div>
-          )}
-          {featuresAccess.isSubscribed && (
-            <div className="flex flex-wrap items-center justify-between gap-2 lg:flex-nowrap">
-              <div className="flex w-full grow gap-2 md:w-auto">
-                <div className="grow basis-0 md:grow-0">
-                  <QrCodeSort />
-                </div>
-              </div>
-              <div className="flex gap-x-2 max-md:w-full">
-                <div className="w-full md:w-56 lg:w-64">
-                  <SearchBoxPersisted
-                    loading={isValidating}
-                    inputClassName="h-10"
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full md:w-auto"
+                >
+                  <Button
+                    variant="primary"
+                    className="bg-secondary hover:bg-secondary-800 w-full whitespace-nowrap text-sm font-medium text-white md:w-auto"
+                    onClick={() => {
+                      router.push(`/account/plans`);
+                      router.refresh();
+                    }}
+                    text="Restore Access"
                   />
-                </div>
-
-                <div className="grow-0">
-                  <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
-                </div>
+                </motion.div>
               </div>
             </div>
-          )}
-        </MaxWidthWrapper>
+          </div>
+        )}
+        {featuresAccess.isSubscribed && (
+          <div className="flex flex-wrap items-center justify-between gap-2 lg:flex-nowrap">
+            <div className="flex w-full grow gap-2 md:w-auto">
+              <div className="grow basis-0 md:grow-0">
+                <QrCodeSort />
+              </div>
+            </div>
+            <div className="flex gap-x-2 max-md:w-full">
+              <div className="w-full md:w-56 lg:w-64">
+                <SearchBoxPersisted
+                  loading={isValidating}
+                  inputClassName="h-10"
+                />
+              </div>
+
+              <div className="grow-0">
+                <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="mt-3">
+      <div className="mt-6">
         <QrCodesContainer
           CreateQrCodeButton={
             featuresAccess

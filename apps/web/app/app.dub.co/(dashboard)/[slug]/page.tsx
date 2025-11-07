@@ -1,12 +1,11 @@
 import { checkFeaturesAccessAuthLess } from "@/lib/actions/check-features-access-auth-less";
 import { getQrs } from "@/lib/api/qrs/get-qrs";
 import { getSession } from "@/lib/auth";
-import { PageContent } from "@/ui/layout/page-content";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { getUserCookieService } from "core/services/cookie/user-session.service";
 import { Viewport } from "next";
 import WorkspaceQRsClient from "./custom-page-client";
-import { LinksTitle } from "./links-title";
+import { CardContent } from "@/components/ui/card";
 
 export const viewport: Viewport = {
   themeColor: "#f6f6f7",
@@ -33,14 +32,19 @@ const WorkspaceQRsPage = async () => {
 
   return (
     <>
-      <PageContent title={<LinksTitle />}>
+      <CardContent className="h-full p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-foreground">
+            My QR Codes
+          </h1>
+        </div>
         <WorkspaceQRsClient
           initialQrs={qrs as any}
           featuresAccess={featuresAccess}
           user={authUser}
           cookieUser={user}
         />
-      </PageContent>
+      </CardContent>
       <PageViewedTrackerComponent
         sessionId={sessionId!}
         pageName="dashboard"

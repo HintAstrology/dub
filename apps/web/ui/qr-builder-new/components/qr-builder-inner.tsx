@@ -168,8 +168,8 @@ export const QRBuilderInner = () => {
           className={cn(
             "relative h-auto shrink-0 basis-1/3 items-start justify-center rounded-lg md:flex",
             {
-              "hidden md:flex": isTypeStep && !homepageDemo,
-              "!hidden": isTypeStep && homepageDemo,
+              // "hidden md:flex": isTypeStep && !homepageDemo,
+              "!hidden": isTypeStep,
               "items-start": isCustomizationStep,
             },
           )}
