@@ -29,7 +29,7 @@ function QRRenameModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [name, setName] = useState(qrCode.title || "");
 
-  const { updateQRTitle } = useNewQrOperations();
+  const { updateQRTitle } = useNewQrOperations({ initialQrData: qrCode });
 
   const handleSave = async () => {
     if (!qrCode?.id) {

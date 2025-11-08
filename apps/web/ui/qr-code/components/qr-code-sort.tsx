@@ -3,7 +3,7 @@ import { IconMenu, Popover, Tick, useRouterStuff } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { ChevronDown, SortDesc } from "lucide-react";
 import { useContext, useState } from "react";
-import { sortOptions } from "./qr-codes-display-provider";
+import { sortOptions } from "../qr-codes-display-provider";
 
 export default function QrCodeSort() {
   const { queryParams } = useRouterStuff();

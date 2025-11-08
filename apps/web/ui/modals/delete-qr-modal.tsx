@@ -25,7 +25,7 @@ function DeleteQRModal({
 }: DeleteQRModalProps) {
   const [deleting, setDeleting] = useState(false);
 
-  const { deleteQR } = useNewQrOperations();
+  const { deleteQR } = useNewQrOperations({ initialQrData: qrCode });
 
   const handleDelete = useCallback(async () => {
     setDeleting(true);

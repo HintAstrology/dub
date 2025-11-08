@@ -4,9 +4,9 @@ import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { Session } from "@/lib/auth/utils";
 import useQrs from "@/lib/swr/use-qrs.ts";
 import { UserProvider } from "@/ui/contexts/user";
-import { CreateQRButton, QRBuilderModal } from "@/ui/modals/qr-builder-new";
+import { CreateQRButton, QRBuilderNewModal } from "@/ui/modals/qr-builder-new";
 import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
-import QrCodeSort from "@/ui/qr-code/qr-code-sort.tsx";
+import QrCodeSort from "@/ui/qr-code/components/qr-code-sort";
 import QrCodesContainer from "@/ui/qr-code/qr-codes-container.tsx";
 import { QrCodesDisplayProvider } from "@/ui/qr-code/qr-codes-display-provider.tsx";
 import { SearchBoxPersisted } from "@/ui/shared/search-box";
@@ -62,7 +62,7 @@ function WorkspaceQRs({
 
   return (
     <>
-      <QRBuilderModal
+      <QRBuilderNewModal
         showModal={showQRBuilderModal}
         setShowModal={setShowQRBuilderModal}
       />

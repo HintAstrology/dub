@@ -1,6 +1,6 @@
 "use client";
 
-import { prepareFileDataForModal } from "@/ui/modals/qr-content-editor/prepare-file-data";
+import { prepareFileDataForModal } from "@/ui/modals/qr-content-editor/helpers/prepare-file-data";
 import { LoaderCircle } from "lucide-react";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { EQRType, FILE_QR_TYPES } from "../constants/get-qr-config";

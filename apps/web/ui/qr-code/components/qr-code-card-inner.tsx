@@ -1,9 +1,11 @@
 import { Session } from "@/lib/auth";
-import { FC } from "react";
-import { QR_TYPES } from "../qr-builder-new/constants/get-qr-config";
-import { useQrBuilderContext } from "../qr-builder-new/context";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
-import { useQRCodeStyling } from "../qr-builder-new/hooks/use-qr-code-styling";
+import { FC, useMemo } from "react";
+import { QR_TYPES } from "../../qr-builder-new/constants/get-qr-config";
+import {
+  extractCustomizationData,
+  TQrServerData,
+} from "../../qr-builder-new/helpers/data-converters";
+import { useQRCodeStyling } from "../../qr-builder-new/hooks/use-qr-code-styling";
 import { QrCodeDetailsColumn } from "./qr-code-details-column";
 import { QrCodeTitleColumn } from "./qr-code-title-column";
 
@@ -20,16 +22,21 @@ export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
   featuresAccess,
   setShowTrialExpiredModal,
 }) => {
-  const { customizationData, shortLink, selectedQrType } =
-    useQrBuilderContext();
+  const currentQrTypeInfo = useMemo(() => {
+    return QR_TYPES.find((item) => item.id === qrCode.qrType)!;
+  }, [qrCode]);
 
-  const currentQrTypeInfo = QR_TYPES.find(
-    (item) => item.id === selectedQrType,
-  )!;
+  const customizationData = useMemo(() => {
+    return extractCustomizationData(
+      qrCode.styles,
+      qrCode.frameOptions,
+      qrCode.logoOptions,
+    );
+  }, [qrCode]);
 
   const { qrCode: qrCodeStylingInstance, svgString } = useQRCodeStyling({
     customizationData,
-    defaultData: shortLink,
+    defaultData: qrCode.link.shortLink,
   });
 
   return (

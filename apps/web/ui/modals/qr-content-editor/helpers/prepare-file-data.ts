@@ -3,43 +3,7 @@ import {
   compressImage,
   createCompressedImageFile,
 } from "@/ui/utils/compress-image.ts";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
-
-/**
- * Prepares file data for QR content editor modal
- * Creates File objects with metadata for file upload fields
- */
-export const prepareFileDataForModal = async (
-  qr: TQrServerData,
-): Promise<Record<string, File[]> | undefined> => {
-  const { qrType, fileId, file } = qr;
-
-  if (!fileId || !file?.name) {
-    return undefined;
-  }
-
-  try {
-    let result;
-    switch (qrType) {
-      case "image":
-        result = await prepareImageFile(qr);
-        break;
-      case "pdf":
-        result = preparePdfFile(qr);
-        break;
-      case "video":
-        result = prepareVideoFile(qr);
-        break;
-      default:
-        return undefined;
-    }
-
-    return result;
-  } catch (error) {
-    console.error(`Failed to prepare file data for QR ${qr.id}:`, error);
-    return undefined;
-  }
-};
+import { TQrServerData } from "../../../qr-builder-new/helpers/data-converters";
 
 /**
  * Prepares image file with compression
@@ -119,4 +83,40 @@ const prepareVideoFile = (
 
   console.log("prepareVideoFile: created placeholder", placeholderFile);
   return { filesVideo: [placeholderFile] };
+};
+
+/**
+ * Prepares file data for QR content editor modal
+ * Creates File objects with metadata for file upload fields
+ */
+export const prepareFileDataForModal = async (
+  qr: TQrServerData,
+): Promise<Record<string, File[]> | undefined> => {
+  const { qrType, fileId, file } = qr;
+
+  if (!fileId || !file?.name) {
+    return undefined;
+  }
+
+  try {
+    let result;
+    switch (qrType) {
+      case "image":
+        result = await prepareImageFile(qr);
+        break;
+      case "pdf":
+        result = preparePdfFile(qr);
+        break;
+      case "video":
+        result = prepareVideoFile(qr);
+        break;
+      default:
+        return undefined;
+    }
+
+    return result;
+  } catch (error) {
+    console.error(`Failed to prepare file data for QR ${qr.id}:`, error);
+    return undefined;
+  }
 };

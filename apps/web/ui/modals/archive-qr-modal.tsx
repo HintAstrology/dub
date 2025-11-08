@@ -24,7 +24,7 @@ function ArchiveQRModal({
   setShowArchiveQRModal,
   qrCode,
 }: ArchiveQRModalProps) {
-  const { archiveQR } = useNewQrOperations();
+  const { archiveQR } = useNewQrOperations({ initialQrData: qrCode });
   const [archiving, setArchiving] = useState(false);
 
   const handleArchiveRequest = async (event: MouseEvent<HTMLButtonElement>) => {

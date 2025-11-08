@@ -3,7 +3,7 @@
 import { Session } from "@/lib/auth/utils";
 import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal.tsx";
 import useQrs from "@/lib/swr/use-qrs.ts";
-import QrCodeCardPlaceholder from "@/ui/qr-code/qr-code-card-placeholder.tsx";
+import QrCodeCardPlaceholder from "@/ui/qr-code/components/qr-code-card-placeholder.tsx";
 import { QrCodesDisplayContext } from "@/ui/qr-code/qr-codes-display-provider.tsx";
 import { CardList, MaxWidthWrapper } from "@dub/ui";
 import { CursorRays, QRCode as QRCodeIcon } from "@dub/ui/icons";
@@ -18,7 +18,7 @@ import {
 } from "react";
 import { TQrServerData } from "../qr-builder-new/helpers/data-converters.ts";
 import { AnimatedEmptyState } from "../shared/animated-empty-state";
-import { QrCodeCard } from "./qr-code-card.tsx";
+import { QrCodeCard } from "./components/qr-code-card.tsx";
 
 export default function QrCodesContainer({
   CreateQrCodeButton,

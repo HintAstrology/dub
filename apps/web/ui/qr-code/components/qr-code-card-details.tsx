@@ -8,7 +8,7 @@ import { Tooltip } from "@dub/ui";
 import { cn, getPrettyUrl } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
 import { memo } from "react";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 
 const getDisplayContent = (qrCode: TQrServerData): string => {
   const { data, qrType } = qrCode;
@@ -91,7 +91,7 @@ export const QRCardDetails = memo(
     const qrType = qrCode.qrType as EQRType;
 
     const { setShowQRContentEditorModal, QRContentEditorModal } =
-      useQRContentEditor();
+      useQRContentEditor({ qrCode });
 
     const onEditClick = (e: React.MouseEvent<SVGSVGElement>) => {
       e.stopPropagation();
@@ -123,12 +123,7 @@ export const QRCardDetails = memo(
                 title={qrCode.link.url}
                 className="min-w-0 truncate font-medium text-neutral-500 transition-colors hover:text-neutral-700 hover:underline hover:underline-offset-2"
               >
-                {qrType === EQRType.WEBSITE ||
-                qrType === EQRType.APP_LINK ||
-                qrType === EQRType.SOCIAL ||
-                qrType === EQRType.FEEDBACK
-                  ? getPrettyUrl(displayContent)
-                  : displayContent}
+                {getPrettyUrl(displayContent)}
               </a>
             ) : (
               <span

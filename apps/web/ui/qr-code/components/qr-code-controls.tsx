@@ -3,8 +3,9 @@ import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useArchiveQRModal } from "@/ui/modals/archive-qr-modal.tsx";
 import { useDeleteQRModal } from "@/ui/modals/delete-qr-modal.tsx";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal.tsx";
+import { TStepState } from "@/ui/qr-builder-new/types/context";
 import { QrCodesListContext } from "@/ui/qr-code/qr-codes-container.tsx";
-import { Button, Popover, useMediaQuery } from "@dub/ui";
+import { Button, Popover } from "@dub/ui";
 import { Download } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
@@ -20,10 +21,11 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { useContext } from "react";
-import { useDuplicateQRModal } from "../modals/duplicate-qr-modal";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
-import { ThreeDots } from "../shared/icons";
+import { useContext, useState } from "react";
+import { useDuplicateQRModal } from "../../modals/duplicate-qr-modal";
+import { QRBuilderNewModal } from "../../modals/qr-builder-new";
+import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
+import { ThreeDots } from "../../shared/icons";
 
 interface QrCodeControlsProps {
   qrCode: TQrServerData;
@@ -42,10 +44,12 @@ export function QrCodeControls({
   setShowTrialExpiredModal,
   user,
 }: QrCodeControlsProps) {
+  const [currentStep, setCurrentStep] = useState<TStepState>(null);
+  const [showEditQRModal, setShowEditQRModal] = useState(false);
+
   const { domain, key } = qrCode.link;
   const { slug } = useWorkspace();
 
-  const { isMobile } = useMediaQuery();
   const router = useRouter();
 
   const { openMenuQrCodeId, setOpenMenuQrCodeId } =
@@ -68,27 +72,9 @@ export function QrCodeControls({
   const { QRPreviewModal, setShowQRPreviewModal } = useQRPreviewModal({
     qrCodeStylingInstance,
     svgString,
-    width: isMobile ? 300 : 200,
-    height: isMobile ? 300 : 200,
     qrCodeId: qrCode.id,
     user,
   });
-
-  // const {
-  //   setShowQRBuilderModal: setShowQRTypeModal,
-  //   QRBuilderModal: QRChangeTypeModal,
-  // } = useQRBuilder({
-  //   props: qrCode,
-  //   initialStep: 1,
-  // });
-
-  // const {
-  //   setShowQRBuilderModal: setShowQRCustomizeModal,
-  //   QRBuilderModal: QRCustomizeModal,
-  // } = useQRBuilder({
-  //   props: qrCode,
-  //   initialStep: 3, // design customization
-  // });
 
   const onDownloadButtonClick = () => {
     trackClientEvents({
@@ -151,14 +137,25 @@ export function QrCodeControls({
     });
   };
 
+  const onCloseEditQRModal = () => {
+    setShowEditQRModal(false);
+    setCurrentStep(null);
+  };
+
   return (
     <div className="flex flex-col-reverse items-end justify-end gap-2 lg:flex-row lg:items-center">
       <DuplicateQRModal />
       <QRPreviewModal />
-      {/* <QRChangeTypeModal />
-      <QRCustomizeModal /> */}
       <ArchiveQRModal />
       <DeleteLinkModal />
+
+      <QRBuilderNewModal
+        showModal={showEditQRModal}
+        onClose={onCloseEditQRModal}
+        user={user}
+        qrCode={qrCode}
+        initialStep={currentStep}
+      />
 
       <Button
         onClick={onDownloadButtonClick}
@@ -246,7 +243,9 @@ export function QrCodeControls({
                     setShowTrialExpiredModal?.(true);
                     return;
                   }
-                  // setShowQRTypeModal(true);
+
+                  setShowEditQRModal(true);
+                  setCurrentStep(1);
                 }}
                 icon={<ArrowRightLeft className="size-4" />}
                 className="h-9 w-full justify-start px-2 font-medium"
@@ -264,7 +263,8 @@ export function QrCodeControls({
                     return;
                   }
 
-                  // setShowQRCustomizeModal(true);
+                  setShowEditQRModal(true);
+                  setCurrentStep(3);
                 }}
                 icon={<Palette className="size-4" />}
                 className="h-9 w-full justify-start px-2 font-medium"

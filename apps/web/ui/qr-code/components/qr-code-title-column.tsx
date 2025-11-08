@@ -4,17 +4,17 @@ import { Session } from "@/lib/auth";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal";
 import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
-import { QRCardDetails } from "@/ui/qr-code/qr-code-card-details.tsx";
-import { QRCardTitle } from "@/ui/qr-code/qr-code-card-title.tsx";
-import { QrCardType } from "@/ui/qr-code/qr-code-card-type.tsx";
-import { Tooltip, useMediaQuery, useRouterStuff } from "@dub/ui";
+import { QRCardDetails } from "@/ui/qr-code/components/qr-code-card-details";
+import { QRCardTitle } from "@/ui/qr-code/components/qr-code-card-title";
+import { QrCardType } from "@/ui/qr-code/components/qr-code-card-type";
+import { Tooltip, useRouterStuff } from "@dub/ui";
 import { cn, formatDateTime, timeAgo } from "@dub/utils";
 import { Text } from "@radix-ui/themes";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { useEffect, useRef } from "react";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
+import { useEffect } from "react";
+import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeTitleColumnProps {
@@ -37,20 +37,16 @@ export function QrCodeTitleColumn({
   setShowTrialExpiredModal,
 }: IQrCodeTitleColumnProps) {
   const { createdAt } = qrCode ?? {};
-  const { isMobile } = useMediaQuery();
 
   const { newQrId, setNewQrId } = useNewQrContext();
   const searchParams = useSearchParams();
   const { queryParams } = useRouterStuff();
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const { QRPreviewModal, setShowQRPreviewModal, handleOpenNewQr } =
     useQRPreviewModal({
       qrCodeStylingInstance,
       svgString,
       qrCodeId: qrCode.id,
-      width: isMobile ? 300 : 200,
-      height: isMobile ? 300 : 200,
       user,
     });
 
@@ -85,10 +81,7 @@ export function QrCodeTitleColumn({
     <>
       <QRPreviewModal />
 
-      <div
-        ref={containerRef}
-        className="flex h-full min-w-0 flex-row items-start gap-4"
-      >
+      <div className="flex h-full min-w-0 flex-row items-start gap-4">
         <div className="flex flex-col gap-2">
           <div
             className="h-[100px] w-[100px] cursor-pointer"

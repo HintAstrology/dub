@@ -5,10 +5,10 @@ import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import {
   TDownloadFormat,
   useQrDownload,
-} from "@/ui/qr-code/use-qr-download.ts";
+} from "@/ui/qr-code/hooks/use-qr-download";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr";
-import { Button, Modal, useRouterStuff } from "@dub/ui";
+import { Button, Modal, useMediaQuery, useRouterStuff } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { Icon } from "@iconify/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -41,8 +41,6 @@ interface IQRPreviewModalProps {
   qrCodeStylingInstance: QRCodeStyling | null;
   svgString: string;
   qrCodeId?: string;
-  width?: number;
-  height?: number;
   user: Session["user"];
 }
 
@@ -54,10 +52,9 @@ function QRPreviewModal({
   qrCodeStylingInstance,
   svgString = "",
   qrCodeId,
-  width = 200,
-  height = 200,
   user,
 }: IQRPreviewModalProps) {
+  const { isMobile } = useMediaQuery();
   const { queryParams } = useRouterStuff();
   const searchParams = useSearchParams();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -252,8 +249,8 @@ function QRPreviewModal({
               <div className="flex justify-center">
                 <QRCanvas
                   svgString={svgString}
-                  width={width}
-                  height={height}
+                  width={isMobile ? 300 : 200}
+                  height={isMobile ? 300 : 200}
                   className="p-1"
                 />
               </div>
@@ -338,18 +335,9 @@ export function useQRPreviewModal(data: {
   qrCodeStylingInstance: QRCodeStyling | null;
   svgString: string;
   qrCodeId?: string;
-  width?: number;
-  height?: number;
   user: Session["user"];
 }) {
-  const {
-    qrCodeStylingInstance,
-    svgString = "",
-    qrCodeId,
-    width = 200,
-    height = 200,
-    user,
-  } = data;
+  const { qrCodeStylingInstance, svgString = "", qrCodeId, user } = data;
   const [showQRPreviewModal, setShowQRPreviewModal] = useState(false);
   const [isNewQr, setIsNewQr] = useState(false);
 
@@ -364,8 +352,6 @@ export function useQRPreviewModal(data: {
         qrCodeStylingInstance={qrCodeStylingInstance}
         svgString={svgString}
         qrCodeId={qrCodeId}
-        width={width}
-        height={height}
         showQRPreviewModal={showQRPreviewModal}
         setShowQRPreviewModal={setShowQRPreviewModal}
         setIsNewQr={setIsNewQr}
@@ -374,8 +360,6 @@ export function useQRPreviewModal(data: {
       />
     );
   }, [
-    width,
-    height,
     showQRPreviewModal,
     qrCodeId,
     qrCodeStylingInstance,

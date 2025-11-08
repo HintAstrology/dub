@@ -2,17 +2,12 @@
 
 import { useKeyboardShortcut, useMediaQuery } from "@dub/ui";
 import { Theme } from "@radix-ui/themes";
-import { useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect } from "react";
 import { Drawer } from "vaul";
 
 import { Session } from "@/lib/auth";
-import { QRBuilderNew } from "@/ui/qr-builder-new";
-import {
-  TNewQRBuilderData,
-  TQrServerData,
-} from "@/ui/qr-builder-new/helpers/data-converters";
-import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
-import { TStepState } from "@/ui/qr-builder-new/types/context";
+import { QRBuilderWrapper } from "@/ui/qr-builder-new/components/qr-builder-wrapper";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr.tsx";
 import { Modal } from "@dub/ui";
@@ -21,24 +16,20 @@ import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.i
 import { LoaderCircle } from "lucide-react";
 
 interface QRBuilderModalProps {
-  qrCode?: TQrServerData;
   showModal: boolean;
-  onClose: () => void;
+  setShowModal: (show: boolean) => void;
   user: Session["user"];
-  initialStep: TStepState;
 }
 
-export function QRBuilderNewModal({
-  qrCode,
+export const QRBuilderUpdateModal: FC<Readonly<QRBuilderModalProps>> = ({
   showModal,
-  initialStep,
-  onClose,
+  setShowModal,
   user,
-}: QRBuilderModalProps) {
-  const { createQr, updateQr } = useNewQrOperations({ initialQrData: qrCode! });
+}) => {
   const { isMobile } = useMediaQuery();
+  const { isProcessing, initialQrData } = useQrBuilderContext();
 
-  const [isProcessing, setIsProcessing] = useState(false);
+  const title = initialQrData?.title ?? initialQrData?.id;
 
   useEffect(() => {
     if (showModal) {
@@ -47,37 +38,20 @@ export function QRBuilderNewModal({
         params: {
           page_name: "dashboard",
           element_name: "qr_builder_modal",
-          content_value: qrCode ? "edit" : "create",
+          content_value: "edit",
           email: user?.email,
           event_category: "Authorized",
         },
         sessionId: user?.id,
       });
     }
-  }, [showModal, qrCode, user]);
-
-  const handleSaveQR = async (data: TNewQRBuilderData) => {
-    setIsProcessing(true);
-
-    try {
-      if (qrCode) {
-        await updateQr(qrCode, data);
-      } else {
-        await createQr(data);
-      }
-      onClose();
-    } catch (error) {
-      console.error("Error saving QR:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  }, [showModal, user]);
 
   const handleClose = useCallback(() => {
     if (!isProcessing) {
-      onClose();
+      setShowModal(false);
     }
-  }, [isProcessing]);
+  }, [isProcessing, setShowModal]);
 
   useKeyboardShortcut("Escape", handleClose);
 
@@ -96,11 +70,11 @@ export function QRBuilderNewModal({
         <div className="flex items-center gap-2">
           <QRIcon className="text-primary h-5 w-5" />
           <h3 className="!mt-0 max-w-xs truncate text-lg font-medium">
-            {qrCode ? `Edit QR - ${qrCode.title ?? qrCode.id}` : "New QR"}
+            {`Edit QR - ${title}`}
           </h3>
         </div>
         <button
-          onClick={onClose}
+          onClick={() => setShowModal(false)}
           disabled={isProcessing}
           type="button"
           className="active:bg-border-500 group relative -right-2 z-10 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
@@ -109,11 +83,7 @@ export function QRBuilderNewModal({
         </button>
       </div>
       <Theme>
-        <QRBuilderNew
-          initialStep={initialStep}
-          initialQrData={qrCode}
-          onSave={handleSaveQR}
-        />
+        <QRBuilderWrapper />
       </Theme>
     </div>
   );
@@ -122,7 +92,7 @@ export function QRBuilderNewModal({
     return (
       <Drawer.Root
         open={showModal}
-        onOpenChange={onClose}
+        onOpenChange={setShowModal}
         dismissible={false}
         repositionInputs={false}
       >
@@ -141,11 +111,12 @@ export function QRBuilderNewModal({
   return (
     <Modal
       showModal={showModal}
-      setShowModal={onClose}
+      setShowModal={setShowModal}
+      onClose={handleClose}
       desktopOnly
       className="border-border-500 w-full max-w-6xl overflow-hidden"
     >
       {modalContent}
     </Modal>
   );
-}
+};

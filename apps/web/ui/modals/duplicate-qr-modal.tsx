@@ -18,7 +18,7 @@ type Props = {
 };
 
 function DuplicateQRModal({ isOpen, onToggleModal, qrCode }: Props) {
-  const { duplicateQR } = useNewQrOperations();
+  const { duplicateQR } = useNewQrOperations({ initialQrData: qrCode });
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async (event: MouseEvent<HTMLButtonElement>) => {

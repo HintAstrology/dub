@@ -6,7 +6,6 @@ import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-q
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { EQRType, FILE_QR_TYPES } from "../constants/get-qr-config";
-import { useQrBuilderContext } from "../context";
 import {
   convertNewQRBuilderDataToServer,
   TNewQRBuilderData,
@@ -14,13 +13,19 @@ import {
 } from "../helpers/data-converters";
 import { TQRFormData } from "../types/context";
 
-export const useNewQrOperations = () => {
+interface IUseNewQrOperationsProps {
+  initialQrData: TQrServerData;
+}
+
+export const useNewQrOperations = ({
+  initialQrData,
+}: IUseNewQrOperationsProps) => {
   const { id: workspaceId } = useWorkspace();
   const { setNewQrId } = useNewQrContext();
 
   const toastWithUndo = useToastWithUndo();
 
-  const { initialQrData, selectedQrType } = useQrBuilderContext();
+  const selectedQrType = initialQrData?.qrType as EQRType;
 
   const createQr = useCallback(
     async (builderData: TNewQRBuilderData, retryCount = 0) => {
@@ -454,7 +459,7 @@ export const useNewQrOperations = () => {
       toast.error("Failed to delete QR");
       return false;
     }
-  }, [workspaceId, initialQrData]);
+  }, [workspaceId]);
 
   const duplicateQR = useCallback(async () => {
     try {
@@ -493,7 +498,7 @@ export const useNewQrOperations = () => {
       toast.error("Failed to duplicate QR");
       return false;
     }
-  }, [workspaceId, setNewQrId, initialQrData]);
+  }, [workspaceId, setNewQrId]);
 
   return {
     createQr,

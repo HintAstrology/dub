@@ -44,27 +44,28 @@ const QrBuilderContext = createContext<IQrBuilderContextType | undefined>(
 interface QrBuilderProviderProps {
   children: ReactNode;
   initialQrData?: TQrServerData | null;
-  isEdit?: boolean;
   homepageDemo?: boolean;
   sessionId?: string;
   onSave?: (builderData: TNewQRBuilderData) => Promise<any>;
   typeToScrollTo?: EQRType | null;
   handleResetTypeToScrollTo?: () => void;
+  initialStep?: TStepState;
 }
 
 // Provider component
 export function QrBuilderProvider({
   children,
   initialQrData,
-  isEdit = false,
   homepageDemo = false,
   sessionId,
   onSave: onSaveProp,
   typeToScrollTo,
   handleResetTypeToScrollTo,
+  initialStep,
 }: QrBuilderProviderProps) {
   const user = useUser();
   const { isMobile } = useMediaQuery();
+  const isEdit = !!initialQrData;
 
   const getInitializedProps = useCallback(() => {
     if (initialQrData) {
@@ -90,7 +91,7 @@ export function QrBuilderProvider({
 
   const initialState = getInitializedProps();
 
-  const [builderStep, setBuilderStep] = useState<TStepState>(1);
+  const [builderStep, setBuilderStep] = useState<TStepState>(initialStep || 1);
   const [destinationData, setDestinationData] =
     useState<TDestinationData>(null);
   const [selectedQrType, setSelectedQrType] = useState<TQrType>(
@@ -130,7 +131,7 @@ export function QrBuilderProvider({
     useState<IQRCustomizationData>(initialState.customizationData);
   const [customizationActiveTab, setCustomizationActiveTab] =
     useState<string>("Frame");
-  
+
   // Dialog state for mobile homepage demo
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -183,10 +184,10 @@ export function QrBuilderProvider({
   const handleNextStep = useCallback(() => {
     // Prevent scroll on step change
     const scrollPosition = window.scrollY;
-    
+
     // @ts-ignore
     setBuilderStep((prev) => Math.min(prev + 1, 3));
-    
+
     // Restore scroll position after state update
     requestAnimationFrame(() => {
       window.scrollTo(0, scrollPosition);
@@ -214,10 +215,10 @@ export function QrBuilderProvider({
 
       // Prevent scroll on step change
       const scrollPosition = window.scrollY;
-      
+
       setTypeSelectionError("");
       setBuilderStep(newStep as TStepState);
-      
+
       // Restore scroll position after state update
       requestAnimationFrame(() => {
         window.scrollTo(0, scrollPosition);
@@ -304,54 +305,51 @@ export function QrBuilderProvider({
 
     // Scroll on mobile - Commented out to prevent scroll on step change
     // handleScroll();
-  }, [
-    builderStep,
-    handleChangeStep,
-    homepageDemo,
-    user,
-    sessionId,
-  ]);
+  }, [builderStep, handleChangeStep, homepageDemo, user, sessionId]);
 
   // Methods
-  const onSave = useCallback(async (providedFormData?: TQRFormData) => {
-    const dataToSave = providedFormData || formData;
-    
-    if (!selectedQrType || !dataToSave) {
-      toast.error("Please complete all required fields");
-      return;
-    }
+  const onSave = useCallback(
+    async (providedFormData?: TQRFormData) => {
+      const dataToSave = providedFormData || formData;
 
-    if (!onSaveProp) {
-      console.error("onSave prop not provided to QrBuilderProvider");
-      toast.error("Save functionality not configured");
-      return;
-    }
+      if (!selectedQrType || !dataToSave) {
+        toast.error("Please complete all required fields");
+        return;
+      }
 
-    setIsProcessing(true);
+      if (!onSaveProp) {
+        console.error("onSave prop not provided to QrBuilderProvider");
+        toast.error("Save functionality not configured");
+        return;
+      }
 
-    try {
-      const builderData: TNewQRBuilderData = {
-        qrType: selectedQrType,
-        formData: dataToSave,
-        customizationData,
-        title: initialState.qrTitle || `${selectedQrType} QR Code`,
-        fileId: (dataToSave as any)?.fileId || initialState.fileId,
-      };
+      setIsProcessing(true);
 
-      await onSaveProp(builderData);
-    } catch (error) {
-      console.error("Error saving QR:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [
-    selectedQrType,
-    formData,
-    customizationData,
-    initialState.qrTitle,
-    initialState.fileId,
-    onSaveProp,
-  ]);
+      try {
+        const builderData: TNewQRBuilderData = {
+          qrType: selectedQrType,
+          formData: dataToSave,
+          customizationData,
+          title: initialState.qrTitle || `${selectedQrType} QR Code`,
+          fileId: (dataToSave as any)?.fileId || initialState.fileId,
+        };
+
+        await onSaveProp(builderData);
+      } catch (error) {
+        console.error("Error saving QR:", error);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [
+      selectedQrType,
+      formData,
+      customizationData,
+      initialState.qrTitle,
+      initialState.fileId,
+      onSaveProp,
+    ],
+  );
 
   const handleContinue = useCallback(async () => {
     if (isCustomizationStep) {
@@ -446,7 +444,7 @@ export function QrBuilderProvider({
     handleSelectQRType,
     handleResetTypeToScrollTo,
   ]);
-  
+
   // Open dialog when on steps 2 or 3 in mobile homepage demo
   useEffect(() => {
     if (isMobile && homepageDemo && !isTypeStep) {
@@ -484,7 +482,7 @@ export function QrBuilderProvider({
     isCustomizationStep,
     isEditMode: isEdit,
     homepageDemo,
-    
+
     // Dialog state
     isDialogOpen,
     setIsDialogOpen,

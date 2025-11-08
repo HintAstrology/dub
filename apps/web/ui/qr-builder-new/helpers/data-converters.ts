@@ -1,9 +1,10 @@
-import { NewQrProps } from "@/lib/types";
+import { NewQrProps, UpdateQrProps } from "@/lib/types";
 import { Options } from "qr-code-styling";
 import { FRAMES } from "../constants/customization/frames";
-import { EQRType } from "../constants/get-qr-config";
+import { EQRType, FILE_QR_TYPES } from "../constants/get-qr-config";
 import { TQRFormData } from "../types/context";
 import { IFrameData, IQRCustomizationData } from "../types/customization";
+import { TQRUpdateResult } from "../types/update";
 import { encodeQRData, parseQRData } from "./qr-data-handlers";
 import {
   getCornerDotType,
@@ -89,10 +90,10 @@ export type TQrServerData = {
 // HELPER FUNCTIONS - QR STYLING OPTIONS
 // ============================================================================
 
-function buildQRStylingOptions(
+const buildQRStylingOptions = (
   customizationData: IQRCustomizationData,
   qrData: string,
-): Options {
+): Options => {
   const { style, shape, logo } = customizationData;
 
   const options: Options = {
@@ -150,12 +151,12 @@ function buildQRStylingOptions(
   }
 
   return options;
-}
+};
 
 /**
  * Converts frame data to frame options object
  */
-function buildFrameOptions(frameData: IFrameData) {
+const buildFrameOptions = (frameData: IFrameData) => {
   // Find the frame by ID and get its TYPE for storage
   const frame = FRAMES.find((f) => f.id === frameData.id);
   const frameType = frame?.type || "none";
@@ -168,14 +169,14 @@ function buildFrameOptions(frameData: IFrameData) {
   };
 
   return result;
-}
+};
 
 /**
  * Converts logo data to logo options object
  */
-function buildLogoOptions(
+const buildLogoOptions = (
   logoData: IQRCustomizationData["logo"],
-): TQrServerData["logoOptions"] {
+): TQrServerData["logoOptions"] => {
   if (logoData.type === "none") {
     return undefined;
   }
@@ -195,13 +196,13 @@ function buildLogoOptions(
   }
 
   return undefined;
-}
+};
 
 // ============================================================================
 // HELPER FUNCTIONS - EXTRACT/PARSE DATA
 // ============================================================================
 
-function extractLogoData(
+const extractLogoData = (
   logoOptions?: TQrServerData["logoOptions"],
   styles?: Options,
 ): {
@@ -209,7 +210,7 @@ function extractLogoData(
   id?: string;
   iconSrc?: string;
   fileId?: string;
-} {
+} => {
   // Prioritize logoOptions if available (new format)
   if (logoOptions) {
     console.log("Using logoOptions");
@@ -278,12 +279,12 @@ function extractLogoData(
 
   // Otherwise it's an uploaded logo (legacy or blob URL)
   return { type: "uploaded" };
-}
+};
 
 /**
  * Get style ID from QRCodeStyling type
  */
-function getDotsStyleId(type: any): string {
+const getDotsStyleId = (type: any): string => {
   const typeMap: Record<string, string> = {
     square: "dots-square",
     dots: "dots-dots",
@@ -293,9 +294,9 @@ function getDotsStyleId(type: any): string {
     "extra-rounded": "dots-extra-rounded",
   };
   return typeMap[type] || "dots-square";
-}
+};
 
-function getCornerSquareStyleId(type: any): string {
+const getCornerSquareStyleId = (type: any): string => {
   const typeMap: Record<string, string> = {
     square: "corner-square-square",
     rounded: "corner-square-rounded",
@@ -303,9 +304,9 @@ function getCornerSquareStyleId(type: any): string {
     "classy-rounded": "corner-square-classy-rounded",
   };
   return typeMap[type] || "corner-square-square";
-}
+};
 
-function getCornerDotStyleId(type: any): string {
+const getCornerDotStyleId = (type: any): string => {
   const typeMap: Record<string, string> = {
     square: "corner-dot-square",
     dot: "corner-dot-dot",
@@ -314,17 +315,17 @@ function getCornerDotStyleId(type: any): string {
     classy: "corner-dot-classy",
   };
   return typeMap[type] || "corner-dot-square";
-}
+};
 
 /**
  * Extract customization data from server styles, frame options, and logo options
  * IMPORTANT: Storage has frame TYPE (e.g., "card"), but we need ID (e.g., "frame-card")
  */
-function extractCustomizationData(
+export const extractCustomizationData = (
   styles: Options,
   frameOptions: any,
   logoOptions?: TQrServerData["logoOptions"],
-): IQRCustomizationData {
+): IQRCustomizationData => {
   // Convert frame TYPE to ID by finding the frame in FRAMES array
   const frameType = frameOptions?.id || "none";
   const frame = FRAMES.find((f) => f.type === frameType);
@@ -350,7 +351,7 @@ function extractCustomizationData(
     },
     logo: extractLogoData(logoOptions, styles),
   };
-}
+};
 
 // ============================================================================
 // MAIN CONVERSION FUNCTIONS
@@ -359,10 +360,10 @@ function extractCustomizationData(
 /**
  * Convert new QR builder data to server API format
  */
-export async function convertNewQRBuilderDataToServer(
+export const convertNewQRBuilderDataToServer = async (
   builderData: TNewQRBuilderData,
   options: { domain: string },
-): Promise<NewQrProps> {
+): Promise<NewQrProps> => {
   const { qrType, formData, customizationData, title, fileId } = builderData;
   const { domain } = options;
 
@@ -397,14 +398,14 @@ export async function convertNewQRBuilderDataToServer(
   };
 
   return result;
-}
+};
 
 /**
  * Convert server QR data back to new builder format
  */
-export function convertServerQRToNewBuilder(
+export const convertServerQRToNewBuilder = (
   serverData: TQrServerData,
-): TNewQRBuilderData {
+): TNewQRBuilderData => {
   // Parse QR data to form data using qr-data-handlers
   const sourceData = serverData.link?.url || serverData.data;
   const formData = parseQRData(
@@ -431,14 +432,14 @@ export function convertServerQRToNewBuilder(
     title: serverData.title ?? "",
     fileId: serverData.fileId ?? undefined,
   };
-}
+};
 
 /**
  * Convert new builder data to storage format (for localStorage/Redis)
  */
-export function convertNewBuilderToStorageFormat(
+export const convertNewBuilderToStorageFormat = (
   builderData: TNewQRBuilderData,
-): TQRBuilderDataForStorage {
+): TQRBuilderDataForStorage => {
   const { qrType, formData, customizationData, title, fileId } = builderData;
 
   // Encode form data to QR data string
@@ -464,26 +465,22 @@ export function convertNewBuilderToStorageFormat(
   };
 
   return result;
-}
+};
 // ============================================================================
 // COMPATIBILITY FUNCTIONS FOR WORKSPACE OPERATIONS
 // ============================================================================
-
-import { UpdateQrProps } from "@/lib/types";
-import { FILE_QR_TYPES } from "../constants/get-qr-config";
-import { TQRUpdateResult } from "../types/update";
 
 /**
  * Compare original QR data with new builder data and generate update payload
  * Used for determining what changed and building the update request
  */
-export async function convertNewQRForUpdate(
+export const convertNewQRForUpdate = async (
   originalQR: TQrServerData,
   newBuilderData: TNewQRBuilderData,
   options: {
     domain: string;
   },
-): Promise<TQRUpdateResult> {
+): Promise<TQRUpdateResult> => {
   const { domain } = options;
 
   // Convert new builder data to server format
@@ -577,4 +574,4 @@ export async function convertNewQRForUpdate(
     },
     updateData,
   };
-}
+};
