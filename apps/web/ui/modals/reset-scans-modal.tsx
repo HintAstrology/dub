@@ -1,4 +1,3 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Flex, Text, Theme } from "@radix-ui/themes";
@@ -10,11 +9,12 @@ import {
   useCallback,
   useState,
 } from "react";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
 type ArchiveQRModalProps = {
   isOpen: boolean;
   onToggleModal: Dispatch<SetStateAction<boolean>>;
-  props: QrStorageData;
+  props: TQrServerData;
 };
 
 function ResetScansModal({
@@ -108,7 +108,7 @@ function ResetScansModal({
   );
 }
 
-export function useResetScansModal({ props }: { props: QrStorageData }) {
+export function useResetScansModal({ props }: { props: TQrServerData }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const ResetScansModalCallback = useCallback(() => {
