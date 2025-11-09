@@ -2,6 +2,7 @@
 
 import { saveQrDataToRedisAction } from "@/lib/actions/pre-checkout-flow/save-qr-data-to-redis.ts";
 import { Session } from "@/lib/auth";
+import { QrTabsTitle } from "@/ui/landing/components/qr-tabs/components/qr-tabs-title";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
 import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
 import {
@@ -10,7 +11,6 @@ import {
 } from "@/ui/qr-builder-new/helpers/data-converters";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
-import { QrTabsTitle } from "@/ui/qr-builder/qr-tabs-title.tsx";
 import { useMediaQuery } from "@dub/ui";
 import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
@@ -70,7 +70,7 @@ export const QRTabs: FC<
       setIsProcessingSignup(true);
 
       const existingSession = await getSession();
-      console.log("existingSession", existingSession);
+
       const user = (existingSession?.user as Session["user"]) || undefined;
 
       if (existingSession?.user) {

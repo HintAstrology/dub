@@ -1,6 +1,6 @@
 "use client";
 
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQRBuilderDataForStorage } from "@/ui/qr-builder-new/helpers/data-converters";
 import { Modal, useMediaQuery } from "@dub/ui";
 import {
   setPeopleAnalyticOnce,
@@ -13,7 +13,7 @@ import { TrialOfferInner } from "./trial-offer-inner";
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: TQrServerData | null;
+  firstQr: TQRBuilderDataForStorage | null;
   isPaidTraffic: boolean;
 }
 

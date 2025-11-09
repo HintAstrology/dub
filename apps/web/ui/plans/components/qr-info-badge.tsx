@@ -1,12 +1,12 @@
 "use client";
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { cn } from "@dub/utils/src";
 import { FC } from "react";
 
 interface IPopularQrInfo {
-  mostScannedQR: QrStorageData | null;
+  mostScannedQR: TQrServerData | null;
   featuresAccess: FeaturesAccess;
 }
 

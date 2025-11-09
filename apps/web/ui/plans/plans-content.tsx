@@ -9,12 +9,12 @@ import { PlansHeading } from "@/ui/plans/components/plans-heading.tsx";
 import { PopularQrInfo } from "@/ui/plans/components/popular-qr-info.tsx";
 import { ICustomerBody } from "core/integration/payment/config";
 import { FC, useRef } from "react";
-import { QrStorageData } from "../qr-builder/types/types";
+import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
 interface IPlansContentProps {
   user: ICustomerBody;
   featuresAccess: FeaturesAccess;
-  mostScannedQR: QrStorageData | null;
+  mostScannedQR: TQrServerData | null;
 }
 
 export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
@@ -53,7 +53,7 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
         </div>
       </div>
 
-      <FAQSection faqItems={FAQ_ITEMS_PAYWALL} homePageDemo={false} />
+      <FAQSection faqItems={FAQ_ITEMS_PAYWALL} />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { convertSessionUserToCustomerBody, getSession } from "@/lib/auth";
 import { PageContent } from "@/ui/layout/page-content";
 import { getMostScannedQr } from "@/ui/plans/actions/getMostScannedQr";
 import { PlansContent } from "@/ui/plans/plans-content.tsx";
-import { QrStorageData } from "@/ui/qr-builder/types/types";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { MaxWidthWrapper } from "@dub/ui";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker/page-viewed-tracker.component";
 import { NextPage } from "next";
@@ -25,7 +25,7 @@ const PlansPage: NextPage = async () => {
       <PageContent>
         <MaxWidthWrapper>
           <PlansContent
-            mostScannedQR={mostScannedQR as QrStorageData}
+            mostScannedQR={mostScannedQR as unknown as TQrServerData}
             user={user!}
             featuresAccess={featuresAccess}
           />

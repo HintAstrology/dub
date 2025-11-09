@@ -2,13 +2,13 @@
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { PlansFeatures } from "@/ui/plans/components/plans-features.tsx";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { QRCodeDemoMap } from "@/ui/qr-builder/components/qr-code-demos/qr-code-demo-map";
 import {
   EQRType,
   FILE_QR_TYPES,
   QR_TYPES,
 } from "@/ui/qr-builder/constants/get-qr-config.ts";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
 import { parseQRData } from "@/ui/utils/qr-data-parser";
 import { Button } from "@dub/ui";
 import { Flex, Heading, Text } from "@radix-ui/themes";
@@ -17,7 +17,7 @@ import { FC, useMemo } from "react";
 import { QrInfoBadge } from "./qr-info-badge";
 
 interface IPopularQrInfo {
-  mostScannedQR: QrStorageData | null;
+  mostScannedQR: TQrServerData | null;
   featuresAccess: FeaturesAccess;
   handleScroll: () => void;
 }

@@ -3,6 +3,7 @@
 import { actionClient } from "@/lib/actions/safe-action";
 import z from "@/lib/zod";
 import { emailSchema } from "@/lib/zod/schemas/auth";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { prisma } from "@dub/prisma";
 import {
   getUserCookieService,
@@ -11,9 +12,8 @@ import {
 import { encodeUserMarketingToken } from "core/services/user-marketing-token.service";
 import { flattenValidationErrors } from "next-safe-action";
 import { throwIfAuthenticated } from "../auth/throw-if-authenticated";
-import { getQrDataFromRedis } from './get-qr-data-from-redis';
-import { saveQrDataToRedisAction } from './save-qr-data-to-redis';
-import { QRBuilderData } from '@/ui/qr-builder/types/types';
+import { getQrDataFromRedis } from "./get-qr-data-from-redis";
+import { saveQrDataToRedisAction } from "./save-qr-data-to-redis";
 
 class AuthError extends Error {
   constructor(
@@ -57,11 +57,17 @@ export const changePreSignupEmailAction = actionClient
       if (qrData) {
         await saveQrDataToRedisAction({
           sessionId: dbUser.id,
-          qrData: qrData as QRBuilderData,
+          qrData: qrData as TQrServerData,
           extraKey: "qr-from-landing",
         });
       }
-      return { success: true, userToken: null, signupMethod, email, error: "email-exists" };
+      return {
+        success: true,
+        userToken: null,
+        signupMethod,
+        email,
+        error: "email-exists",
+      };
     }
 
     await updateUserCookieService({ email });

@@ -5,7 +5,7 @@ import { showMessage } from "@/ui/auth/helpers";
 import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import {
   extractCustomizationData,
-  TQrServerData,
+  TQRBuilderDataForStorage,
 } from "@/ui/qr-builder-new/helpers/data-converters";
 import { useQRCodeStyling } from "@/ui/qr-builder-new/hooks/use-qr-code-styling";
 import { FiveStarsComponent } from "@/ui/shared/five-stars.component";
@@ -35,7 +35,7 @@ const FEATURES = [
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: TQrServerData | null;
+  firstQr: TQRBuilderDataForStorage | null;
   isPaidTraffic: boolean;
 }
 

@@ -5,7 +5,7 @@ import { LandingSectionsServer } from "@/ui/landing/landing-sections-server.tsx"
 import { FC, useCallback, useState } from "react";
 import { trackClientEvents } from "../../core/integration/analytic";
 import { EAnalyticEvents } from "../../core/integration/analytic/interfaces/analytic.interface.ts";
-import { EQRType } from "../qr-builder/constants/get-qr-config.ts";
+import { EQRType } from "../qr-builder-new/types/qr-type.ts";
 import { scrollToBuilder } from "./helpers/scrollToBuilder.tsx";
 
 interface ILandingSectionsClientProps {
