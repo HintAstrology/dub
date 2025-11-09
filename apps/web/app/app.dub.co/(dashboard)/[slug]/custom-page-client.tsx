@@ -64,7 +64,8 @@ function WorkspaceQRs({
     <>
       <QRBuilderNewModal
         showModal={showQRBuilderModal}
-        setShowModal={setShowQRBuilderModal}
+        onClose={() => setShowQRBuilderModal(false)}
+        user={user}
       />
 
       <div className="flex w-full items-center pt-2">

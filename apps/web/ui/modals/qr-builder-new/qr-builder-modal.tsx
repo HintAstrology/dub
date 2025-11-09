@@ -25,7 +25,7 @@ interface QRBuilderModalProps {
   showModal: boolean;
   onClose: () => void;
   user: Session["user"];
-  initialStep: TStepState;
+  initialStep?: TStepState;
 }
 
 export function QRBuilderNewModal({
@@ -109,11 +109,13 @@ export function QRBuilderNewModal({
         </button>
       </div>
       <Theme>
-        <QRBuilderNew
-          initialStep={initialStep}
-          initialQrData={qrCode}
-          onSave={handleSaveQR}
-        />
+        <div className="p-4 pt-0">
+          <QRBuilderNew
+            initialStep={initialStep}
+            initialQrData={qrCode}
+            onSave={handleSaveQR}
+          />
+        </div>
       </Theme>
     </div>
   );
