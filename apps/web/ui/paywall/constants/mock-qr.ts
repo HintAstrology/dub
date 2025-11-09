@@ -1,7 +1,7 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types";
-import { APP_DOMAIN } from '@dub/utils';
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { APP_DOMAIN } from "@dub/utils";
 
-export const MOCK_QR: QrStorageData = {
+export const MOCK_QR: TQrServerData = {
   id: "demo-qr-id",
   title: "Universal QR Code",
   data: APP_DOMAIN,
@@ -32,13 +32,13 @@ export const MOCK_QR: QrStorageData = {
     text: "Create Me",
     textColor: "#1CAB7B",
   },
-  fileId: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  userId: "demo-user-id",
-  linkId: "demo-link-id",
-  workspaceId: "demo-workspace-id",
-  user: {} as any,
+  // fileId: null,
+  // createdAt: new Date(),
+  // updatedAt: new Date(),
+  // userId: "demo-user-id",
+  // linkId: "demo-link-id",
+  // workspaceId: "demo-workspace-id",
+  // user: {} as any,
   link: {
     id: "demo-link-id",
     shortLink: APP_DOMAIN,

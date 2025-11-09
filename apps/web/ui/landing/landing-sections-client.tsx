@@ -2,11 +2,11 @@
 
 import { QRTabs } from "@/ui/landing/components/qr-tabs/qr-tabs.tsx";
 import { LandingSectionsServer } from "@/ui/landing/landing-sections-server.tsx";
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { trackClientEvents } from "../../core/integration/analytic";
 import { EAnalyticEvents } from "../../core/integration/analytic/interfaces/analytic.interface.ts";
 import { EQRType } from "../qr-builder/constants/get-qr-config.ts";
-import { scrollToBuilder } from './helpers/scrollToBuilder.tsx';
+import { scrollToBuilder } from "./helpers/scrollToBuilder.tsx";
 
 interface ILandingSectionsClientProps {
   sessionId: string;
@@ -35,7 +35,7 @@ export const LandingSectionsClient: FC<
     });
 
     setTypeToScrollTo(scrollTo || null);
-    
+
     setTimeout(scrollToBuilder);
   };
 
@@ -56,7 +56,7 @@ export const LandingSectionsClient: FC<
       {/* 1. New Builder */}
       <section
         id="qr-generation-block"
-        className="bg-primary-100 w-full px-3 py-6 lg:py-14 min-h-[100svh] md:min-h-0 flex items-center justify-center"
+        className="bg-primary-100 flex min-h-[100svh] w-full items-center justify-center px-3 py-6 md:min-h-0 lg:py-14"
       >
         <QRTabs
           sessionId={sessionId}

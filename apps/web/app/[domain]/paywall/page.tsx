@@ -3,7 +3,7 @@ import { DashboardPlug } from "@/ui/paywall/components/dashboard-plug";
 import { SidebarPlug } from "@/ui/paywall/components/sidebar-plug";
 import { TrialOfferModal } from "@/ui/paywall/components/trial-offer-modal";
 import { UserTokenReadingComponent } from "@/ui/paywall/components/user-token-reading";
-import { QRBuilderData } from "@/ui/qr-builder/types/types";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { getUserCookieService } from "core/services/cookie/user-session.service";
 import { decodeUserMarketingToken } from "core/services/user-marketing-token.service";
@@ -46,7 +46,7 @@ const PaywallPage: NextPage<IPaywallPageProps> = async ({ searchParams }) => {
 
       <TrialOfferModal
         user={user}
-        firstQr={firstQr as QRBuilderData}
+        firstQr={firstQr as TQrServerData}
         isPaidTraffic={isPaidTraffic}
       />
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { QRBuilderData } from "@/ui/qr-builder/types/types";
+import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { Modal, useMediaQuery } from "@dub/ui";
 import {
   setPeopleAnalyticOnce,
@@ -13,7 +13,7 @@ import { TrialOfferInner } from "./trial-offer-inner";
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: QRBuilderData | null;
+  firstQr: TQrServerData | null;
   isPaidTraffic: boolean;
 }
 

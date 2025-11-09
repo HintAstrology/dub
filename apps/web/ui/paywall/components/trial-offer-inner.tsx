@@ -2,11 +2,12 @@
 
 import { createUserAccountAction } from "@/lib/actions/create-user-account";
 import { showMessage } from "@/ui/auth/helpers";
-import { AvatarsComponent } from "@/ui/modals/trial-offer-with-qr-preview/components/avatars.component";
-import { CreateSubscriptionFlow } from "@/ui/modals/trial-offer-with-qr-preview/components/create-subscription-flow.component";
-import { useQrCustomization } from "@/ui/qr-builder/hooks/use-qr-customization";
-import { QRCanvas } from "@/ui/qr-builder/qr-canvas";
-import { QRBuilderData, QrStorageData } from "@/ui/qr-builder/types/types";
+import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
+import {
+  extractCustomizationData,
+  TQrServerData,
+} from "@/ui/qr-builder-new/helpers/data-converters";
+import { useQRCodeStyling } from "@/ui/qr-builder-new/hooks/use-qr-code-styling";
 import { FiveStarsComponent } from "@/ui/shared/five-stars.component";
 import { Button, useLocalStorage, useMediaQuery } from "@dub/ui";
 import { Theme } from "@radix-ui/themes";
@@ -19,9 +20,10 @@ import { Check, Gift } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { MOCK_QR } from "../constants/mock-qr";
-import { APP_DOMAIN } from '@dub/utils';
+import { AvatarsComponent } from "./avatars.component";
+import { CreateSubscriptionFlow } from "./create-subscription-flow.component";
 
 const FEATURES = [
   "Download your QR code in PNG, JPG, or SVG",
@@ -33,7 +35,7 @@ const FEATURES = [
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: QRBuilderData | null;
+  firstQr: TQrServerData | null;
   isPaidTraffic: boolean;
 }
 
@@ -44,29 +46,29 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
 }) => {
   const router = useRouter();
   const { isMobile } = useMediaQuery();
-  console.log("firstQr", firstQr);
 
   const [clientToken, setClientToken] = useState<string | null>(null);
-  const [signupMethod] = useLocalStorage<
-    "email" | "google" | null
-  >("signup-method", null);
+  const [signupMethod] = useLocalStorage<"email" | "google" | null>(
+    "signup-method",
+    null,
+  );
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const memoizedQrData = useMemo(() => {
-    return firstQr
-      ? ({
-          ...firstQr,
-          link: {
-            shortLink: APP_DOMAIN,
-          },
-        } as QRBuilderData)
-      : MOCK_QR;
+    return firstQr ? firstQr : MOCK_QR;
   }, [firstQr]);
 
-  const { qrCode: demoBuiltQrCodeObject } = useQrCustomization(
-    memoizedQrData as QrStorageData,
-    true,
-  );
+  const customizationData = useMemo(() => {
+    return extractCustomizationData(
+      memoizedQrData.styles,
+      memoizedQrData.frameOptions,
+      memoizedQrData.logoOptions,
+    );
+  }, [memoizedQrData]);
+
+  const { svgString } = useQRCodeStyling({
+    customizationData,
+    defaultData: `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}/qr-complete-setup`,
+  });
 
   const { executeAsync } = useAction(createUserAccountAction, {
     onError({ error }) {
@@ -156,12 +158,12 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
       event: EAnalyticEvents.AUTH_ERROR,
       params: {
         page_name: "paywall",
-          auth_type: "signup",
-          auth_method: signupMethod ?? "email",
-          email: user?.email,
-          event_category: "nonAuthorized",
-          error_code: errorCode,
-          error_message: errorMessage,
+        auth_type: "signup",
+        auth_method: signupMethod ?? "email",
+        email: user?.email,
+        event_category: "nonAuthorized",
+        error_code: errorCode,
+        error_message: errorMessage,
       },
     });
   };
@@ -179,12 +181,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
           </div>
 
           <div className="relative flex w-full max-w-[300px] flex-col justify-center gap-2">
-            <QRCanvas
-              ref={canvasRef}
-              qrCode={demoBuiltQrCodeObject}
-              width={300}
-              height={300}
-            />
+            <QRCanvas svgString={svgString} width={300} height={300} />
 
             <span className="text-center text-sm">
               {firstQr?.title || MOCK_QR.title}

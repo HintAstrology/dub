@@ -474,6 +474,8 @@ export const convertNewBuilderToStorageFormat = (
  * Compare original QR data with new builder data and generate update payload
  * Used for determining what changed and building the update request
  */
+
+// TODO: REMOVE THIS FUNCTION
 export const convertNewQRForUpdate = async (
   originalQR: TQrServerData,
   newBuilderData: TNewQRBuilderData,
