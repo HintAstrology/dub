@@ -1,4 +1,5 @@
 import { Session } from "@/lib/auth";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { FC, useMemo } from "react";
 import { QR_TYPES } from "../../qr-builder-new/constants/get-qr-config";
 import {
@@ -36,7 +37,8 @@ export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
 
   const { qrCode: qrCodeStylingInstance, svgString } = useQRCodeStyling({
     customizationData,
-    defaultData: qrCode.link.shortLink,
+    defaultData:
+      qrCode.qrType === EQRType.WIFI ? qrCode.data : qrCode.link.shortLink,
   });
 
   return (

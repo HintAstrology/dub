@@ -1,7 +1,8 @@
 import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
-import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
+import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Flex, Text, Theme } from "@radix-ui/themes";
+import { CircleAlert } from "lucide-react";
 import {
   Dispatch,
   MouseEvent,
@@ -9,8 +10,6 @@ import {
   useCallback,
   useState,
 } from "react";
-import { X } from "@/ui/shared/icons";
-import { CircleAlert } from 'lucide-react';
 
 type ArchiveQRModalProps = {
   isOpen: boolean;
@@ -18,20 +17,24 @@ type ArchiveQRModalProps = {
   props: QrStorageData;
 };
 
-function ResetScansModal({ isOpen, onToggleModal, props }: ArchiveQRModalProps) {
-  const { resetScans } = useQrOperations();
+function ResetScansModal({
+  isOpen,
+  onToggleModal,
+  props,
+}: ArchiveQRModalProps) {
+  // const { resetScans } = useQrOperations();
   const [loading, setLoading] = useState(false);
 
   const handleArchiveRequest = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     setLoading(true);
-    const success = await resetScans(props.id);
+    // const success = await resetScans(props.id);
     setLoading(false);
 
-    if (success) {
-      onToggleModal(false);
-    }
+    // if (success) {
+    //   onToggleModal(false);
+    // }
   };
 
   const handleClose = () => {
@@ -49,8 +52,8 @@ function ResetScansModal({ isOpen, onToggleModal, props }: ArchiveQRModalProps) 
     >
       <Theme>
         <div className="flex flex-col gap-2">
-          <div className="flex w-full items-center justify-center px-2 py-4 relative">
-            <h3 className="!mt-0 max-w-xs text-lg font-semibold text-center">
+          <div className="relative flex w-full items-center justify-center px-2 py-4">
+            <h3 className="!mt-0 max-w-xs text-center text-lg font-semibold">
               Are you sure you want to reset
               <br />
               scans for "{props.title}"?
@@ -68,16 +71,12 @@ function ResetScansModal({ isOpen, onToggleModal, props }: ArchiveQRModalProps) 
           <div className="px-6 pb-6">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
-                <Flex
-                  direction="row"
-                  align="center"
-                  className="w-full gap-2"
-                >
-                  <CircleAlert className="text-amber-600 h-[18px] w-[18px]" strokeWidth={2} />
-                  <Text
-                    as="span"
-                    size={{ initial: "1", lg: "2" }}
-                  >
+                <Flex direction="row" align="center" className="w-full gap-2">
+                  <CircleAlert
+                    className="h-[18px] w-[18px] text-amber-600"
+                    strokeWidth={2}
+                  />
+                  <Text as="span" size={{ initial: "1", lg: "2" }}>
                     All scan statistics for this QR code will be deleted.
                     <br />
                     This can't be undone.
@@ -122,5 +121,9 @@ export function useResetScansModal({ props }: { props: QrStorageData }) {
     ) : null;
   }, [isOpen, setIsOpen]);
 
-  return { isOpen, handleToggleModal: setIsOpen, ResetScansModal: ResetScansModalCallback };
+  return {
+    isOpen,
+    handleToggleModal: setIsOpen,
+    ResetScansModal: ResetScansModalCallback,
+  };
 }

@@ -12,7 +12,7 @@ interface QRBuilderNewProps {
   isEdit?: boolean;
   typeToScrollTo?: EQRType | null;
   handleResetTypeToScrollTo?: () => void;
-  initialStep: TStepState;
+  initialStep?: TStepState;
 }
 
 export const QRBuilderNew = ({

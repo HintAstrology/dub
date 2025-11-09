@@ -1,21 +1,20 @@
 "use client";
 
 import { saveQrDataToRedisAction } from "@/lib/actions/pre-checkout-flow/save-qr-data-to-redis.ts";
-import { Session } from '@/lib/auth';
+import { Session } from "@/lib/auth";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
 import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
 import {
   convertNewBuilderToStorageFormat,
   TNewQRBuilderData,
-  TQRBuilderDataForStorage,
 } from "@/ui/qr-builder-new/helpers/data-converters";
+import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
 import { QrTabsTitle } from "@/ui/qr-builder/qr-tabs-title.tsx";
-import { useQrOperations } from '@/ui/qr-code/hooks/use-qr-operations';
 import { useMediaQuery } from "@dub/ui";
-import { getSession } from 'next-auth/react';
+import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { FC, forwardRef, Ref, useEffect, useState } from "react";
 
 interface IQRTabsProps {
@@ -30,7 +29,7 @@ export const QRTabs: FC<
   ({ sessionId, typeToScrollTo, handleResetTypeToScrollTo }, ref) => {
     const { AuthModal, showModal } = useAuthModal({ sessionId });
     const router = useRouter();
-    const { createQr } = useQrOperations();
+    const { createQr } = useNewQrOperations({ initialQrData: null });
 
     const { executeAsync: saveQrDataToRedis } = useAction(
       saveQrDataToRedisAction,
@@ -72,7 +71,7 @@ export const QRTabs: FC<
 
       const existingSession = await getSession();
       console.log("existingSession", existingSession);
-      const user = existingSession?.user as Session['user'] || undefined;
+      const user = (existingSession?.user as Session["user"]) || undefined;
 
       if (existingSession?.user) {
         const createdQrId = await createQr(data, user?.defaultWorkspace);

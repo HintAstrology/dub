@@ -14,7 +14,7 @@ import {
 import { TQRFormData } from "../types/context";
 
 interface IUseNewQrOperationsProps {
-  initialQrData: TQrServerData;
+  initialQrData: TQrServerData | null;
 }
 
 export const useNewQrOperations = ({
@@ -28,9 +28,9 @@ export const useNewQrOperations = ({
   const selectedQrType = initialQrData?.qrType as EQRType;
 
   const createQr = useCallback(
-    async (builderData: TNewQRBuilderData, retryCount = 0) => {
+    async (builderData: TNewQRBuilderData, projectSlug?: string) => {
       try {
-        if (!workspaceId) {
+        if (!workspaceId && !projectSlug) {
           toast.error("Workspace ID not found");
           return false;
         }
@@ -42,13 +42,16 @@ export const useNewQrOperations = ({
 
         console.log(serverData, "serverData11111");
 
-        const res = await fetch(`/api/qrs?workspaceId=${workspaceId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const res = await fetch(
+          `/api/qrs?workspaceId=${projectSlug ? projectSlug : workspaceId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(serverData),
           },
-          body: JSON.stringify(serverData),
-        });
+        );
 
         if (res.status === 200) {
           await mutatePrefix(["/api/qrs", "/api/links"]);
@@ -58,25 +61,9 @@ export const useNewQrOperations = ({
         } else {
           const errorResponse = await res.json();
           console.error("API Error Response:", errorResponse);
+
           const errorMessage =
             errorResponse?.error?.message || "Failed to create QR";
-
-          // Check if it's a body consumption error and retry
-          if (
-            errorMessage.includes("Body is unusable") ||
-            errorMessage.includes("already been read")
-          ) {
-            if (retryCount < 2) {
-              // Add a small delay before retry
-              await new Promise((resolve) => setTimeout(resolve, 500));
-              return createQr(builderData, retryCount + 1);
-            } else {
-              toast.error(
-                "Request failed after multiple attempts. Please try again.",
-              );
-              return false;
-            }
-          }
 
           console.error("Error creating QR:", errorMessage);
           toast.error(errorMessage);
@@ -84,17 +71,6 @@ export const useNewQrOperations = ({
         }
       } catch (e) {
         console.error("Failed to create QR", e);
-
-        // Check if it's a network-level body consumption error and retry
-        if (
-          e instanceof Error &&
-          (e.message.includes("Body is unusable") ||
-            e.message.includes("already been read")) &&
-          retryCount < 2
-        ) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          return createQr(builderData, retryCount + 1);
-        }
 
         toast.error("Failed to create QR");
         return false;
@@ -104,11 +80,7 @@ export const useNewQrOperations = ({
   );
 
   const updateQr = useCallback(
-    async (
-      originalQR: TQrServerData,
-      builderData: TNewQRBuilderData,
-      retryCount = 0,
-    ) => {
+    async (originalQR: TQrServerData, builderData: TNewQRBuilderData) => {
       try {
         if (!workspaceId) {
           toast.error("Workspace ID not found");
@@ -162,40 +134,12 @@ export const useNewQrOperations = ({
           const errorMessage =
             errorResponse?.error?.message || "Failed to update QR";
 
-          // Check if it's a body consumption error and retry
-          if (
-            errorMessage.includes("Body is unusable") ||
-            errorMessage.includes("already been read")
-          ) {
-            if (retryCount < 2) {
-              await new Promise((resolve) => setTimeout(resolve, 500));
-              return updateQr(originalQR, builderData, retryCount + 1);
-            } else {
-              toast.error(
-                "Update failed after multiple attempts. Please try again.",
-              );
-              return false;
-            }
-          }
-
           toast.error(errorMessage);
           return false;
         }
       } catch (e) {
         console.error("Failed to update QR", e);
 
-        // Check if it's a network-level body consumption error and retry
-        if (
-          e instanceof Error &&
-          (e.message.includes("Body is unusable") ||
-            e.message.includes("already been read")) &&
-          retryCount < 2
-        ) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          return updateQr(originalQR, builderData, retryCount + 1);
-        }
-
-        toast.error("Failed to update QR");
         return false;
       }
     },
@@ -251,24 +195,12 @@ export const useNewQrOperations = ({
           const errorMessage =
             errorResponse?.error?.message || "Failed to update QR";
 
-          // Check if it's a body consumption error and retry
-          if (
-            errorMessage.includes("Body is unusable") ||
-            errorMessage.includes("already been read")
-          ) {
-            toast.error(
-              "Update failed after multiple attempts. Please try again.",
-            );
-            return false;
-          }
-
           toast.error(errorMessage);
           return false;
         }
       } catch (e) {
         console.error("Failed to update QR", e);
 
-        toast.error("Failed to update QR");
         return false;
       }
     },
@@ -348,24 +280,13 @@ export const useNewQrOperations = ({
           const errorMessage =
             errorResponse?.error?.message || "Failed to update QR";
 
-          // Check if it's a body consumption error and retry
-          if (
-            errorMessage.includes("Body is unusable") ||
-            errorMessage.includes("already been read")
-          ) {
-            toast.error(
-              "Update failed after multiple attempts. Please try again.",
-            );
-            return false;
-          }
-
           toast.error(errorMessage);
+
           return false;
         }
       } catch (e) {
         console.error("Failed to update QR", e);
 
-        toast.error("Failed to update QR");
         return false;
       }
     },
