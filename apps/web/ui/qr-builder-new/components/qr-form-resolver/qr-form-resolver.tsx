@@ -79,7 +79,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
     const formComponents = {
       [EQRType.WEBSITE]: (
         <WebsiteForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={defaultValues}
           contentOnly={contentOnly}
@@ -87,7 +87,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.WHATSAPP]: (
         <WhatsAppForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={defaultValues}
           contentOnly={contentOnly}
@@ -103,7 +103,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.PDF]: (
         <PdfForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={combinedDefaultValues}
           contentOnly={contentOnly}
@@ -111,7 +111,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.IMAGE]: (
         <ImageForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={combinedDefaultValues}
           contentOnly={contentOnly}
@@ -119,7 +119,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.VIDEO]: (
         <VideoForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={combinedDefaultValues}
           contentOnly={contentOnly}
@@ -127,7 +127,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.SOCIAL]: (
         <WebsiteForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={defaultValues}
           contentOnly={contentOnly}
@@ -135,7 +135,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.APP_LINK]: (
         <WebsiteForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={defaultValues}
           contentOnly={contentOnly}
@@ -143,7 +143,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.FEEDBACK]: (
         <WebsiteForm
-          ref={ref}
+          ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={defaultValues}
           contentOnly={contentOnly}

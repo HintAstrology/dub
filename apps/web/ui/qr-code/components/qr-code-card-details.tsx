@@ -1,78 +1,12 @@
 import { useQRContentEditor } from "@/ui/modals/qr-content-editor";
 import { LINKED_QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
-import { unescapeWiFiValue } from "@/ui/qr-builder-new/helpers/wifi-helpers";
+import { getDisplayContent } from "@/ui/qr-builder-new/helpers/qr-data-handlers";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Tooltip } from "@dub/ui";
 import { cn, getPrettyUrl } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
 import { memo } from "react";
 import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
-
-const getDisplayContent = (qrCode: TQrServerData): string => {
-  const { data, qrType } = qrCode;
-
-  switch (qrType as EQRType) {
-    case EQRType.WHATSAPP:
-      try {
-        const url = new URL(qrCode?.link?.url || "");
-        let number = "";
-
-        if (url.hostname === "wa.me") {
-          number = url.pathname.replace("/", "");
-        } else if (
-          url.hostname === "whatsapp.com" ||
-          url.hostname === "api.whatsapp.com"
-        ) {
-          number = url.searchParams.get("phone") || "";
-        }
-
-        if (number) {
-          return `+${number.replace(/\D/g, "")}`;
-        }
-      } catch (e) {
-        const numberMatch = data.match(/\d+/);
-        if (numberMatch) {
-          return `+${numberMatch[0]}`;
-        }
-      }
-      return data;
-
-    case EQRType.WIFI:
-      const wifiMatch = data.match(
-        /WIFI:T:([^;]+(?:\\;[^;]+)*);S:([^;]+(?:\\;[^;]+)*);P:([^;]+(?:\\;[^;]+)*);H:([^;]+(?:\\;[^;]+)*);/,
-      );
-      if (wifiMatch) {
-        return unescapeWiFiValue(wifiMatch[2]); // networkName
-      }
-      return data;
-
-    case EQRType.PDF:
-    case EQRType.IMAGE:
-    case EQRType.VIDEO:
-      if (qrCode?.file?.name) {
-        return qrCode.file.name;
-      }
-
-      if (qrCode.link?.url) {
-        try {
-          const url = new URL(qrCode.link.url);
-          const id = url.pathname.split("/").pop();
-          return id || qrCode.link.url;
-        } catch {
-          return qrCode.link.url;
-        }
-      }
-
-      return data;
-
-    case EQRType.WEBSITE:
-    case EQRType.APP_LINK:
-    case EQRType.SOCIAL:
-    case EQRType.FEEDBACK:
-    default:
-      return qrCode.link?.url || data;
-  }
-};
 
 export const QRCardDetails = memo(
   ({
