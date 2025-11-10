@@ -1,4 +1,5 @@
 import { getQrDataFromRedis } from "@/lib/actions/pre-checkout-flow/get-qr-data-from-redis";
+import { getSession } from "@/lib/auth";
 import { DashboardPlug } from "@/ui/paywall/components/dashboard-plug";
 import { SidebarPlug } from "@/ui/paywall/components/sidebar-plug";
 import { TrialOfferModal } from "@/ui/paywall/components/trial-offer-modal";
@@ -15,6 +16,12 @@ interface IPaywallPageProps {
 }
 
 const PaywallPage: NextPage<IPaywallPageProps> = async ({ searchParams }) => {
+  const authSession = await getSession();
+
+  if (authSession?.user) {
+    redirect("/");
+  }
+
   const { user_token } = searchParams;
 
   const { sessionId, user, isPaidTraffic } = await getUserCookieService();

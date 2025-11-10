@@ -12,9 +12,10 @@ import {
   setPeopleAnalyticOnce,
 } from "core/integration/analytic";
 import { useAction } from "next-safe-action/hooks";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useRouterStuff } from "node_modules/@dub/ui/src/hooks/use-router-stuff";
 import { FC, useEffect } from "react";
+import { toast } from "sonner";
 
 interface IUserTokenReadingComponentProps {
   id: string;
@@ -27,6 +28,7 @@ export const UserTokenReadingComponent: FC<
 > = ({ id, email, isPaidUser }) => {
   const { queryParams } = useRouterStuff();
 
+  const router = useRouter();
   const { data, isLoading } = useGetUserProfileQuery();
   const { trigger: triggerUpdateUserCookie } = useUpdateUserMutation();
 
@@ -44,14 +46,32 @@ export const UserTokenReadingComponent: FC<
         });
       }, 1000);
     },
-    onError: () => {
-      redirect("/");
-    },
   });
 
   useEffect(() => {
     if (!isLoading && data?.success && data?.data?.currency?.currencyForPay) {
-      executeAsync({ email });
+      const changeEmailSession = async () => {
+        try {
+          const result = await executeAsync({ email });
+
+          if (result?.serverError) {
+            const errorCodeMatch = result.serverError.match(/^\[(.*?)\]/);
+            const errorCode = errorCodeMatch ? errorCodeMatch[1] : null;
+
+            if (errorCode === "email-exists") {
+              toast.error("Your email is already registered. Please log in.");
+            }
+
+            return router.push("/?login=true");
+          }
+        } catch (error) {
+          console.error(error);
+
+          return router.push("/?login=true");
+        }
+      };
+
+      changeEmailSession();
     }
   }, [email, isLoading, data]);
 
