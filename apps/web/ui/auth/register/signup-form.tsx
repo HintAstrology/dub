@@ -2,20 +2,20 @@
 
 import { changePreSignupEmailAction } from "@/lib/actions/pre-checkout-flow/change-email";
 import { useLocalStorage } from "@dub/ui";
+import slugify from "@sindresorhus/slugify";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import {
   setPeopleAnalytic,
   setPeopleAnalyticOnce,
   trackClientEvents,
 } from "core/integration/analytic/services/analytic.service.ts";
+import { signIn } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
+import { showMessage } from "../helpers";
 import { SignUpEmail } from "./signup-email";
 import { SignUpOAuth } from "./signup-oauth";
-import { signIn } from 'next-auth/react';
-import { showMessage } from '../helpers';
-import slugify from "@sindresorhus/slugify";
 
 interface ISignUpFormProps {
   sessionId: string;
@@ -148,6 +148,16 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
         });
 
         if (userToken) {
+          trackClientEvents({
+            event: EAnalyticEvents.GET_USER_TOKEN,
+            params: {
+              page_name: "landing",
+              email: email,
+              user_token: userToken,
+              event_category: "nonAuthorized",
+            },
+            sessionId,
+          });
           setPeopleAnalyticOnce({ user_token: userToken });
         }
 
@@ -167,7 +177,7 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
     <div className="flex flex-col gap-3 p-1">
       {methods.includes("email") && (
         <SignUpEmail
-         sessionId={sessionId}
+          sessionId={sessionId}
           onEmailSubmit={handleEmailSubmit}
           isLoading={loadingState.email}
           isDisabled={isAnyLoading}
