@@ -5,7 +5,7 @@ export const QrTabsTitle: FC = () => {
   return (
     <div className="mb-6 md:mb-12 flex flex-col items-center justify-center gap-3">
       <SectionTitle
-        titleFirstPart={"Create Your"}
+        titleFirstPart={"Create Your QR Code"}
         highlightedTitlePart={"QR Code"}
       />
       <p className="text-muted-foreground text-center max-w-4xl text-base hidden sm:block md:text-lg">

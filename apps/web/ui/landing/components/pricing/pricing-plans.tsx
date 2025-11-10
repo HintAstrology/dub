@@ -25,8 +25,8 @@ export const PricingSection: FC<IPricingSectionProps> = ({
     <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-14">
       <div className="mb-12 flex flex-col items-center justify-center gap-3">
         <SectionTitle
-          titleFirstPart={"Start 7-Day Trial Today, Upgrade when"}
-          highlightedTitlePart={"You Need"}
+          titleFirstPart={"Start 7-Day Trial Today, Upgrade when You Need"}
+          // highlightedTitlePart={"You Need"}
           className="lg:!leading-[52px]"
         />
         <p className="text-muted-foreground text-center max-w-4xl text-base md:text-lg">
@@ -62,7 +62,8 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                       /{plan.plan.split("/")[1]}
                     </span>
                   </div>
-                  <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/20 pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold">
+                  <Badge 
+                  className="bg-primary hover:bg-primary/20 pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold">
                     {plan.badge}
                   </Badge>
                 </div>

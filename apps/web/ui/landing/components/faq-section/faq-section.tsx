@@ -26,9 +26,9 @@ export const FAQSection: FC<IFaqSectionProps> = ({ faqItems }) => {
         {/* FAQ Header */}
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle
-            titleFirstPart="Frequently"
-            highlightedTitlePart="Asked"
-            titleSecondPart="Questions"
+            titleFirstPart="Frequently Asked Questions"
+            // highlightedTitlePart="Asked"
+            // titleSecondPart="Questions"
           />
           <p className="text-muted-foreground text-center max-w-4xl text-base md:text-lg">
             Get answers for your full QR-code journey

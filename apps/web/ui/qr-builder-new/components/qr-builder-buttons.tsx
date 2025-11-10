@@ -79,7 +79,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
         variant="outline"
         size="lg"
         className={cn(
-          "border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 md:gap-2",
+          "bg-white border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 md:gap-2",
           {
             "border-neutral-400 text-neutral-400": isProcessing,
             "w-full": isLastStep && !showDownloadOnCustomizationStep,
@@ -109,7 +109,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
           variant="outline"
           size="lg"
           className={cn(
-            "border-secondary text-secondary hover:bg-secondary/10 w-full shrink",
+            "bg-white border-secondary text-secondary hover:bg-secondary/10 w-full shrink",
             {
               "border-neutral-400 text-neutral-400": isProcessing,
               "bg-secondary hover:bg-secondary/90 text-white border-secondary": isMobile && isContentStep,

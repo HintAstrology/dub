@@ -89,7 +89,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
   );
 
   return (
-    <footer className="bg-white">
+    <footer>
       <Separator />
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10 md:py-12 lg:flex-row lg:justify-between lg:gap-12">
         <div className="flex flex-col items-start gap-4 lg:max-w-sm">
@@ -181,7 +181,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
           </div>
 
           {/* Company Links */}
-          <div className="flex w-max flex-col">
+          <div className="flex w-max flex-col gap-8">
             <div className="flex flex-col gap-4">
               <div className="text-lg font-medium">Company</div>
               <ul className="text-muted-foreground space-y-2">
@@ -222,6 +222,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
                 ))}
               </ul>
             </div>
+              <SocialMedia sessionId={sessionId} />
           </div>
         </div>
       </div>
@@ -230,12 +231,9 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
 
       {/* Bottom section with copyright and payments */}
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-2 pb-0 sm:px-6">
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-neutral-600">
-            © GetQR - {new Date().getFullYear()}. All rights reserved.
-          </p>
-          <SocialMedia sessionId={sessionId} />
-        </div>
+        <p className="text-sm text-neutral-600">
+          © GetQR - {new Date().getFullYear()}. All rights reserved.
+        </p>
         <Payments />
       </div>
     </footer>

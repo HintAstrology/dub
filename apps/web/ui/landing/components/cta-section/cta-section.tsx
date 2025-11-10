@@ -21,14 +21,7 @@ export const CTASection: FC<ICTASectionProps> = ({
   return (
     <section className="relative py-6 lg:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Card className="group relative overflow-hidden rounded-3xl border-2 shadow pt-6">
-          {/* Animated gradient background */}
-          <div className="from-background to-muted/30 absolute inset-0 bg-gradient-to-br" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
-
-          {/* Decorative blobs */}
-          <div className="bg-primary/10 absolute -right-20 -top-20 h-72 w-72 animate-pulse rounded-full blur-3xl" />
-          <div className="bg-secondary/10 absolute -bottom-20 -left-20 h-72 w-72 animate-pulse rounded-full blur-3xl delay-700" />
+        <Card className="group border-none shadow relative overflow-hidden rounded-3xl pt-6">
 
           <CardContent className="relative flex items-center gap-8 px-6 sm:max-lg:flex-col md:gap-16 md:px-12 lg:py-14">
             {/* Images Section */}

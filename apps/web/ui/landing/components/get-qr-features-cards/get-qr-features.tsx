@@ -66,9 +66,9 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
       <div className="mx-auto max-w-7xl overflow-hidden px-4 sm:px-6 lg:px-8">
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle
-            titleFirstPart="More Than Just a "
-            highlightedTitlePart="QR Code"
-            titleSecondPart=" Generator"
+            titleFirstPart="More Than Just a QR Code Generator"
+            // highlightedTitlePart="QR Code"
+            // titleSecondPart=" Generator"
           />
           <p className="text-muted-foreground max-w-4xl text-center text-base md:text-lg">
             Own the full lifecycle: creation, refinement, data insights.
