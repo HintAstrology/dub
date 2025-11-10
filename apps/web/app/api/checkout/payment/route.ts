@@ -6,6 +6,7 @@ import {
   ICreatePaymentBody,
   ICreatePaymentRes,
 } from "core/api/user/payment/payment.interface.ts";
+import { getSubscriptionRenewalAction } from "core/constants/subscription-plans-weight";
 import {
   getChargePeriodDaysIdByPlan,
   getPaymentPlanPrice,
@@ -86,7 +87,12 @@ export const POST = withSession(
 
       //**** for analytics ****//
       email: user.email || null,
-      flow_type: isInternalPayment ? "internal" : "upgrade",
+      flow_type: isInternalPayment
+        ? "internal"
+        : getSubscriptionRenewalAction(
+            body.paymentPlan,
+            paymentData?.paymentInfo?.subscriptionPlanCode,
+          ) || "upgrade",
       locale: "en",
       mixpanel_user_id:
         user.id || cookieStore.get(ECookieArg.SESSION_ID)?.value || null,
