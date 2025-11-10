@@ -335,6 +335,7 @@ export const authOptions: NextAuthOptions = {
             title: qrDataFromLanding?.title,
             description: undefined,
             styles: qrDataFromLanding?.styles,
+            logoOptions: qrDataFromLanding?.logoOptions,
             frameOptions: qrDataFromLanding?.frameOptions,
             fileId: qrDataFromLanding?.fileId,
             link: {

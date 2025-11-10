@@ -3,15 +3,16 @@
 import { verifyAndCreateUser } from "@/lib/actions/verify-and-create-user.ts";
 import { WorkspaceProps } from "@/lib/types.ts";
 import { ratelimit, redis } from "@/lib/upstash";
+import { TQRBuilderDataForStorage } from "@/ui/qr-builder-new/helpers/data-converters";
 import { R2_URL } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
 import { getUserCookieService } from "core/services/cookie/user-session.service.ts";
 import { flattenValidationErrors } from "next-safe-action";
 import { createQrWithLinkUniversal } from "../api/qrs/create-qr-with-link-universal";
 import { createId, getIP } from "../api/utils";
-import z from "../zod";
 import { signUpSchema } from "../zod/schemas/auth";
 import { throwIfAuthenticated } from "./auth/throw-if-authenticated";
+import { getQrDataFromRedis } from "./pre-checkout-flow/get-qr-data-from-redis";
 import { actionClient } from "./safe-action";
 
 class AuthError extends Error {
@@ -24,37 +25,9 @@ class AuthError extends Error {
   }
 }
 
-const qrDataToCreateSchema = z.object({
-  title: z.string(),
-  styles: z.object({}).passthrough(),
-  frameOptions: z.object({
-    id: z.string(),
-    color: z.string().optional(),
-    textColor: z.string().optional(),
-    text: z.string().optional(),
-  }),
-  qrType: z.enum([
-    "website",
-    "pdf",
-    "image",
-    "video",
-    "whatsapp",
-    "social",
-    "wifi",
-    "app",
-    "feedback",
-  ]),
-  fileId: z.string().optional().describe("The file the link leads to"),
-});
-
-const schema = signUpSchema.extend({
-  // code: z.string().min(6, "OTP must be 6 characters long."),
-  qrDataToCreate: qrDataToCreateSchema.nullish(),
-});
-
 // Sign up a new user using email and password
 export const createUserAccountAction = actionClient
-  .schema(schema, {
+  .schema(signUpSchema, {
     handleValidationErrorsShape: (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -64,7 +37,6 @@ export const createUserAccountAction = actionClient
       email,
       password,
       // code,
-      qrDataToCreate,
     } = parsedInput;
 
     const { success } = await ratelimit(2, "1 m").limit(`signup:${getIP()}`);
@@ -125,6 +97,10 @@ export const createUserAccountAction = actionClient
       );
     }
 
+    const { qrData } = await getQrDataFromRedis(sessionId!);
+
+    const qrDataToCreate = qrData as TQRBuilderDataForStorage;
+
     waitUntil(
       Promise.all([
         ...(qrDataToCreate
@@ -141,6 +117,7 @@ export const createUserAccountAction = actionClient
                     title: qrDataToCreate?.title,
                     description: undefined,
                     styles: qrDataToCreate?.styles,
+                    logoOptions: qrDataToCreate?.logoOptions,
                     frameOptions: qrDataToCreate?.frameOptions,
                     fileId: qrDataToCreate?.fileId,
                     link: {

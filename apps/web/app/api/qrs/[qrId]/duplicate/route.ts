@@ -1,11 +1,11 @@
 import { checkFeaturesAccessAuthLess } from "@/lib/actions/check-features-access-auth-less.ts";
 import { DubApiError } from "@/lib/api/errors";
-import { createQrWithLinkUniversal } from '@/lib/api/qrs/create-qr-with-link-universal';
+import { createQrWithLinkUniversal } from "@/lib/api/qrs/create-qr-with-link-universal";
 import { getQr } from "@/lib/api/qrs/get-qr";
 import { withWorkspace } from "@/lib/auth";
-import { sendWorkspaceWebhook } from '@/lib/webhook/publish';
-import { linkEventSchema } from '@/lib/zod/schemas/links';
-import { waitUntil } from '@vercel/functions';
+import { sendWorkspaceWebhook } from "@/lib/webhook/publish";
+import { linkEventSchema } from "@/lib/zod/schemas/links";
+import { waitUntil } from "@vercel/functions";
 import { NextResponse } from "next/server";
 
 // POST /api/qrs/[qrId]/duplicate – Duplicate qr by id
@@ -33,6 +33,7 @@ export const POST = withWorkspace(
           title: `${qr.title} (Copy)`,
           description: qr.description ?? undefined,
           styles: qr.styles as Record<string, any> | undefined,
+          logoOptions: qr.logoOptions as Record<string, any> | undefined,
           frameOptions: qr.frameOptions as Record<string, any> | undefined,
           fileId: qr.fileId ?? undefined,
           link: {

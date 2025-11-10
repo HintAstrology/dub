@@ -35,13 +35,13 @@ const FEATURES = [
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: TQRBuilderDataForStorage | null;
+  qrDataToCreate: TQRBuilderDataForStorage | null;
   isPaidTraffic: boolean;
 }
 
 export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
   user,
-  firstQr,
+  qrDataToCreate,
   isPaidTraffic,
 }) => {
   const router = useRouter();
@@ -54,9 +54,9 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
   );
 
   const memoizedQrData = useMemo(() => {
-    return firstQr ? firstQr : MOCK_QR;
-  }, [firstQr]);
-  console.log("memoizedQrData", memoizedQrData);
+    return qrDataToCreate ? qrDataToCreate : MOCK_QR;
+  }, [qrDataToCreate]);
+
   const customizationData = useMemo(() => {
     return extractCustomizationData(
       memoizedQrData.styles,
@@ -115,7 +115,6 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
     await executeAsync({
       email: user!.email!,
       password: "defaultPassword12Secret",
-      qrDataToCreate: firstQr,
     });
   };
 
@@ -173,7 +172,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
       <div className="flex w-full flex-col overflow-y-auto sm:flex-row">
         <div className="flex grow flex-col items-center gap-4 bg-neutral-50 p-6">
           <div className="flex flex-col gap-2 text-center">
-            {firstQr && (
+            {qrDataToCreate && (
               <h2 className="text-primary !mt-0 truncate text-2xl font-bold">
                 Your QR Code is Ready!
               </h2>
@@ -184,7 +183,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
             <QRCanvas svgString={svgString} width={300} height={300} />
 
             <span className="text-center text-sm">
-              {firstQr?.title || MOCK_QR.title}
+              {qrDataToCreate?.title || MOCK_QR.title}
             </span>
           </div>
 
@@ -199,7 +198,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
               <Button
                 onClick={onScrollToPaymentBlock}
                 className="max-w-md"
-                text={firstQr ? "Download Now!" : "Create QR Noew!"}
+                text={qrDataToCreate ? "Download Now!" : "Create QR Noew!"}
               />
             </div>
           ) : null}
@@ -217,7 +216,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
         <div className="flex grow flex-col gap-4 p-6 sm:min-w-[50%] sm:max-w-[50%] sm:basis-[50%]">
           <div className="flex flex-col gap-2 text-center">
             <h2 className="text-neutral !mt-0 truncate text-2xl font-bold">
-              {isPaidTraffic && firstQr
+              {isPaidTraffic && qrDataToCreate
                 ? "Download Your QR Code"
                 : "Unlock 7-Day Full Access"}
             </h2>

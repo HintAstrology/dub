@@ -13,13 +13,13 @@ import { TrialOfferInner } from "./trial-offer-inner";
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: TQRBuilderDataForStorage | null;
+  qrDataToCreate: TQRBuilderDataForStorage | null;
   isPaidTraffic: boolean;
 }
 
 export const TrialOfferModal: FC<Readonly<ITrialOfferProps>> = ({
   user,
-  firstQr,
+  qrDataToCreate,
   isPaidTraffic,
 }) => {
   const { isMobile } = useMediaQuery();
@@ -27,7 +27,7 @@ export const TrialOfferModal: FC<Readonly<ITrialOfferProps>> = ({
   const innerComponent = (
     <TrialOfferInner
       user={user}
-      firstQr={firstQr}
+      qrDataToCreate={qrDataToCreate}
       isPaidTraffic={isPaidTraffic}
     />
   );

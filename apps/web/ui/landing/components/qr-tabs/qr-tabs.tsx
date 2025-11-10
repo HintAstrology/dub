@@ -82,13 +82,13 @@ export const QRTabs: FC<
       }
 
       try {
-        const storageData = await convertNewQRBuilderDataToServer(data, {
+        const serverData = await convertNewQRBuilderDataToServer(data, {
           domain: SHORT_DOMAIN!,
         });
 
         await saveQrDataToRedis({
           sessionId,
-          qrData: storageData,
+          qrData: serverData,
         });
 
         showModal("signup");

@@ -42,7 +42,7 @@ const PaywallPage: NextPage<IPaywallPageProps> = async ({ searchParams }) => {
     );
   }
 
-  const { qrData: firstQr } = await getQrDataFromRedis(sessionId!);
+  const { qrData: qrDataToCreate } = await getQrDataFromRedis(sessionId!);
 
   return (
     <>
@@ -53,7 +53,7 @@ const PaywallPage: NextPage<IPaywallPageProps> = async ({ searchParams }) => {
 
       <TrialOfferModal
         user={user}
-        firstQr={firstQr as TQRBuilderDataForStorage}
+        qrDataToCreate={qrDataToCreate as TQRBuilderDataForStorage}
         isPaidTraffic={isPaidTraffic}
       />
 
