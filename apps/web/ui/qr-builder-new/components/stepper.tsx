@@ -44,10 +44,15 @@ export default function Stepper({
                   className={cn(
                     "h-auto flex-shrink-0 gap-2 rounded !bg-transparent p-0 transition-all disabled:opacity-100",
                     "flex-col items-center md:flex-row md:items-center",
+                    "focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                     isActive && "cursor-pointer hover:scale-105",
                     !isClickable && "cursor-default",
                   )}
-                  onClick={() => isClickable && onStepClick(step.number)}
+                  onClick={(e) => {
+                    if (isClickable) {
+                      onStepClick(step.number);
+                    }
+                  }}
                   disabled={!isClickable}
                 >
                   <Avatar className="size-10">
