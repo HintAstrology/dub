@@ -1,7 +1,7 @@
 import { DubApiError, ErrorCodes } from "@/lib/api/errors";
 import { createLink, processLink } from "@/lib/api/links";
 import { NewQrProps, WorkspaceProps } from "@/lib/types";
-import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { createQr } from "./create-qr";
 
 interface CreateQrWithLinkOptions {

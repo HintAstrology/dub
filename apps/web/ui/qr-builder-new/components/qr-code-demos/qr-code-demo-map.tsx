@@ -1,4 +1,4 @@
-import { EQRType } from "../../constants/get-qr-config.ts";
+import { EQRType } from "../../types/qr-type";
 import { QRCodeDemoImage } from "./demos/image";
 import { QRCodeDemoPDF } from "./demos/pdf";
 import { QRCodeDemoVideo } from "./demos/video";

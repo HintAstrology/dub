@@ -7,7 +7,7 @@ import { Links } from "@/ui/landing/components/footer/components/links.tsx";
 import { Payments } from "@/ui/landing/components/footer/components/payments.tsx";
 import { SocialMedia } from "@/ui/landing/components/footer/components/social-media.tsx";
 import { USAFlag } from "@/ui/landing/components/footer/components/usa-flag.tsx";
-import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Logo } from "@/ui/shared/logo.tsx";
 import { LEGAL_LINKS } from "constants/links";
 import { trackClientEvents } from "core/integration/analytic";

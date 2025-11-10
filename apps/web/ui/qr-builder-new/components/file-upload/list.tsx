@@ -4,7 +4,7 @@ import { cn } from "@dub/utils";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { LIST_NAME } from "../../constants/file-upload";
+import { LIST_NAME } from "../../constants/file-upload.constants";
 import type { FileUploadListProps } from "../../types/file-upload";
 import { useFileUploadContext, useStore } from "./context";
 

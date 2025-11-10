@@ -4,13 +4,13 @@ import { saveQrDataToRedisAction } from "@/lib/actions/pre-checkout-flow/save-qr
 import { Session } from "@/lib/auth";
 import { QrTabsTitle } from "@/ui/landing/components/qr-tabs/components/qr-tabs-title";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
-import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
 import {
   convertNewBuilderToStorageFormat,
   TNewQRBuilderData,
 } from "@/ui/qr-builder-new/helpers/data-converters";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { useMediaQuery } from "@dub/ui";
 import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";

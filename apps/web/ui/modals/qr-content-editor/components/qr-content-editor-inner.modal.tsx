@@ -1,8 +1,8 @@
+import { QrFormResolver } from "@/ui/qr-builder-new/components/qr-form-resolver/qr-form-resolver";
 import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
-import { QrFormResolver } from "@/ui/qr-builder-new/forms/qr-form-resolver";
-import { QRFormRef } from "@/ui/qr-builder-new/forms/types";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { TQRFormData } from "@/ui/qr-builder-new/types/context";
+import { QRFormRef } from "@/ui/qr-builder-new/types/qr-form-ref";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr.tsx";
 import { Button } from "@dub/ui";

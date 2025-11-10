@@ -3,7 +3,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { ITEM_DELETE_NAME } from "../../constants/file-upload";
+import { ITEM_DELETE_NAME } from "../../constants/file-upload.constants";
 import { useAsRef } from "../../hooks/use-as-ref";
 import type { FileUploadItemDeleteProps } from "../../types/file-upload";
 import { useFileUploadItemContext, useStoreContext } from "./context";

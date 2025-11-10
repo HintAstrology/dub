@@ -1,5 +1,5 @@
 import { NewQrProps } from "@/lib/types";
-import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { prisma } from "@dub/prisma";
 import { createId } from "../utils";
 

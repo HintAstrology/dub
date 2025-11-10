@@ -5,13 +5,14 @@ import { SHORT_DOMAIN } from "@dub/utils/src";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { EQRType, FILE_QR_TYPES } from "../constants/get-qr-config";
+import { FILE_QR_TYPES } from "../constants/get-qr-config";
 import {
   convertNewQRBuilderDataToServer,
   TNewQRBuilderData,
   TQrServerData,
 } from "../helpers/data-converters";
 import { TQRFormData } from "../types/context";
+import { EQRType } from "../types/qr-type";
 
 interface IUseNewQrOperationsProps {
   initialQrData: TQrServerData | null;

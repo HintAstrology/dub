@@ -1,9 +1,10 @@
 import { NewQrProps, UpdateQrProps } from "@/lib/types";
 import { Options } from "qr-code-styling";
 import { FRAMES } from "../constants/customization/frames";
-import { EQRType, FILE_QR_TYPES } from "../constants/get-qr-config";
+import { FILE_QR_TYPES } from "../constants/get-qr-config";
 import { TQRFormData } from "../types/context";
 import { IFrameData, IQRCustomizationData } from "../types/customization";
+import { EQRType } from "../types/qr-type";
 import { TQRUpdateResult } from "../types/update";
 import { encodeQRData, parseQRData } from "./qr-data-handlers";
 import {

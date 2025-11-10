@@ -1,9 +1,7 @@
 import { useQRContentEditor } from "@/ui/modals/qr-content-editor";
-import {
-  EQRType,
-  LINKED_QR_TYPES,
-} from "@/ui/qr-builder-new/constants/get-qr-config";
+import { LINKED_QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { unescapeWiFiValue } from "@/ui/qr-builder-new/helpers/wifi-helpers";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Tooltip } from "@dub/ui";
 import { cn, getPrettyUrl } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
@@ -29,7 +27,6 @@ const getDisplayContent = (qrCode: TQrServerData): string => {
         }
 
         if (number) {
-          // Форматируем номер с кодом страны
           return `+${number.replace(/\D/g, "")}`;
         }
       } catch (e) {

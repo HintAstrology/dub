@@ -17,7 +17,7 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { EQRType } from "../constants/get-qr-config.ts";
+import { DEFAULT_QR_CUSTOMIZATION } from "../constants/default-qr-customization.constants";
 import {
   convertServerQRToNewBuilder,
   TNewQRBuilderData,
@@ -30,10 +30,8 @@ import {
   TQrType,
   TStepState,
 } from "../types/context";
-import {
-  DEFAULT_QR_CUSTOMIZATION,
-  IQRCustomizationData,
-} from "../types/customization";
+import { IQRCustomizationData } from "../types/customization";
+import { EQRType } from "../types/qr-type";
 
 // Create context
 const QrBuilderContext = createContext<IQrBuilderContextType | undefined>(

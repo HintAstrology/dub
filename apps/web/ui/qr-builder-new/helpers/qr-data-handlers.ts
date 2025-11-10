@@ -1,5 +1,5 @@
-import { APP_DOMAIN } from '@dub/utils';
-import { EQRType } from "../constants/get-qr-config";
+import { APP_DOMAIN } from "@dub/utils";
+import { EQRType } from "../types/qr-type";
 
 // Function to escape special characters in Wi-Fi QR code
 export const escapeWiFiValue = (value: string): string => {

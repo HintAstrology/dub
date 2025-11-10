@@ -2,8 +2,8 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { useQrBuilderContext } from "../context/qr-builder-context";
-import { QrFormResolver } from "../forms/qr-form-resolver.tsx";
-import { QRFormRef } from "../forms/types";
+import { QRFormRef } from "../types/qr-form-ref";
+import { QrFormResolver } from "./qr-form-resolver/qr-form-resolver";
 
 export interface QRContentStepRef {
   validateForm: () => Promise<boolean>;

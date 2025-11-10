@@ -3,9 +3,9 @@
 import { cn } from "@dub/utils";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
-import { ROOT_NAME } from "../../constants/file-upload";
 import { FileUploadContext, StoreContext } from "./context";
 
+import { ROOT_NAME } from "../../constants/file-upload.constants";
 import { useAsRef } from "../../hooks/use-as-ref";
 import { DirectionContext, useDirection } from "../../hooks/use-direction";
 import { useLazyRef } from "../../hooks/use-lazy-ref";
