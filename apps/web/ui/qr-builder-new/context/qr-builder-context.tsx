@@ -306,48 +306,45 @@ export function QrBuilderProvider({
   }, [builderStep, handleChangeStep, homepageDemo, user, sessionId]);
 
   // Methods
-  const onSave = useCallback(
-    async (providedFormData?: TQRFormData) => {
-      const dataToSave = providedFormData || formData;
+  const onSave = useCallback(async () => {
+    const dataToSave = formData;
 
-      if (!selectedQrType || !dataToSave) {
-        toast.error("Please complete all required fields");
-        return;
-      }
+    if (!selectedQrType || !dataToSave) {
+      toast.error("Please complete all required fields");
+      return;
+    }
 
-      if (!onSaveProp) {
-        console.error("onSave prop not provided to QrBuilderProvider");
-        toast.error("Save functionality not configured");
-        return;
-      }
+    if (!onSaveProp) {
+      console.error("onSave prop not provided to QrBuilderProvider");
+      toast.error("Save functionality not configured");
+      return;
+    }
 
-      setIsProcessing(true);
+    setIsProcessing(true);
 
-      try {
-        const builderData: TNewQRBuilderData = {
-          qrType: selectedQrType,
-          formData: dataToSave,
-          customizationData,
-          title: initialState.qrTitle || `${selectedQrType} QR Code`,
-          fileId: (dataToSave as any)?.fileId || initialState.fileId,
-        };
+    try {
+      const builderData: TNewQRBuilderData = {
+        qrType: selectedQrType,
+        formData: dataToSave,
+        customizationData,
+        title: formData?.qrName || `${selectedQrType} QR Code`,
+        fileId: (dataToSave as any)?.fileId || initialState.fileId,
+      };
 
-        await onSaveProp(builderData);
-      } catch (error) {
-        console.error("Error saving QR:", error);
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    [
-      selectedQrType,
-      formData,
-      customizationData,
-      initialState.qrTitle,
-      initialState.fileId,
-      onSaveProp,
-    ],
-  );
+      await onSaveProp(builderData);
+    } catch (error) {
+      console.error("Error saving QR:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [
+    selectedQrType,
+    formData,
+    customizationData,
+    initialState.qrTitle,
+    initialState.fileId,
+    onSaveProp,
+  ]);
 
   const handleContinue = useCallback(async () => {
     if (isCustomizationStep) {
