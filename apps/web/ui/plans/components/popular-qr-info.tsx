@@ -150,16 +150,6 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
       <div className="hidden lg:block">
         <PlansFeatures />
       </div>
-
-      {!featuresAccess.isSubscribed && (
-        <Button
-          className="block lg:hidden"
-          text={
-            !featuresAccess.isTrialOver ? "Upgrade Plan" : "Restore QR Code"
-          }
-          onClick={handleScroll}
-        />
-      )}
     </Flex>
   );
 };
