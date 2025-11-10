@@ -10,6 +10,8 @@ export enum EAnalyticEvents {
   AUTH_SUCCESS = "authSuccess",
   AUTH_ERROR = "authError",
 
+  GET_USER_TOKEN = "getUserToken",
+
   PURCHASE_ATTEMPT = "purchaseAttempt",
   PURCHASE_SUCCESS = "purchaseSuccess",
   PURCHASE_ERROR = "purchaseError",

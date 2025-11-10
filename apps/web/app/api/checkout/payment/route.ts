@@ -6,7 +6,6 @@ import {
   ICreatePaymentBody,
   ICreatePaymentRes,
 } from "core/api/user/payment/payment.interface.ts";
-import { getSubscriptionRenewalAction } from "core/constants/subscription-plans-weight.ts";
 import {
   getChargePeriodDaysIdByPlan,
   getPaymentPlanPrice,
@@ -99,11 +98,12 @@ export const POST = withSession(
         user: cookieUser!,
       }),
       payment_subtype: "SUBSCRIPTION",
-      billing_action:
-        getSubscriptionRenewalAction(
-          body.paymentPlan,
-          paymentData?.paymentInfo?.subscriptionPlanCode,
-        ) || "upgrade",
+      // billing_action:
+      //   getSubscriptionRenewalAction(
+      //     body.paymentPlan,
+      //     paymentData?.paymentInfo?.subscriptionPlanCode,
+      //   ) || "upgrade",
+      billing_action: isInternalPayment ? "internal" : "upgrade",
       //**** for analytics ****//
 
       //**** fields for subscription system ****//
