@@ -74,9 +74,11 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
       const result = await executeAsync({ email, signupMethod });
 
       if (result?.serverError) {
+        const errorCodeMatch = result.serverError.match(/^\[(.*?)\]/);
+        const errorCode = errorCodeMatch ? errorCodeMatch[1] : null;
         const errorMessage = result.serverError.replace(/^\[.*?\]\s*/, "");
 
-        if (errorMessage === "email-exists") {
+        if (errorCode === "email-exists") {
           trackClientEvents({
             event: EAnalyticEvents.AUTH_ERROR,
             params: {
