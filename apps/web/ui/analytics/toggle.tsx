@@ -535,218 +535,44 @@ export default function Toggle({
   }
 
   return (
-    <>
-      <div
-        className={cn("py-3 md:py-3", {
-          "sticky top-14 z-10 bg-neutral-50": dashboardProps,
-          "sticky top-16 z-10 bg-neutral-50": adminPage || demoPage,
-          "shadow-md": scrolled && dashboardProps,
-        })}
-      >
-        <div
-          className={cn(
-            "mx-auto flex w-full max-w-screen-xl flex-col gap-2 px-3 lg:px-10",
-            {
-              "md:h-10": key,
-            },
-          )}
-        >
-          <div
-            className={cn(
-              "flex w-full flex-col items-center justify-between gap-2 md:flex-row",
-              {
-                "flex-col md:flex-row": !key,
-                "items-center": key,
-              },
-            )}
-          >
-            {dashboardProps && (
-              <a
-                className="group flex items-center text-lg font-semibold text-neutral-800"
-                href={linkConstructor({ domain, key })}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <BlurImage
-                  alt={url || "Dub.co"}
-                  src={
-                    url
-                      ? `${GOOGLE_FAVICON_URL}${getApexDomain(url)}`
-                      : DUB_LOGO
-                  }
-                  className="mr-2 h-6 w-6 flex-shrink-0 overflow-hidden rounded-full"
-                  width={48}
-                  height={48}
-                />
-                <p className="max-w-[192px] truncate sm:max-w-[400px]">
-                  {linkConstructor({
-                    domain,
-                    key,
-                    pretty: true,
-                  })}
-                </p>
-                <ExpandingArrow className="h-5 w-5" />
-              </a>
-            )}
-            <div
-              className={cn(
-                "flex w-full flex-col items-center gap-2 min-[500px]:flex-row",
-                dashboardProps && "md:w-auto",
-              )}
-            >
-              <Filter.Select
-                className="w-full min-[500px]:w-fit"
-                filters={filters}
-                activeFilters={activeFilters}
-                onSelect={onFilterSelect}
-                onRemove={(key, value) =>
-                  queryParams({
-                    del: key === "link" ? ["domain", "key"] : key,
-                    scroll: false,
-                  })
-                }
-                onOpenFilter={(key) =>
-                  setRequestedFilters((rf) => (rf.includes(key) ? rf : [...rf, key]))
-                }
-                resetDefaultStates={() => {
-                  setSelectedToggleFilterKey(undefined)
-                }}
-                defaultSelectedFilterKey={selectedToggleFilterKey}
-              />
-              <DateRangePicker
-                className="w-full min-[500px]:w-fit"
-                align={dashboardProps ? "end" : "center"}
-                value={
-                  start && end
-                    ? {
-                        from: start,
-                        to: end,
-                      }
-                    : undefined
-                }
-                presetId={start && end ? undefined : interval ?? "30d"}
-                onChange={(range, preset) => {
-                  if (preset) {
-                    queryParams({
-                      del: ["start", "end"],
-                      set: {
-                        interval: preset.id,
-                      },
-                      scroll: false,
-                    });
-
-                    return;
-                  }
-
-                  // Regular range
-                  if (!range || !range.from || !range.to) return;
-
-                  queryParams({
-                    del: "preset",
-                    set: {
-                      start: range.from.toISOString(),
-                      end: range.to.toISOString(),
-                    },
-                    scroll: false,
-                  });
-                }}
-                presets={INTERVAL_DISPLAYS.map(({ display, value, shortcut }) => {
-                  // const requiresUpgrade =
-                  //   partnerPage ||
-                  //   DUB_DEMO_LINKS.find((l) => l.domain === domain && l.key === key)
-                  //     ? false
-                  //     : !validDateRangeForPlan({
-                  //         plan: plan || dashboardProps?.workspacePlan,
-                  //         dataAvailableFrom: createdAt,
-                  //         interval: value,
-                  //         start,
-                  //         end,
-                  //       });
-                  const requiresUpgrade = false;
-                  const { startDate, endDate } = getStartEndDates({
-                    interval: value,
-                    dataAvailableFrom: createdAt,
-                  });
-
-                  return {
-                    id: value,
-                    label: display,
-                    dateRange: {
-                      from: startDate,
-                      to: endDate,
-                    },
-                    requiresUpgrade,
-                    tooltipContent: requiresUpgrade ? (
-                      <UpgradeTooltip rangeLabel={display} plan={plan} />
-                    ) : undefined,
-                    shortcut,
-                  };
-                })}
-              />
-              <div className="flex items-center h-10 gap-x-2 w-full min-[500px]:w-fit">
-                <Switch
-                  id="unique"
-                  checked={!!searchParamsObj.unique}
-                  onCheckedChange={(checked: boolean) => {
-                    if (checked) {
-                      queryParams({
-                        set: { unique: "true"},
-                        scroll: false,
-                      });
-                    } else {
-                      queryParams({
-                        del: "unique",
-                        scroll: false,
-                      });
-                    }
-                  }}
-                />
-                <label htmlFor="unique">Unique Scans</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-screen-xl px-3 lg:px-10">
-        <Filter.List
-          filters={filters}
-          activeFilters={[
-            ...activeFilters,
-            ...(streaming && !activeFilters.length
-              ? Array.from({ length: 2 }, (_, i) => i).map((i) => ({
-                  key: "loader",
-                  value: i,
-                }))
-              : []),
-          ]}
-          onRemove={(key, value) => {
-              queryParams({
-                del: key === "link" ? ["domain", "key", "url"] : key,
-                scroll: false,
-              })
-            }
-          }
-          onRemoveAll={() =>
+    <div className="mx-auto w-full max-w-screen-xl px-3 lg:px-10 pt-3">
+      <Filter.List
+        filters={filters}
+        activeFilters={[
+          ...activeFilters,
+          ...(streaming && !activeFilters.length
+            ? Array.from({ length: 2 }, (_, i) => i).map((i) => ({
+                key: "loader",
+                value: i,
+              }))
+            : []),
+        ]}
+        onRemove={(key, value) => {
             queryParams({
-              // Reset all filters except for date range
-              del: VALID_ANALYTICS_FILTERS.concat(["page"]).filter(
-                (f) => !["interval", "start", "end"].includes(f),
-              ),
+              del: key === "link" ? ["domain", "key", "url"] : key,
               scroll: false,
             })
           }
-          onSelect={onFilterSelect}
-          isOptionDropdown
-        />
-        <div
-          className={cn(
-            "transition-[height] duration-[300ms]",
-            streaming || activeFilters.length ? "h-3" : "h-0",
-          )}
-        />
-      </div>
-    </>
+        }
+        onRemoveAll={() =>
+          queryParams({
+            // Reset all filters except for date range
+            del: VALID_ANALYTICS_FILTERS.concat(["page"]).filter(
+              (f) => !["interval", "start", "end"].includes(f),
+            ),
+            scroll: false,
+          })
+        }
+        onSelect={onFilterSelect}
+        isOptionDropdown
+      />
+      <div
+        className={cn(
+          "transition-[height] duration-[300ms]",
+          streaming || activeFilters.length ? "h-3" : "h-0",
+        )}
+      />
+    </div>
   );
 }
 

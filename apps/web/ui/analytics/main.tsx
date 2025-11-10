@@ -192,9 +192,9 @@ export default function Main() {
           )}
         >
           {view === "timeseries" && (
-            <div className="p-5 pt-10 sm:p-10">
+            // <div className="p-5 pt-10 sm:p-10">
               <AnalyticsAreaChart resource={tab.id} demo={showPaywall} />
-            </div>
+            // </div>
           )}
           {view === "funnel" && <AnalyticsFunnelChart demo={showPaywall} />}
         </div>

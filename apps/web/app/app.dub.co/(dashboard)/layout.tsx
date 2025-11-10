@@ -7,6 +7,7 @@ import { ECookieArg } from "core/interfaces/cookie.interface.ts";
 import { cookies } from "next/headers";
 import { ReactNode, CSSProperties } from "react";
 import { Card } from "@/components/ui/card";
+import { DashboardHeader } from "@/ui/layout/dashboard-header";
 
 // export const dynamic = "force-static";
 export const metadata = constructMetadata();
@@ -31,9 +32,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
         >
           <AppSidebar />
           <div className="z-1 mx-auto flex size-full flex-1 flex-col px-4 py-6 sm:px-6">
-            <header className="bg-card mb-6 flex items-center rounded-[20px] border border-border px-6 py-3.5 shadow-sm">
-              <SidebarTrigger className="text-secondary hover:bg-secondary/10 [&_svg]:!size-5" />
-            </header>
+            <DashboardHeader />
             <main className="mb-6 size-full flex-1">
               <Card className="h-full rounded-[20px] border-border shadow-sm">
                 {children}
