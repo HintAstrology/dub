@@ -23,12 +23,13 @@ interface QRFormResolverProps {
   onSubmit: (data: TQRFormData) => void;
   defaultValues?: Partial<TQRFormData>;
   contentOnly?: boolean;
-  isEdit?: boolean;
 }
 
 export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
-  ({ qrType, onSubmit, defaultValues, contentOnly, isEdit }, ref) => {
+  ({ qrType, onSubmit, defaultValues, contentOnly }, ref) => {
     const { initialQrData } = useQrBuilderContext();
+
+    const isEdit = !!initialQrData;
 
     const [fileData, setFileData] = useState<
       Record<string, File[]> | undefined

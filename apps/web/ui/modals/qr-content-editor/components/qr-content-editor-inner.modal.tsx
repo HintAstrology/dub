@@ -123,7 +123,6 @@ export const QrContentEditorInnerModal: FC<
           onSubmit={handleFormSubmit}
           defaultValues={formData || undefined}
           contentOnly
-          isEdit={!!initialQrData}
         />
 
         {/* Actions */}
