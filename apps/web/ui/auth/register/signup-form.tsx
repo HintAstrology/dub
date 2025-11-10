@@ -109,6 +109,18 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
         setErrorState({ message: errorMessage, method: signupMethod });
       } else if (result?.data) {
         const { signupMethod, email, userToken } = result.data;
+
+        trackClientEvents({
+          event: EAnalyticEvents.GET_USER_TOKEN,
+          params: {
+            page_name: "landing",
+            email: email,
+            user_token: userToken,
+            event_category: "nonAuthorized",
+          },
+          sessionId,
+        });
+
         setPeopleAnalytic({
           signup_method: signupMethod,
           $email: email,
@@ -151,7 +163,7 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
       )}
       {methods.includes("email") && (
         <SignUpEmail
-         sessionId={sessionId}
+          sessionId={sessionId}
           onEmailSubmit={handleEmailSubmit}
           isLoading={loadingState.email}
           isDisabled={isAnyLoading}
