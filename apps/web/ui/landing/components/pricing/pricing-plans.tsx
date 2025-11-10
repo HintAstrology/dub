@@ -63,7 +63,12 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                     </span>
                   </div>
                   <Badge 
-                  className="bg-primary hover:bg-primary/20 pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold">
+                  className={cn(
+                    "pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold",
+                    plan.withButton 
+                      ? "bg-primary hover:bg-primary/20" 
+                      : "bg-white text-primary border-primary hover:bg-white"
+                  )}>
                     {plan.badge}
                   </Badge>
                 </div>
