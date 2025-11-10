@@ -10,14 +10,11 @@ const schema = z.object({
   sessionId: z.string(),
   extraKey: z.string().optional().describe("Extra key to identify the data"),
   qrData: z.object({
-    title: z.string(),
-    styles: z.object({}).passthrough(), // Logo stored in styles.image
-    frameOptions: z.object({
-      id: z.string(),
-      color: z.string().optional(),
-      textColor: z.string().optional(),
-      text: z.string().optional(),
-    }),
+    data: z.string(),
+    title: z.string().optional(),
+    styles: z.record(z.any()).optional(), // Logo stored in styles.image
+    frameOptions: z.record(z.any()).optional(),
+    logoOptions: z.record(z.any()).optional(),
     qrType: z.enum([
       "website",
       "pdf",
@@ -28,8 +25,10 @@ const schema = z.object({
       "wifi",
       "app",
       "feedback",
+      "email",
     ]),
     fileId: z.string().optional(), // For PDF/Image/Video QR content files ONLY
+    link: z.record(z.any()),
   }),
 });
 

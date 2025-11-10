@@ -56,7 +56,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
   const memoizedQrData = useMemo(() => {
     return firstQr ? firstQr : MOCK_QR;
   }, [firstQr]);
-
+  console.log("memoizedQrData", memoizedQrData);
   const customizationData = useMemo(() => {
     return extractCustomizationData(
       memoizedQrData.styles,

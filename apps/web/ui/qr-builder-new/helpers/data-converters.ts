@@ -436,46 +436,9 @@ export const convertServerQRToNewBuilder = (
 };
 
 /**
- * Convert new builder data to storage format (for localStorage/Redis)
- */
-export const convertNewBuilderToStorageFormat = (
-  builderData: TNewQRBuilderData,
-): TQRBuilderDataForStorage => {
-  const { qrType, formData, customizationData, title, fileId } = builderData;
-
-  // Encode form data to QR data string
-  const qrData = encodeQRData(qrType, formData, fileId);
-
-  // Build QR styling options
-  const styles = buildQRStylingOptions(customizationData, qrData);
-
-  // Build frame options
-  const frameOptions = buildFrameOptions(customizationData.frame);
-
-  // Build logo options
-  const logoOptions = buildLogoOptions(customizationData.logo);
-
-  const result = {
-    title:
-      title || `${qrType.charAt(0).toUpperCase() + qrType.slice(1)} QR Code`,
-    styles,
-    frameOptions,
-    logoOptions,
-    qrType,
-    fileId, // For PDF/Image/Video content files only
-  };
-
-  return result;
-};
-// ============================================================================
-// COMPATIBILITY FUNCTIONS FOR WORKSPACE OPERATIONS
-// ============================================================================
-
-/**
  * Compare original QR data with new builder data and generate update payload
  * Used for determining what changed and building the update request
  */
-
 // TODO: REMOVE THIS FUNCTION
 export const convertNewQRForUpdate = async (
   originalQR: TQrServerData,

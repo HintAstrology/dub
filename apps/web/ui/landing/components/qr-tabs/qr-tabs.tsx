@@ -5,13 +5,14 @@ import { Session } from "@/lib/auth";
 import { QrTabsTitle } from "@/ui/landing/components/qr-tabs/components/qr-tabs-title";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
 import {
-  convertNewBuilderToStorageFormat,
+  convertNewQRBuilderDataToServer,
   TNewQRBuilderData,
 } from "@/ui/qr-builder-new/helpers/data-converters";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { useMediaQuery } from "@dub/ui";
+import { SHORT_DOMAIN } from "@dub/utils";
 import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -81,7 +82,9 @@ export const QRTabs: FC<
       }
 
       try {
-        const storageData = convertNewBuilderToStorageFormat(data);
+        const storageData = await convertNewQRBuilderDataToServer(data, {
+          domain: SHORT_DOMAIN!,
+        });
 
         await saveQrDataToRedis({
           sessionId,

@@ -1,7 +1,7 @@
 import { mutatePrefix } from "@/lib/swr/mutate.ts";
 import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useToastWithUndo } from "@dub/ui";
-import { SHORT_DOMAIN } from "@dub/utils/src";
+import { SHORT_DOMAIN } from "@dub/utils";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -40,8 +40,6 @@ export const useNewQrOperations = ({
         const serverData = await convertNewQRBuilderDataToServer(builderData, {
           domain: SHORT_DOMAIN!,
         });
-
-        console.log(serverData, "serverData11111");
 
         const res = await fetch(
           `/api/qrs?workspaceId=${projectSlug ? projectSlug : workspaceId}`,
