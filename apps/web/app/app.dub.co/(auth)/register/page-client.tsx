@@ -5,7 +5,7 @@ import {
   useRegisterContext,
 } from "@/ui/auth/register/context";
 import { SignUpForm } from "@/ui/auth/register/signup-form";
-import { VerifyEmailForm } from "@/ui/auth/register/verify-email-form";
+// import { VerifyEmailForm } from "@/ui/auth/register/verify-email-form";
 import { truncate } from "@dub/utils";
 import Link from "next/link";
 
@@ -57,7 +57,7 @@ function Verify() {
           </p>
         </div>
         <div className="bg-neutral-50 px-4 py-8 sm:px-16">
-          <VerifyEmailForm />
+          {/* <VerifyEmailForm /> */}
         </div>
       </div>
       <p className="mt-4 text-center text-sm text-neutral-500">

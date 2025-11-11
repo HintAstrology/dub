@@ -227,6 +227,8 @@ export const analyticsResponse = {
     })
     .openapi({ ref: "AnalyticsOS" }),
 
+  download: z.any(),
+
   triggers: analyticsTriggersResponse,
   trigger: analyticsTriggersResponse, // backwards compatibility
 

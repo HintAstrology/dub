@@ -1,14 +1,14 @@
 "use client";
 
 import { Session } from "@/lib/auth";
-import { QRCanvas } from "@/ui/qr-builder/qr-canvas";
+import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import {
   TDownloadFormat,
   useQrDownload,
-} from "@/ui/qr-code/use-qr-download.ts";
+} from "@/ui/qr-code/hooks/use-qr-download";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr";
-import { Button, Modal, useRouterStuff } from "@dub/ui";
+import { Button, Modal, useMediaQuery, useRouterStuff } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { Icon } from "@iconify/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -20,7 +20,6 @@ import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
 import {
   Dispatch,
-  RefObject,
   SetStateAction,
   useCallback,
   useEffect,
@@ -39,13 +38,10 @@ interface IQRPreviewModalProps {
   setShowQRPreviewModal: Dispatch<SetStateAction<boolean>>;
   setIsNewQr: Dispatch<SetStateAction<boolean>>;
   isNewQr?: boolean;
-  canvasRef: RefObject<HTMLCanvasElement>;
-  qrCode: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   qrCodeId?: string;
-  width?: number;
-  height?: number;
   user: Session["user"];
-  onCanvasReady?: () => void;
 }
 
 function QRPreviewModal({
@@ -53,20 +49,18 @@ function QRPreviewModal({
   setShowQRPreviewModal,
   setIsNewQr,
   isNewQr,
-  canvasRef,
-  qrCode,
+  qrCodeStylingInstance,
+  svgString = "",
   qrCodeId,
-  width = 200,
-  height = 200,
   user,
-  onCanvasReady,
 }: IQRPreviewModalProps) {
+  const { isMobile } = useMediaQuery();
   const { queryParams } = useRouterStuff();
   const searchParams = useSearchParams();
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<TDownloadFormat>("svg");
 
-  const { downloadQrCode } = useQrDownload(qrCode);
+  const { downloadQrCode } = useQrDownload(qrCodeStylingInstance);
 
   const isWelcomeModal = searchParams.has("onboarded") || isNewQr;
   const [canShare, setCanShare] = useState(false);
@@ -84,7 +78,7 @@ function QRPreviewModal({
   };
 
   const handleDownload = async () => {
-    if (!qrCode || !canvasRef.current) {
+    if (!qrCodeStylingInstance) {
       toast.error("QR code not found");
       return;
     }
@@ -116,7 +110,7 @@ function QRPreviewModal({
   };
 
   const onShareClick = async () => {
-    if (!qrCode) {
+    if (!qrCodeStylingInstance) {
       return;
     }
 
@@ -136,7 +130,7 @@ function QRPreviewModal({
 
     try {
       setIsDownloading(true);
-      const blob = await qrCode.getRawData(
+      const blob = await qrCodeStylingInstance.getRawData(
         selectedFormat === "jpg" ? "jpeg" : selectedFormat,
       );
 
@@ -145,7 +139,7 @@ function QRPreviewModal({
         return;
       }
 
-      const file = new File([blob], `qr-code.${selectedFormat}`, {
+      const file = new File([blob as BlobPart], `qr-code.${selectedFormat}`, {
         type:
           selectedFormat === "svg"
             ? "image/svg+xml"
@@ -191,7 +185,7 @@ function QRPreviewModal({
     setCanShare(
       typeof navigator !== "undefined" &&
         !!navigator.share &&
-        !!navigator.canShare
+        !!navigator.canShare,
     );
   }, []);
 
@@ -254,12 +248,10 @@ function QRPreviewModal({
             <div className="flex flex-col items-center gap-6">
               <div className="flex justify-center">
                 <QRCanvas
-                  ref={canvasRef}
-                  qrCode={qrCode}
-                  qrCodeId={qrCodeId}
-                  width={width}
-                  height={height}
-                  onCanvasReady={onCanvasReady}
+                  svgString={svgString}
+                  width={isMobile ? 300 : 200}
+                  height={isMobile ? 300 : 200}
+                  className="p-1"
                 />
               </div>
 
@@ -340,23 +332,12 @@ function QRPreviewModal({
 }
 
 export function useQRPreviewModal(data: {
-  canvasRef: RefObject<HTMLCanvasElement>;
-  qrCode: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   qrCodeId?: string;
-  width?: number;
-  height?: number;
   user: Session["user"];
-  onCanvasReady?: () => void;
 }) {
-  const {
-    canvasRef,
-    qrCode,
-    qrCodeId,
-    width = 200,
-    height = 200,
-    user,
-    onCanvasReady,
-  } = data;
+  const { qrCodeStylingInstance, svgString = "", qrCodeId, user } = data;
   const [showQRPreviewModal, setShowQRPreviewModal] = useState(false);
   const [isNewQr, setIsNewQr] = useState(false);
 
@@ -368,20 +349,24 @@ export function useQRPreviewModal(data: {
   const QRPreviewModalCallback = useCallback(() => {
     return (
       <QRPreviewModal
-        canvasRef={canvasRef}
-        qrCode={qrCode}
+        qrCodeStylingInstance={qrCodeStylingInstance}
+        svgString={svgString}
         qrCodeId={qrCodeId}
-        width={width}
-        height={height}
         showQRPreviewModal={showQRPreviewModal}
         setShowQRPreviewModal={setShowQRPreviewModal}
         setIsNewQr={setIsNewQr}
         isNewQr={isNewQr}
         user={user}
-        onCanvasReady={onCanvasReady}
       />
     );
-  }, [width, height, showQRPreviewModal, qrCodeId]);
+  }, [
+    showQRPreviewModal,
+    qrCodeId,
+    qrCodeStylingInstance,
+    svgString,
+    user,
+    isNewQr,
+  ]);
 
   return {
     QRPreviewModal: QRPreviewModalCallback,

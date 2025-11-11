@@ -4,7 +4,7 @@ import { cn } from "@dub/utils";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { ITEM_PROGRESS_NAME } from "../../constants/file-upload";
+import { ITEM_PROGRESS_NAME } from "../../constants/file-upload.constants";
 import type { FileUploadItemProgressProps } from "../../types/file-upload";
 import { useFileUploadItemContext } from "./context";
 

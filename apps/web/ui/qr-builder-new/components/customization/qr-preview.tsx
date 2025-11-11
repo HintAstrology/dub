@@ -1,7 +1,5 @@
-import { useQrBuilderContext } from "../../context";
 import { useQRCodeStyling } from "../../hooks/use-qr-code-styling";
 import { IQRCustomizationData } from "../../types/customization";
-import { DownloadButton } from "../download-button";
 import { QRCanvas } from "../qr-canvas";
 
 interface QRPreviewProps {
@@ -13,12 +11,10 @@ export const QRPreview = ({
   homepageDemo,
   customizationData,
 }: QRPreviewProps) => {
-  const { selectedQrType, formData, currentFormValues } = useQrBuilderContext();
-
-  const activeFormData =
-    Object.keys(currentFormValues || {}).length > 0
-      ? currentFormValues
-      : formData;
+  // const activeFormData =
+  //   Object.keys(currentFormValues || {}).length > 0
+  //     ? currentFormValues
+  //     : formData;
 
   // const qrData = useMemo(() => {
   //   if (selectedQrType && activeFormData) {
@@ -33,16 +29,19 @@ export const QRPreview = ({
   //   return "https://getqr.com/qr-complete-setup";
   // }, [selectedQrType, activeFormData]);
 
-  const qrCode = useQRCodeStyling({
+  const { svgString } = useQRCodeStyling({
     customizationData,
     defaultData: "https://getqr.com/qr-complete-setup",
   });
 
-  const isDisabled = !selectedQrType || !activeFormData;
-
   return (
-    <div className="flex justify-center items-center w-full">
-      <QRCanvas qrCode={qrCode} width={270} height={270} />
+    <div className="flex w-full items-center justify-center">
+      <QRCanvas
+        svgString={svgString}
+        width={270}
+        height={270}
+        className="p-3"
+      />
     </div>
   );
 };

@@ -7,14 +7,14 @@ import { PaymentComponent } from "@/ui/plans/components/payment-component.tsx";
 import { PlansFeatures } from "@/ui/plans/components/plans-features.tsx";
 import { PlansHeading } from "@/ui/plans/components/plans-heading.tsx";
 import { PopularQrInfo } from "@/ui/plans/components/popular-qr-info.tsx";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { ICustomerBody } from "core/integration/payment/config";
 import { FC, useRef } from "react";
-import { QrStorageData } from "../qr-builder/types/types";
 
 interface IPlansContentProps {
   user: ICustomerBody;
   featuresAccess: FeaturesAccess;
-  mostScannedQR: QrStorageData | null;
+  mostScannedQR: TQrServerData | null;
 }
 
 export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
@@ -53,7 +53,7 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
         </div>
       </div>
 
-      <FAQSection faqItems={FAQ_ITEMS_PAYWALL} homePageDemo={false} />
+      <FAQSection faqItems={FAQ_ITEMS_PAYWALL} />
     </div>
   );
 };

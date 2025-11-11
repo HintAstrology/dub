@@ -1,5 +1,4 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
-import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Flex, Text, Theme } from "@radix-ui/themes";
@@ -11,30 +10,32 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useNewQrOperations } from "../qr-builder-new/hooks/use-qr-operations";
 
 type DeleteQRModalProps = {
   showDeleteQRModal: boolean;
   setShowDeleteQRModal: Dispatch<SetStateAction<boolean>>;
-  props: QrStorageData;
+  qrCode: TQrServerData;
 };
 
 function DeleteQRModal({
   showDeleteQRModal,
   setShowDeleteQRModal,
-  props,
+  qrCode,
 }: DeleteQRModalProps) {
-  const { deleteQr } = useQrOperations();
   const [deleting, setDeleting] = useState(false);
+
+  const { deleteQR } = useNewQrOperations({ initialQrData: qrCode });
 
   const handleDelete = useCallback(async () => {
     setDeleting(true);
-    const success = await deleteQr(props.id);
+    const success = await deleteQR();
     setDeleting(false);
 
     if (success) {
       setShowDeleteQRModal(false);
     }
-  }, [deleteQr, props.id, setShowDeleteQRModal]);
+  }, [qrCode, setShowDeleteQRModal]);
 
   const handleClose = () => {
     setShowDeleteQRModal(false);
@@ -54,7 +55,7 @@ function DeleteQRModal({
           <div className="relative flex w-full items-center justify-center px-2 py-4">
             <h3 className="!mt-0 max-w-xs text-center text-lg font-semibold">
               Are you sure you want to delete
-              <br />"{props.title}"?
+              <br />"{qrCode.title}"?
             </h3>
             <button
               disabled={deleting}
@@ -113,17 +114,17 @@ function DeleteQRModal({
   );
 }
 
-export function useDeleteQRModal({ props }: { props?: QrStorageData }) {
+export function useDeleteQRModal({ qrCode }: { qrCode: TQrServerData }) {
   const [showDeleteQRModal, setShowDeleteQRModal] = useState(false);
 
   const DeleteLinkModalCallback = useCallback(() => {
-    return props ? (
+    return (
       <DeleteQRModal
         showDeleteQRModal={showDeleteQRModal}
         setShowDeleteQRModal={setShowDeleteQRModal}
-        props={props}
+        qrCode={qrCode}
       />
-    ) : null;
+    );
   }, [showDeleteQRModal, setShowDeleteQRModal]);
 
   return useMemo(

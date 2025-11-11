@@ -2,10 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  EQRType,
-  QR_TYPES,
-} from "@/ui/qr-builder-new/constants/get-qr-config.ts";
+import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Icon } from "@iconify/react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { trackClientEvents } from "core/integration/analytic";
@@ -47,7 +45,7 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
         <div className="mb-8 flex items-center justify-center text-center">
           <div className="flex max-w-3xl flex-col items-center justify-center gap-3">
             <QrTabsDetailedTitle />
-            <p className="text-muted-foreground text-center max-w-4xl text-base md:text-lg">
+            <p className="text-muted-foreground max-w-4xl text-center text-base md:text-lg">
               All QR formats in one platform built for scale and precision.
             </p>
           </div>
@@ -101,7 +99,7 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
                     </p>
 
                     <Button
-                      className="bg-secondary hover:bg-secondary/90 text-white w-fit"
+                      className="bg-secondary hover:bg-secondary/90 w-fit text-white"
                       size="lg"
                       onClick={() =>
                         handleScrollButtonClick("2", type.scrollTo)

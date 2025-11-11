@@ -12,7 +12,6 @@ import {
   linkEventSchema,
 } from "@/lib/zod/schemas/links";
 import { createQrBodySchema } from "@/lib/zod/schemas/qrs";
-import { prisma } from "@dub/prisma";
 import { LOCALHOST_IP, R2_URL } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
 import { NextResponse } from "next/server";

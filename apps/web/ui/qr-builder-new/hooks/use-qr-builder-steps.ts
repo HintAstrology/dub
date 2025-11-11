@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { EQRType } from "../constants/get-qr-config.ts";
+import { EQRType } from "../types/qr-type";
 
 interface UseQRBuilderStepsProps {
   selectedQRType: EQRType | null;

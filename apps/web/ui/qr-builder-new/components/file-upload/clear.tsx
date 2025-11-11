@@ -3,7 +3,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { CLEAR_NAME } from "../../constants/file-upload";
+import { CLEAR_NAME } from "../../constants/file-upload.constants";
 import { useAsRef } from "../../hooks/use-as-ref";
 import type { FileUploadClearProps } from "../../types/file-upload";
 import { useFileUploadContext, useStore, useStoreContext } from "./context";

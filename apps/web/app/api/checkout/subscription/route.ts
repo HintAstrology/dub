@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { createAutoLoginURL } from "@/lib/auth/jwt-signin";
-import { QR_TYPES } from "@/ui/qr-builder/constants/get-qr-config";
+import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
 import { prisma } from "@dub/prisma";
 import {
