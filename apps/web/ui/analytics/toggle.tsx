@@ -8,8 +8,6 @@ import useWorkspace from "@/lib/swr/use-workspace";
 import { LinkProps } from "@/lib/types";
 import {
   BlurImage,
-  Button,
-  ChartLine,
   DateRangePicker,
   ExpandingArrow,
   Filter,
@@ -48,6 +46,7 @@ import {
   REGIONS,
 } from "@dub/utils";
 import { Icon } from "@iconify/react";
+import { Switch } from "@radix-ui/themes";
 import { readStreamableValue } from "ai/rsc";
 import {
   ComponentProps,
@@ -57,12 +56,11 @@ import {
   useState,
 } from "react";
 import { LinkIcon } from "../links/link-icon";
-import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder/constants/get-qr-config";
+import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
 import { AnalyticsContext } from "./analytics-provider";
 import ContinentIcon from "./continent-icon";
 import DeviceIcon from "./device-icon";
 import { useAnalyticsFilterOption } from "./utils";
-import { Switch } from '@radix-ui/themes';
 
 export default function Toggle({
   page = "analytics",
@@ -144,67 +142,67 @@ export default function Toggle({
 
   const { data: links } = useAnalyticsFilterOption("top_links", {
     cacheOnly: !isRequested("link"),
-    filterKey: "domain"
+    filterKey: "domain",
   });
   const { data: countries } = useAnalyticsFilterOption("countries", {
     cacheOnly: !isRequested("country"),
-    filterKey: "country"
+    filterKey: "country",
   });
   const { data: regions } = useAnalyticsFilterOption("regions", {
     cacheOnly: !isRequested("region"),
-    filterKey: "region"
+    filterKey: "region",
   });
   const { data: cities } = useAnalyticsFilterOption("cities", {
     cacheOnly: !isRequested("city"),
-    filterKey: "city"
+    filterKey: "city",
   });
   const { data: continents } = useAnalyticsFilterOption("continents", {
     cacheOnly: !isRequested("continent"),
-    filterKey: "continent"
+    filterKey: "continent",
   });
   const { data: devices } = useAnalyticsFilterOption("devices", {
     cacheOnly: !isRequested("device"),
-    filterKey: "device"
+    filterKey: "device",
   });
   const { data: browsers } = useAnalyticsFilterOption("browsers", {
     cacheOnly: !isRequested("browser"),
-    filterKey: "browser"
+    filterKey: "browser",
   });
   const { data: os } = useAnalyticsFilterOption("os", {
     cacheOnly: !isRequested("os"),
-    filterKey: "os"
+    filterKey: "os",
   });
   const { data: referers } = useAnalyticsFilterOption("referers", {
     cacheOnly: !isRequested("referer"),
-    filterKey: "referer"
+    filterKey: "referer",
   });
   const { data: refererUrls } = useAnalyticsFilterOption("referer_urls", {
     cacheOnly: !isRequested("refererUrl"),
-    filterKey: "refererUrl"
+    filterKey: "refererUrl",
   });
   const { data: urls } = useAnalyticsFilterOption("top_urls", {
     cacheOnly: !isRequested("url"),
-    filterKey: "url"
+    filterKey: "url",
   });
   const { data: utmSources } = useAnalyticsFilterOption("utm_sources", {
     cacheOnly: !isRequested("utm_source"),
-    filterKey: "utm_source"
+    filterKey: "utm_source",
   });
   const { data: utmMediums } = useAnalyticsFilterOption("utm_mediums", {
     cacheOnly: !isRequested("utm_medium"),
-    filterKey: "utm_medium"
+    filterKey: "utm_medium",
   });
   const { data: utmCampaigns } = useAnalyticsFilterOption("utm_campaigns", {
     cacheOnly: !isRequested("utm_campaign"),
-    filterKey: "utm_campaign"
+    filterKey: "utm_campaign",
   });
   const { data: utmTerms } = useAnalyticsFilterOption("utm_terms", {
     cacheOnly: !isRequested("utm_term"),
-    filterKey: "utm_term"
+    filterKey: "utm_term",
   });
   const { data: utmContents } = useAnalyticsFilterOption("utm_contents", {
     cacheOnly: !isRequested("utm_content"),
-    filterKey: "utm_content"
+    filterKey: "utm_content",
   });
   const utmData = {
     utm_source: utmSources,
@@ -522,8 +520,7 @@ export default function Toggle({
           key === "link"
             ? {
                 domain: new URL(`https://${value}`).hostname,
-                key:
-                  new URL(`https://${value}`).pathname.slice(1) || "_root",
+                key: new URL(`https://${value}`).pathname.slice(1) || "_root",
               }
             : {
                 [key]: value,
@@ -532,7 +529,7 @@ export default function Toggle({
         scroll: false,
       });
     }
-  }
+  };
 
   return (
     <>
@@ -606,10 +603,12 @@ export default function Toggle({
                   })
                 }
                 onOpenFilter={(key) =>
-                  setRequestedFilters((rf) => (rf.includes(key) ? rf : [...rf, key]))
+                  setRequestedFilters((rf) =>
+                    rf.includes(key) ? rf : [...rf, key],
+                  )
                 }
                 resetDefaultStates={() => {
-                  setSelectedToggleFilterKey(undefined)
+                  setSelectedToggleFilterKey(undefined);
                 }}
                 defaultSelectedFilterKey={selectedToggleFilterKey}
               />
@@ -650,47 +649,49 @@ export default function Toggle({
                     scroll: false,
                   });
                 }}
-                presets={INTERVAL_DISPLAYS.map(({ display, value, shortcut }) => {
-                  // const requiresUpgrade =
-                  //   partnerPage ||
-                  //   DUB_DEMO_LINKS.find((l) => l.domain === domain && l.key === key)
-                  //     ? false
-                  //     : !validDateRangeForPlan({
-                  //         plan: plan || dashboardProps?.workspacePlan,
-                  //         dataAvailableFrom: createdAt,
-                  //         interval: value,
-                  //         start,
-                  //         end,
-                  //       });
-                  const requiresUpgrade = false;
-                  const { startDate, endDate } = getStartEndDates({
-                    interval: value,
-                    dataAvailableFrom: createdAt,
-                  });
+                presets={INTERVAL_DISPLAYS.map(
+                  ({ display, value, shortcut }) => {
+                    // const requiresUpgrade =
+                    //   partnerPage ||
+                    //   DUB_DEMO_LINKS.find((l) => l.domain === domain && l.key === key)
+                    //     ? false
+                    //     : !validDateRangeForPlan({
+                    //         plan: plan || dashboardProps?.workspacePlan,
+                    //         dataAvailableFrom: createdAt,
+                    //         interval: value,
+                    //         start,
+                    //         end,
+                    //       });
+                    const requiresUpgrade = false;
+                    const { startDate, endDate } = getStartEndDates({
+                      interval: value,
+                      dataAvailableFrom: createdAt,
+                    });
 
-                  return {
-                    id: value,
-                    label: display,
-                    dateRange: {
-                      from: startDate,
-                      to: endDate,
-                    },
-                    requiresUpgrade,
-                    tooltipContent: requiresUpgrade ? (
-                      <UpgradeTooltip rangeLabel={display} plan={plan} />
-                    ) : undefined,
-                    shortcut,
-                  };
-                })}
+                    return {
+                      id: value,
+                      label: display,
+                      dateRange: {
+                        from: startDate,
+                        to: endDate,
+                      },
+                      requiresUpgrade,
+                      tooltipContent: requiresUpgrade ? (
+                        <UpgradeTooltip rangeLabel={display} plan={plan} />
+                      ) : undefined,
+                      shortcut,
+                    };
+                  },
+                )}
               />
-              <div className="flex items-center h-10 gap-x-2 w-full min-[500px]:w-fit">
+              <div className="flex h-10 w-full items-center gap-x-2 min-[500px]:w-fit">
                 <Switch
                   id="unique"
                   checked={!!searchParamsObj.unique}
                   onCheckedChange={(checked: boolean) => {
                     if (checked) {
                       queryParams({
-                        set: { unique: "true"},
+                        set: { unique: "true" },
                         scroll: false,
                       });
                     } else {
@@ -721,12 +722,11 @@ export default function Toggle({
               : []),
           ]}
           onRemove={(key, value) => {
-              queryParams({
-                del: key === "link" ? ["domain", "key", "url"] : key,
-                scroll: false,
-              })
-            }
-          }
+            queryParams({
+              del: key === "link" ? ["domain", "key", "url"] : key,
+              scroll: false,
+            });
+          }}
           onRemoveAll={() =>
             queryParams({
               // Reset all filters except for date range

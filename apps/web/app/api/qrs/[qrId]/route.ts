@@ -7,12 +7,7 @@ import { updateQr } from "@/lib/api/qrs/update-qr";
 import { parseRequestBody } from "@/lib/api/utils";
 import { withWorkspace } from "@/lib/auth";
 import { updateQrBodySchema } from "@/lib/zod/schemas/qrs";
-import {
-  EQRType,
-  FILE_QR_TYPES,
-} from "@/ui/qr-builder/constants/get-qr-config";
 import { prisma } from "@dub/prisma";
-import { R2_URL } from "@dub/utils";
 import { NextResponse } from "next/server";
 
 // GET /api/qrs/[qrId] - get a qr
@@ -42,32 +37,33 @@ export const PATCH = withWorkspace(
       }
     }
 
-    const qr = await getQr({
+    const oldQr = await getQr({
       qrId: params.qrId,
     });
 
     const parseJson = await parseRequestBody(req);
     const body = updateQrBodySchema.parse(parseJson) || {};
-    const fileQrType = FILE_QR_TYPES.includes(body.qrType as EQRType);
+
+    // const isFileQrType = FILE_QR_TYPES.includes(body.qrType as EQRType);
 
     try {
       // Define the correct URL for the link
-      let linkUrl: string;
-      if (body.fileId) {
-        // There is a new file - use the new URL
-        linkUrl = `${R2_URL}/qrs-content/${body.fileId}`;
-      } else if (qr.fileId && fileQrType) {
-        // There is no new file, but there is an existing file - use the existing URL
-        linkUrl = `${R2_URL}/qrs-content/${qr.fileId}`;
-      } else {
-        // There is no file - use the data from the QR code or the existing URL
-        linkUrl = body.link?.url || qr.link!.url;
-      }
+      // let linkUrl: string;
+      // if (body.fileId) {
+      //   // There is a new file - use the new URL
+      //   linkUrl = `${R2_URL}/qrs-content/${body.fileId}`;
+      // } else if (oldQr.fileId && isFileQrType) {
+      //   // There is no new file, but there is an existing file - use the existing URL
+      //   linkUrl = `${R2_URL}/qrs-content/${oldQr.fileId}`;
+      // } else {
+      //   // There is no file - use the data from the QR code or the existing URL
+      //   linkUrl = body.link?.url || oldQr.link!.url;
+      // }
 
       const updatedLink = {
-        ...qr.link!,
-        url: linkUrl,
-        geo: qr.link!.geo as Record<string, string> | null,
+        ...oldQr.link!,
+        url: body.link!.url,
+        geo: oldQr.link!.geo as Record<string, string> | null,
       };
 
       const {
@@ -94,9 +90,8 @@ export const PATCH = withWorkspace(
 
       await updateLink({
         oldLink: {
-          domain: qr.link!.domain,
-          key: qr.link!.key,
-          image: qr.link!.image,
+          domain: oldQr.link!.domain,
+          key: oldQr.link!.key,
         },
         updatedLink: processedLink,
       });

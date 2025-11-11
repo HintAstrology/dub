@@ -8,24 +8,13 @@ import QrWebsiteFull from "@/ui/landing/assets/png/get-qr-website-full.png";
 import QrWhatsappFull from "@/ui/landing/assets/png/get-qr-whatsapp-full.png";
 import QrWifiFull from "@/ui/landing/assets/png/get-qr-wifi-full.png";
 import { StaticImageData } from "next/image";
+import { EQRType } from "../types/qr-type";
 
 export const QR_BUILDER_STEP_TITLES = [
   "Choose QR Code Type",
   "Complete the content",
   "Customize your QR",
 ];
-
-export enum EQRType {
-  WEBSITE = "website",
-  PDF = "pdf",
-  IMAGE = "image",
-  VIDEO = "video",
-  WHATSAPP = "whatsapp",
-  SOCIAL = "social",
-  WIFI = "wifi",
-  APP_LINK = "app",
-  FEEDBACK = "feedback",
-}
 
 export type QRType = {
   id: EQRType;

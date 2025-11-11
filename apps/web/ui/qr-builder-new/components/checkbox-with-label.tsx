@@ -24,4 +24,3 @@ export const CheckboxWithLabel: FC<ICheckboxWithLabelProps> = ({
     </Flex>
   </Text>
 );
-

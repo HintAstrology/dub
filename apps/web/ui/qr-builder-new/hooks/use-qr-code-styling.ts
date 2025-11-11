@@ -1,5 +1,5 @@
 import QRCodeStyling, { Options } from "qr-code-styling";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BLACK_COLOR, WHITE_COLOR } from "../constants/customization/colors";
 import { FRAMES } from "../constants/customization/frames";
 import {
@@ -11,6 +11,11 @@ import { IQRCustomizationData } from "../types/customization";
 interface UseQRCodeStylingOptions {
   customizationData: IQRCustomizationData;
   defaultData?: string;
+}
+
+interface UseQRCodeStylingReturn {
+  qrCode: QRCodeStyling | null;
+  svgString: string;
 }
 
 const createBaseQROptions = (
@@ -183,11 +188,13 @@ const updateQRFrame = (
 export const useQRCodeStyling = ({
   customizationData,
   defaultData = "https://getqr.com/qr-complete-setup",
-}: UseQRCodeStylingOptions) => {
+}: UseQRCodeStylingOptions): UseQRCodeStylingReturn => {
   const [qrCode, setQrCode] = useState<QRCodeStyling | null>(null);
+  const [svgString, setSvgString] = useState<string>("");
   const [options, setOptions] = useState<Options>(() =>
     createBaseQROptions(customizationData, defaultData),
   );
+  const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Create stable references to track deep changes in customization data
   const customizationDataString = useMemo(
@@ -200,20 +207,81 @@ export const useQRCodeStyling = ({
     [customizationData.frame],
   );
 
+  // Initialize QR code instance
   useEffect(() => {
     const qrCodeStyling = new QRCodeStyling(options);
     setQrCode(qrCodeStyling);
   }, []);
 
+  // Update QR code options and logo
   useEffect(() => {
     if (!qrCode) return;
     updateQRCodeWithLogo(customizationData, defaultData, qrCode, setOptions);
   }, [qrCode, customizationDataString, defaultData]);
 
+  // Update QR code frame
   useEffect(() => {
     if (!qrCode) return;
     updateQRFrame(customizationData, qrCode);
   }, [qrCode, frameDataString]);
 
-  return qrCode;
+  // Render to hidden container and observe changes
+  useEffect(() => {
+    if (!qrCode) return;
+
+    // Create hidden container if it doesn't exist
+    if (!hiddenContainerRef.current) {
+      hiddenContainerRef.current = document.createElement("div");
+      hiddenContainerRef.current.style.display = "none";
+      document.body.appendChild(hiddenContainerRef.current);
+    }
+
+    const container = hiddenContainerRef.current;
+
+    // Render QR code to hidden container
+    container.replaceChildren();
+    qrCode.append(container);
+
+    // Function to extract and update SVG string
+    const updateSVGString = () => {
+      const svg = container.querySelector("svg");
+      if (svg) {
+        setSvgString(svg.outerHTML);
+      }
+    };
+
+    // Initial update after a brief delay to ensure rendering is complete
+    const initialTimeout = setTimeout(updateSVGString, 100);
+
+    // Watch for changes in the SVG
+    let updateTimeout: NodeJS.Timeout;
+    const observer = new MutationObserver(() => {
+      clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(updateSVGString, 50);
+    });
+
+    observer.observe(container, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+    });
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearTimeout(updateTimeout);
+      observer.disconnect();
+    };
+  }, [qrCode]);
+
+  // Cleanup hidden container on unmount
+  useEffect(() => {
+    return () => {
+      if (hiddenContainerRef.current) {
+        hiddenContainerRef.current.remove();
+        hiddenContainerRef.current = null;
+      }
+    };
+  }, []);
+
+  return { qrCode, svgString };
 };

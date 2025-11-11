@@ -1,9 +1,7 @@
-import { withWorkspace } from "@/lib/auth";
 import { getQr } from "@/lib/api/qrs/get-qr";
-import { prisma } from "@dub/prisma";
+import { withWorkspace } from "@/lib/auth";
+import { verifyFolderAccess } from "@/lib/folder/permissions";
 import { NextResponse } from "next/server";
-import { verifyFolderAccess } from '@/lib/folder/permissions';
-import { recordLinkTB, transformLinkTB } from "@/lib/tinybird/record-link";
 
 // No helper needed; we'll ingest to dub_links_metadata with stats_deleted=1
 

@@ -38,7 +38,7 @@ export async function updateQr(
       description,
       styles,
       frameOptions,
-      logoOptions: logoOptions === undefined ? null : logoOptions,
+      logoOptions,
       archived: archived || false,
       fileId: shouldClearFileId ? null : fileId,
     },

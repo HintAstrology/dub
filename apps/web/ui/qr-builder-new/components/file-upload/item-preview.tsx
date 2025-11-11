@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot";
 import Image from "next/image";
 import * as React from "react";
 
-import { ITEM_PREVIEW_NAME } from "../../constants/file-upload";
+import { ITEM_PREVIEW_NAME } from "../../constants/file-upload.constants";
 import { getFileIcon } from "../../helpers/file-upload";
 import type { FileUploadItemPreviewProps } from "../../types/file-upload";
 import { useFileUploadItemContext } from "./context";

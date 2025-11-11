@@ -4,7 +4,7 @@ import { cn } from "@dub/utils";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { ITEM_NAME } from "../../constants/file-upload";
+import { ITEM_NAME } from "../../constants/file-upload.constants";
 import type { FileUploadItemProps } from "../../types/file-upload";
 import {
   FileUploadItemContext,
