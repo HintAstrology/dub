@@ -32,7 +32,7 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
           <div
             key={type.id}
             className={cn(
-              "qr-type-card group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ease-in-out",
+              "qr-type-card group relative cursor-pointer bg-[#ffffff] overflow-hidden rounded-xl transition-all duration-300 ease-in-out",
               "w-full border-2 border-transparent shadow",
               "ring-1 ring-secondary hover:ring-2 hover:ring-secondary",
               // isSelected && "border-pr",
