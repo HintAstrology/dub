@@ -369,7 +369,7 @@ export const convertServerQRToNewBuilder = (
  * Used for determining what changed and building the update request
  */
 // TODO: REMOVE THIS FUNCTION
-export const convertNewQRForUpdate = async (
+export const prepareQRUpdates = async (
   originalQR: TQrServerData,
   newBuilderData: TNewQRBuilderData,
   options: {
@@ -388,6 +388,10 @@ export const convertNewQRForUpdate = async (
   const titleChanged = newBuilderData.title !== originalQR.title;
   const qrTypeChanged = newBuilderData.qrType !== originalQR.qrType;
 
+  // Check if QR types are file-based
+  const originalQrHasFileQrType = FILE_QR_TYPES.includes(
+    originalQR.qrType as EQRType,
+  );
   const newQrDataHasFileQrType = FILE_QR_TYPES.includes(
     newBuilderData.qrType as EQRType,
   );
@@ -404,10 +408,26 @@ export const convertNewQRForUpdate = async (
     );
   })();
 
-  // Check logo options changes
+  // Check logo options changes - need special handling for uploaded -> suggested transition
+  const originalLogoWasUploaded = originalQR.logoOptions?.type === "uploaded";
+  const newLogoIsSuggested = newServerData.logoOptions?.type === "suggested";
+  const logoTypeChanged = originalLogoWasUploaded && newLogoIsSuggested;
+
+  // Build logo options without fileId when transitioning from uploaded to suggested
+  // When serialized to JSON, undefined fields are omitted, which signals removal to the API
+  let finalLogoOptions = newServerData.logoOptions;
+  if (logoTypeChanged && finalLogoOptions) {
+    const { fileId, ...rest } = finalLogoOptions as any;
+    finalLogoOptions = rest;
+  }
+
+  // Normalize null/undefined for comparison
+  const normalizedOriginalLogo = originalQR.logoOptions ?? undefined;
+  const normalizedFinalLogo = finalLogoOptions ?? undefined;
+
   const logoOptionsChanged =
-    JSON.stringify(originalQR.logoOptions) !==
-    JSON.stringify(newServerData.logoOptions);
+    JSON.stringify(normalizedOriginalLogo) !==
+    JSON.stringify(normalizedFinalLogo);
 
   // Check data changes
   const originalData = originalQR?.link?.url || originalQR.data || "";
@@ -421,12 +441,39 @@ export const convertNewQRForUpdate = async (
   delete originalStyles.data;
   delete newStyles.data;
 
-  const stylesChanged =
-    JSON.stringify(originalStyles) !== JSON.stringify(newStyles);
+  // Deep comparison helper for objects (handles different key orders and nested objects)
+  const deepEqual = (obj1: any, obj2: any): boolean => {
+    // Sort keys recursively for nested objects
+    const sortKeys = (obj: any): any => {
+      if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
+        return obj;
+      }
+      return Object.keys(obj)
+        .sort()
+        .reduce((result: any, key: string) => {
+          result[key] = sortKeys(obj[key]);
+          return result;
+        }, {});
+    };
 
-  // Check files changes
-  const hasNewFiles = !!newBuilderData.fileId;
-  const hasExistingFiles = !!originalQR.fileId;
+    return JSON.stringify(sortKeys(obj1)) === JSON.stringify(sortKeys(obj2));
+  };
+
+  const stylesChanged = !deepEqual(originalStyles, newStyles);
+
+  // Check files changes - detect both adding and removing files
+  // Normalize null/undefined for comparison
+  const normalizedOriginalFileId = originalQR.fileId ?? undefined;
+  const normalizedNewFileId = newBuilderData.fileId ?? undefined;
+  const filesChanged = normalizedNewFileId !== normalizedOriginalFileId;
+
+  // Determine fileId value:
+  // - If new QR type is not file-based, don't include fileId (undefined)
+  // - If new QR type is file-based, use the provided fileId
+  // When fileId is undefined, it will be omitted from JSON serialization
+  const finalFileId = newQrDataHasFileQrType
+    ? newBuilderData.fileId
+    : undefined;
 
   const hasChanges =
     titleChanged ||
@@ -435,10 +482,10 @@ export const convertNewQRForUpdate = async (
     frameOptionsChanged ||
     logoOptionsChanged ||
     stylesChanged ||
-    hasNewFiles;
+    filesChanged;
 
-  const linkUrl =
-    hasNewFiles || (hasExistingFiles && newQrDataHasFileQrType) ? "" : newData;
+  // // For file-based QRs, link.url should be empty; otherwise use the new destination
+  // const linkUrl = newQrDataHasFileQrType ? "" : newData;
 
   const updateData: UpdateQrProps = {
     data: newData,
@@ -446,15 +493,25 @@ export const convertNewQRForUpdate = async (
     title: newBuilderData.title,
     styles: newServerData.styles,
     frameOptions: newServerData.frameOptions,
-    logoOptions: newServerData.logoOptions,
-    fileId: newBuilderData.fileId || undefined,
+    logoOptions: finalLogoOptions,
+    fileId: finalFileId,
     link: {
-      url: linkUrl,
+      url: newData,
       domain,
       tagId: null,
       webhookIds: [],
     },
   };
+
+  console.log("changes", {
+    title: titleChanged,
+    data: dataChanged,
+    qrType: qrTypeChanged,
+    frameOptions: frameOptionsChanged,
+    styles: stylesChanged,
+    logoOptions: logoOptionsChanged,
+    files: filesChanged,
+  });
 
   return {
     hasChanges,
@@ -465,7 +522,7 @@ export const convertNewQRForUpdate = async (
       frameOptions: frameOptionsChanged,
       styles: stylesChanged,
       logoOptions: logoOptionsChanged,
-      files: hasNewFiles,
+      files: filesChanged,
     },
     updateData,
   };

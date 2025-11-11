@@ -6,7 +6,10 @@ import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-q
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { FILE_QR_TYPES } from "../constants/get-qr-config";
-import { convertNewQRBuilderDataToServer } from "../helpers/data-converters";
+import {
+  convertNewQRBuilderDataToServer,
+  prepareQRUpdates,
+} from "../helpers/data-converters";
 import { TQRFormData } from "../types/context";
 import { TNewQRBuilderData } from "../types/qr-builder-data";
 import { TQrServerData } from "../types/qr-server-data";
@@ -76,8 +79,8 @@ export const useNewQrOperations = ({
     [workspaceId],
   );
 
-  const updateQr = useCallback(
-    async (originalQR: TQrServerData, builderData: TNewQRBuilderData) => {
+  const updateQR = useCallback(
+    async (builderData: TNewQRBuilderData) => {
       try {
         if (!workspaceId) {
           toast.error("Workspace ID not found");
@@ -85,25 +88,13 @@ export const useNewQrOperations = ({
         }
 
         // Convert new builder data to server format
-        const newServerData = await convertNewQRBuilderDataToServer(
+        const { updateData, hasChanges, changes } = await prepareQRUpdates(
+          initialQrData!,
           builderData,
           {
             domain: SHORT_DOMAIN!,
           },
         );
-
-        // Simple comparison to check for changes
-        const hasChanges =
-          newServerData.title !== originalQR.title ||
-          newServerData.qrType !== originalQR.qrType ||
-          newServerData.data !== originalQR.data ||
-          JSON.stringify(newServerData.styles) !==
-            JSON.stringify(originalQR.styles) ||
-          JSON.stringify(newServerData.frameOptions) !==
-            JSON.stringify(originalQR.frameOptions) ||
-          JSON.stringify(newServerData.logoOptions) !==
-            JSON.stringify(originalQR.logoOptions) ||
-          newServerData.fileId !== originalQR.fileId;
 
         if (!hasChanges) {
           toast.info("No changes to save");
@@ -111,13 +102,13 @@ export const useNewQrOperations = ({
         }
 
         const res = await fetch(
-          `/api/qrs/${originalQR.id}?workspaceId=${workspaceId}`,
+          `/api/qrs/${initialQrData!.id!}?workspaceId=${workspaceId}`,
           {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(newServerData),
+            body: JSON.stringify(updateData),
           },
         );
 
@@ -140,7 +131,7 @@ export const useNewQrOperations = ({
         return false;
       }
     },
-    [workspaceId],
+    [workspaceId, initialQrData],
   );
 
   const updateQRTitle = useCallback(
@@ -420,7 +411,7 @@ export const useNewQrOperations = ({
 
   return {
     createQr,
-    updateQr,
+    updateQR,
     updateQRTitle,
     updateQRDestination,
     archiveQR,

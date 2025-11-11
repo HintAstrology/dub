@@ -33,7 +33,9 @@ export function QRBuilderNewModal({
   onClose,
   user,
 }: QRBuilderModalProps) {
-  const { createQr, updateQr } = useNewQrOperations({ initialQrData: qrCode! });
+  const { createQr, updateQR } = useNewQrOperations({
+    initialQrData: qrCode!,
+  });
   const { isMobile } = useMediaQuery();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -59,7 +61,7 @@ export function QRBuilderNewModal({
 
     try {
       if (qrCode) {
-        await updateQr(qrCode, data);
+        await updateQR(data);
       } else {
         await createQr(data);
       }
