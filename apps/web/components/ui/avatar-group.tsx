@@ -1,10 +1,25 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { usersWithAvatar } from "@/ui/modals/trial-offer-with-qr-preview/components/avatars.component";
+import { default as man } from "../assets/avatars/man.png";
+import { default as woman } from "../assets/avatars/woman.png";
+
+const usersWithAvatar = [
+  {
+    name: "S",
+  },
+  {
+    name: "John",
+    avatar: man,
+  },
+  {
+    name: "Anna",
+    avatar: woman,
+  },
+];
 
 export const AvatarGroup = () => {
   return (
     <div className="flex -space-x-3">
-      {usersWithAvatar.map((user, index) => (
+      {usersWithAvatar?.map((user, index) => (
         <Avatar
           key={index}
           className="ring-offset-background h-8 w-8 ring-2 ring-gray-300 ring-offset-2"

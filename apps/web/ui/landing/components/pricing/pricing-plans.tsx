@@ -40,9 +40,9 @@ export const PricingSection: FC<IPricingSectionProps> = ({
             <Card
               className={cn(
                 "relative h-full w-full overflow-hidden pt-3",
-                {
-                  "border-primary border-2 shadow": plan.withButton,
-                },
+                plan.withButton
+                  ? "border-primary border-2 shadow"
+                  : "border-none"
               )}
             >
               <CardContent className="flex h-full flex-col gap-6">

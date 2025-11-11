@@ -2,11 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MotionPreset } from "@/components/ui/motion-preset";
 import { AvatarGroup } from "@/components/ui/avatar-group";
 import WebsiteQR from "@/ui/landing/assets/png/get-qr-website-full.png";
 import WhatsappQR from "@/ui/landing/assets/png/get-qr-whatsapp-full.png";
-import { SectionTitle } from "@/ui/landing/components/section-title";
 import { ArrowRight, Sparkles, Zap } from "lucide-react";
 import Image from "next/image";
 import { FC } from "react";
@@ -25,25 +23,8 @@ export const CTASection: FC<ICTASectionProps> = ({
 
           <CardContent className="relative flex items-center gap-8 px-6 sm:max-lg:flex-col md:gap-16 md:px-12 lg:py-14">
             {/* Images Section */}
-            <MotionPreset
-              className="relative w-full max-sm:hidden"
-              fade
-              motionProps={{
-                animate: {
-                  y: [0, -10, 0],
-                  opacity: 1,
-                },
-                transition: {
-                  y: {
-                    duration: 1.7,
-                    repeat: Infinity,
-                    ease: "easeOut",
-                    delay: 0.5,
-                  },
-                },
-              }}
-            >
-              <div className="flex gap-3 max-lg:mx-auto max-lg:max-h-80 lg:absolute lg:-translate-y-1/2 lg:scale-105">
+            <div className="relative w-full max-sm:hidden">
+              <div className="flex gap-3  w-full max-lg:mx-auto max-lg:max-h-80 lg:absolute lg:-translate-y-1/2 lg:scale-105 lg:justify-center lg:gap-8">
                 {/* First Image - Higher with sparkle */}
                 <div className="relative">
                   <div className="absolute -right-2 -top-2 z-10 rounded-full bg-gradient-to-br from-blue-500/80 to-blue-600/80 p-1.5 shadow-sm">
@@ -76,68 +57,39 @@ export const CTASection: FC<ICTASectionProps> = ({
                   </div>
                 </div>
               </div>
-            </MotionPreset>
+            </div>
 
             <div className="relative z-10 flex w-full max-w-2xl flex-col justify-center space-y-4 xl:justify-self-end">
               {/* Social Proof */}
-              <MotionPreset
-                fade
-                slide={{ direction: "up", offset: 30 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="flex items-center justify-center gap-2 sm:justify-start">
-                  <AvatarGroup />
-                  <span className="text-sm font-medium text-gray-600">
-                    Join 1M+ users
-                  </span>
-                </div>
-              </MotionPreset>
+              <div className="flex items-center justify-center gap-2 sm:justify-start">
+                <AvatarGroup />
+                <span className="text-sm font-medium text-gray-600">
+                  Join 1M+ users
+                </span>
+              </div>
 
-              <MotionPreset
-                component="h2"
-                className="text-center text-2xl font-bold sm:text-left sm:text-3xl lg:text-4xl"
-                fade
-                blur
-                slide={{ direction: "up", offset: 50 }}
-                transition={{ duration: 0.5 }}
-              >
+              <h2 className="text-center text-2xl font-bold sm:text-left sm:text-3xl lg:text-4xl">
                 Ready to Create Your
                 <br />
                 <span className="text-primary">Perfect QR Code?</span>
-              </MotionPreset>
+              </h2>
 
-              <MotionPreset
-                component="p"
-                className="text-muted-foreground text-center text-sm sm:text-left sm:text-base"
-                fade
-                blur
-                slide={{ direction: "up", offset: 50 }}
-                delay={0.2}
-                transition={{ duration: 0.5 }}
-              >
+              <p className="text-muted-foreground text-center text-sm sm:text-left sm:text-base">
                 Start generating professional, trackable QR codes in seconds
-              </MotionPreset>
+              </p>
 
-              <MotionPreset
-                fade
-                blur
-                slide={{ direction: "up", offset: 50 }}
-                delay={0.4}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row sm:items-start">
-                  <Button
-                    className="bg-secondary hover:bg-secondary/90 text-white"
-                    size="lg"
-                    onClick={() => handleScrollButtonClick("2")}
-                  >
-                    <span className="flex items-center gap-2">
-                      Create QR Code
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                    </span>
-                  </Button>
-                </div>
-              </MotionPreset>
+              <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row sm:items-start">
+                <Button
+                  className="bg-secondary hover:bg-secondary/90 text-white"
+                  size="lg"
+                  onClick={() => handleScrollButtonClick("2")}
+                >
+                  <span className="flex items-center gap-2">
+                    Create QR Code
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                  </span>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

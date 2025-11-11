@@ -9,6 +9,10 @@ import { ERedisArg } from "core/interfaces/redis.interface";
 import { getUserCookieService } from "core/services/cookie/user-session.service";
 import { Viewport } from "next";
 import WorkspaceQRsClient from "./custom-page-client";
+import { CardContent } from "@/components/ui/card";
+import { redis } from '@/lib/upstash';
+import { ERedisArg } from "core/interfaces/redis.interface.ts";
+
 import { LinksTitle } from "./links-title";
 
 export const viewport: Viewport = {

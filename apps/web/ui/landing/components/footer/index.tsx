@@ -101,7 +101,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
             Ready to get started?
           </h3>
 
-          <div suppressHydrationWarning>
+          {/* <div suppressHydrationWarning>
             <Button
               onClick={handleScrollToQRGenerationBlock}
               className="bg-secondary hover:bg-secondary/90 text-white"
@@ -109,7 +109,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
             >
               Create QR code
             </Button>
-          </div>
+          </div> */}
 
           <div className="text-xs text-neutral-500">
             <p className="flex items-center gap-2">
