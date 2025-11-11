@@ -1,6 +1,7 @@
 "use server";
 
 import { redis } from "@/lib/upstash";
+import { createQrBodySchema } from "@/lib/zod/schemas/qrs";
 import { ERedisArg } from "core/interfaces/redis.interface.ts";
 import z from "../../zod";
 import { actionClient } from "../safe-action";
@@ -8,37 +9,17 @@ import { actionClient } from "../safe-action";
 // schema for qr data
 const schema = z.object({
   sessionId: z.string(),
-  qrData: z.object({
-    title: z.string(),
-    styles: z.object({}).passthrough(), // Logo stored in styles.image
-    frameOptions: z.object({
-      id: z.string(),
-      color: z.string().optional(),
-      textColor: z.string().optional(),
-      text: z.string().optional(),
-    }),
-    qrType: z.enum([
-      "website",
-      "pdf",
-      "image",
-      "video",
-      "whatsapp",
-      "social",
-      "wifi",
-      "app",
-      "feedback",
-    ]),
-    fileId: z.string().optional(), // For PDF/Image/Video QR content files ONLY
-  }),
+  extraKey: z.string().optional().describe("Extra key to identify the data"),
+  qrData: createQrBodySchema,
 });
 
 // save qr data to redis in background
 export const saveQrDataToRedisAction = actionClient
   .schema(schema)
   .action(async ({ parsedInput }) => {
-    const { sessionId, qrData } = parsedInput;
+    const { sessionId, qrData, extraKey } = parsedInput;
 
-    const key = `${ERedisArg.QR_DATA_REG}:${sessionId}`;
+    const key = `${ERedisArg.QR_DATA_REG}:${sessionId}${extraKey ? `:${extraKey}` : ""}`;
     console.log("saveQrDataToRedisAction key", key);
 
     await redis

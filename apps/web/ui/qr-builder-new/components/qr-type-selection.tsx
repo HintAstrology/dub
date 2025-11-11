@@ -1,11 +1,10 @@
+"use client";
+
 import { cn } from "@dub/utils";
-import { Card, Flex } from "@radix-ui/themes";
+import { ArrowRight } from "lucide-react";
 import { FC } from "react";
-import {
-  EQRType,
-  LINKED_QR_TYPES,
-  QR_TYPES,
-} from "../constants/get-qr-config.ts";
+import { LINKED_QR_TYPES, QR_TYPES } from "../constants/get-qr-config.ts";
+import { EQRType } from "../types/qr-type.ts";
 import { QrTypeIcon } from "./qr-type-icon";
 
 interface QrTypeSelectionProps {
@@ -25,60 +24,71 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
   );
 
   return (
-    <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-      {filteredQrTypes.map((type, idx) => (
-        <Card
-          key={type.id}
-          size="1"
-          asChild
-          className={cn(
-            "text-neutral !border-border-500 w-42 group flex min-w-[254px] cursor-pointer items-center justify-center gap-2 rounded-md border px-4 py-3.5 font-medium transition-colors [&_div:first-child]:flex [&_div:first-child]:flex-row [&_div:first-child]:items-center [&_div:first-child]:gap-3 md:[&_div:first-child]:flex-none md:[&_div:first-child]:gap-2 [&_div]:p-0",
-            "hover:!bg-secondary-100 hover:!border-secondary group",
-            "transition-all duration-300 ease-in-out",
-            {
-              "!bg-secondary-100 !border-secondary": selectedQRType === type.id,
-              "!bg-background md:!bg-white": selectedQRType !== type.id,
-            },
-          )}
-          onClick={() => onSelect(type.id)}
-          onMouseEnter={() => onHover(type.id)}
-          onMouseLeave={() => onHover(null)}
-        >
-          <Flex
-            direction={{ initial: "row", md: "column" }}
-            align="start"
-            gap="2"
+    <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-3 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+      {filteredQrTypes.map((type, idx) => {
+        const isSelected = selectedQRType === type.id;
+
+        return (
+          <div
+            key={type.id}
+            className={cn(
+              "qr-type-card group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ease-in-out",
+              "border-secondary/20 hover:border-secondary w-full border-2 shadow",
+              // isSelected && "border-pr",
+            )}
+            onClick={() => onSelect(type.id)}
+            onMouseEnter={() => onHover(type.id)}
+            onMouseLeave={() => onHover(null)}
           >
-            <QrTypeIcon
-              icon={type.icon}
-              idx={idx}
-              isActive={selectedQRType === type.id}
-              className="flex h-8 w-8 md:hidden"
-            />
-            <Flex direction="column">
-              <Flex direction="row" gap="2" align="center">
+            {/* Animated gradient background */}
+            <div className="from-background to-muted/30 absolute inset-0 z-0 bg-gradient-to-br" />
+            {/* Grid pattern overlay */}
+            <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+
+            {/* Blob effect */}
+            {/* <div className="blob bg-secondary absolute left-0 top-0 z-[1] h-[150px] w-[150px] rounded-full opacity-0 blur-2xl transition-all duration-300 ease-in-out" /> */}
+            {/* <div className="fake-blob absolute left-0 top-0 z-[1] h-40 w-40 rounded-full [display:hidden]" /> */}
+
+            {/* Mobile Layout */}
+            <div className="relative z-10 flex items-center gap-3 p-3 md:hidden">
+              <QrTypeIcon
+                icon={type.icon}
+                idx={idx}
+                isActive={isSelected}
+                className="text-primary size-8 shrink-0"
+              />
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <h3 className="text-base font-semibold text-black">
+                  {type.label}
+                </h3>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  {type.info}
+                </p>
+              </div>
+              <ArrowRight className="text-secondary size-5 shrink-0 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-[1.8]" />
+            </div>
+
+            {/* Desktop Layout */}
+            <div className="relative z-10 hidden items-center gap-4 p-8 md:flex">
+              <div className="flex flex-1 flex-col items-start gap-4">
                 <QrTypeIcon
                   icon={type.icon}
                   idx={idx}
-                  isActive={selectedQRType === type.id}
-                  className="hidden h-5 w-5 flex-none md:flex"
+                  isActive={isSelected}
+                  className="text-primary size-7"
                 />
-                <h3
-                  className={cn(
-                    "text-neutral text-md group-hover:text-secondary font-medium md:text-lg",
-                    {
-                      "!text-secondary": selectedQRType === type.id,
-                    },
-                  )}
-                >
+                <h3 className="text-2xl font-semibold text-black">
                   {type.label}
                 </h3>
-              </Flex>
-              <p className="text-xs text-neutral-500 md:text-sm">{type.info}</p>
-            </Flex>
-          </Flex>
-        </Card>
-      ))}
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {type.info}
+                </p>
+              </div>
+              <ArrowRight className="text-secondary size-7 shrink-0 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-[1.8]" />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

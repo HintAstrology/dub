@@ -1,3 +1,4 @@
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { useRouterStuff } from "@dub/ui";
 import { fetcher } from "@dub/utils";
 import { useSession } from "next-auth/react";
@@ -6,7 +7,6 @@ import useSWR, { SWRConfiguration } from "swr";
 import { z } from "zod";
 import { getLinksQuerySchemaExtended } from "../zod/schemas/links";
 import useWorkspace from "./use-workspace";
-import { TQrStorageData } from "@/ui/qr-builder-new/types/database";
 
 const partialQuerySchema = getLinksQuerySchemaExtended.partial();
 
@@ -40,7 +40,7 @@ export default function useQrs(
     data: qrs,
     isValidating,
     error,
-  } = useSWR<TQrStorageData[]>(
+  } = useSWR<TQrServerData[]>(
     workspaceId
       ? `/api/qrs${getQueryString(
           {

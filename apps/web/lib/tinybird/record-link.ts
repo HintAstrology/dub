@@ -1,5 +1,5 @@
 import z from "@/lib/zod";
-import { EQRType } from "@/ui/qr-builder/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { ExpandedLink } from "../api/links";
 import { tb } from "./client";
 

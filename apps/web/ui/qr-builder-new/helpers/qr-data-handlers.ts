@@ -1,5 +1,6 @@
-import { APP_DOMAIN } from '@dub/utils';
-import { EQRType } from "../constants/get-qr-config";
+import { APP_DOMAIN } from "@dub/utils";
+import { TQrServerData } from "../types/qr-server-data";
+import { EQRType } from "../types/qr-type";
 
 // Function to escape special characters in Wi-Fi QR code
 export const escapeWiFiValue = (value: string): string => {
@@ -233,4 +234,70 @@ export const parseQRData = (
   }
 
   return parser(data);
+};
+
+export const getDisplayContent = (qrCode: TQrServerData): string => {
+  const { data, qrType } = qrCode;
+
+  switch (qrType as EQRType) {
+    case EQRType.WHATSAPP:
+      try {
+        const url = new URL(qrCode?.link?.url || "");
+        let number = "";
+
+        if (url.hostname === "wa.me") {
+          number = url.pathname.replace("/", "");
+        } else if (
+          url.hostname === "whatsapp.com" ||
+          url.hostname === "api.whatsapp.com"
+        ) {
+          number = url.searchParams.get("phone") || "";
+        }
+
+        if (number) {
+          return `+${number.replace(/\D/g, "")}`;
+        }
+      } catch (e) {
+        const numberMatch = data.match(/\d+/);
+        if (numberMatch) {
+          return `+${numberMatch[0]}`;
+        }
+      }
+      return data;
+
+    case EQRType.WIFI:
+      const wifiMatch = data.match(
+        /WIFI:T:([^;]+(?:\\;[^;]+)*);S:([^;]+(?:\\;[^;]+)*);P:([^;]+(?:\\;[^;]+)*);H:([^;]+(?:\\;[^;]+)*);/,
+      );
+      if (wifiMatch) {
+        return unescapeWiFiValue(wifiMatch[2]); // networkName
+      }
+      return data;
+
+    case EQRType.PDF:
+    case EQRType.IMAGE:
+    case EQRType.VIDEO:
+      if (qrCode?.file?.name) {
+        return qrCode.file.name;
+      }
+
+      if (qrCode.link?.url) {
+        try {
+          const url = new URL(qrCode.link.url);
+          const id = url.pathname.split("/").pop();
+          return id || qrCode.link.url;
+        } catch {
+          return qrCode.link.url;
+        }
+      }
+
+      return data;
+
+    case EQRType.WEBSITE:
+    case EQRType.APP_LINK:
+    case EQRType.SOCIAL:
+    case EQRType.FEEDBACK:
+    default:
+      return qrCode.link?.url || data;
+  }
 };

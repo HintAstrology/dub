@@ -2,14 +2,14 @@
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { PlansFeatures } from "@/ui/plans/components/plans-features.tsx";
-import { QRCodeDemoMap } from "@/ui/qr-builder/components/qr-code-demos/qr-code-demo-map";
+import { QRCodeDemoMap } from "@/ui/qr-builder-new/components/qr-code-demos/qr-code-demo-map";
 import {
-  EQRType,
   FILE_QR_TYPES,
   QR_TYPES,
-} from "@/ui/qr-builder/constants/get-qr-config.ts";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
-import { parseQRData } from "@/ui/utils/qr-data-parser";
+} from "@/ui/qr-builder-new/constants/get-qr-config";
+import { parseQRData } from "@/ui/qr-builder-new/helpers/qr-data-handlers";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Button } from "@dub/ui";
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { Options } from "qr-code-styling/lib/types";
@@ -17,7 +17,7 @@ import { FC, useMemo } from "react";
 import { QrInfoBadge } from "./qr-info-badge";
 
 interface IPopularQrInfo {
-  mostScannedQR: QrStorageData | null;
+  mostScannedQR: TQrServerData | null;
   featuresAccess: FeaturesAccess;
   handleScroll: () => void;
 }
@@ -150,16 +150,6 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
       <div className="hidden lg:block">
         <PlansFeatures />
       </div>
-
-      {!featuresAccess.isSubscribed && (
-        <Button
-          className="block lg:hidden"
-          text={
-            !featuresAccess.isTrialOver ? "Upgrade Plan" : "Restore QR Code"
-          }
-          onClick={handleScroll}
-        />
-      )}
     </Flex>
   );
 };

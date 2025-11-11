@@ -3,7 +3,7 @@
 import { cn } from "@dub/utils";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
-import { DROPZONE_NAME } from "../../constants/file-upload";
+import { DROPZONE_NAME } from "../../constants/file-upload.constants";
 import { useAsRef } from "../../hooks/use-as-ref";
 import type { FileUploadDropzoneProps } from "../../types/file-upload";
 import { useFileUploadContext, useStore, useStoreContext } from "./context";
