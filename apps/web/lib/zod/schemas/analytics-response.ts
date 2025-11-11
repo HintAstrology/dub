@@ -1,6 +1,6 @@
 import { TRIGGER_TYPES } from "@/lib/analytics/constants";
 import z from "@/lib/zod";
-import { EQRType } from "@/ui/qr-builder/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type"
 import { CONTINENT_CODES, COUNTRY_CODES } from "@dub/utils";
 
 const analyticsTriggersResponse = z
