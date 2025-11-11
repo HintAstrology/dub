@@ -71,12 +71,12 @@ export default function Main() {
     (plan === "free" || plan === "pro");
 
   return (
-    <div className="w-full overflow-hidden bg-white">
-      <div className="scrollbar-hide border-border-500 grid w-full grid-cols-3 divide-x overflow-y-hidden border sm:rounded-t-xl">
+    <div className="w-full overflow-hidden rounded-[20px] border border-border bg-white shadow">
+      <div className="scrollbar-hide flex w-full divide-x overflow-x-auto overflow-y-hidden">
         <NumberFlowGroup>
           {tabs.map(({ id, label, colorClassName, conversions }, idx) => {
             return (
-              <div key={id} className="relative z-0 col-span-3">
+              <div key={id} className="relative z-0 w-full min-w-full shrink-0 sm:min-w-0 sm:flex-1 sm:shrink">
                 {idx > 0 && (
                   <div className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-neutral-200 bg-white p-1.5">
                     <ChevronRight
@@ -110,9 +110,9 @@ export default function Main() {
                 )}
                 <Link
                   className={cn(
-                    "border-box relative block h-full min-w-[110px] flex-none px-4 py-3 sm:min-w-[240px] sm:px-8 sm:py-6",
+                    "border-box relative block h-full min-w-[90px] flex-none px-3 py-2 sm:min-w-[180px] sm:px-4 sm:py-3",
                     "transition-colors hover:bg-neutral-50 focus:outline-none active:bg-neutral-100",
-                    "ring-inset ring-neutral-500 focus-visible:ring-1 sm:first:rounded-tl-xl",
+                    "ring-inset ring-neutral-500 focus-visible:ring-1",
                   )}
                   href={
                     queryParams({
@@ -128,20 +128,20 @@ export default function Main() {
                   <div
                     className={cn(
                       "bg-border-500 absolute bottom-0 left-0 h-0.5 w-full transition-transform duration-100",
-                      tab.id !== id && "translate-y-[3px]", // Translate an extra pixel to avoid sub-pixel issues
+                      tab.id !== id && "translate-y-[2px]", // Translate an extra pixel to avoid sub-pixel issues
                     )}
                   />
 
-                  <div className="flex items-center gap-2.5 text-sm text-neutral-600">
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
                     <div
                       className={cn(
-                        "h-2 w-2 rounded-sm bg-current shadow-[inset_0_0_0_1px_#00000019]",
+                        "h-1.5 w-1.5 rounded-sm bg-current shadow-[inset_0_0_0_1px_#00000019]",
                         colorClassName,
                       )}
                     />
                     <span>{label}</span>
                   </div>
-                  <div className="mt-1 flex h-12 items-center">
+                  <div className="mt-0.5 flex h-8 items-center">
                     {totalEvents?.[id] || totalEvents?.[id] === 0 ? (
                       <NumberFlow
                         value={
@@ -150,7 +150,7 @@ export default function Main() {
                             : totalEvents[id]
                         }
                         className={cn(
-                          "text-2xl font-medium sm:text-3xl",
+                          "text-xl font-medium sm:text-2xl",
                           showPaywall && "opacity-30",
                         )}
                         format={
@@ -158,7 +158,7 @@ export default function Main() {
                             ? {
                                 style: "currency",
                                 currency: "USD",
-                                // @ts-ignore – trailingZeroDisplay is a valid option but TS is outdated
+                                // @ts-ignore – trailingZeroDisplay is a valid option but TS is outdated
                                 trailingZeroDisplay: "stripIfInteger",
                               }
                             : {
@@ -170,11 +170,11 @@ export default function Main() {
                         }
                       />
                     ) : requiresUpgrade ? (
-                      <div className="block rounded-full bg-neutral-100 p-2.5">
-                        <Lock className="h-4 w-4 text-neutral-500" />
+                      <div className="block rounded-full bg-neutral-100 p-2">
+                        <Lock className="h-3.5 w-3.5 text-neutral-500" />
                       </div>
                     ) : (
-                      <div className="h-9 w-16 animate-pulse rounded-md bg-neutral-200" />
+                      <div className="h-7 w-14 animate-pulse rounded-md bg-neutral-200" />
                     )}
                   </div>
                 </Link>
@@ -186,7 +186,7 @@ export default function Main() {
       <div className="relative">
         <div
           className={cn(
-            "border-border-500 relative overflow-hidden border-x border-b sm:rounded-b-xl",
+            "relative overflow-hidden",
             showPaywall &&
               "pointer-events-none [mask-image:linear-gradient(#0006,#0006_25%,transparent_40%)]",
           )}

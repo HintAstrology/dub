@@ -33,10 +33,10 @@ export default function Analytics({
         {({ dashboardProps }) => {
           return (
             <div
-              className={cn("pb-10", dashboardProps && "bg-neutral-50 pt-10")}
+              className={cn("py-3 px-3 sm:px-6 lg:px-10", dashboardProps && "bg-neutral-50")}
             >
               <Toggle />
-              <div className="mx-auto grid max-w-screen-xl gap-5 px-3 lg:px-10">
+              <div className="mx-auto grid w-full max-w-screen-xl gap-5">
                 <Main />
                 <StatsGrid />
               </div>
@@ -58,7 +58,7 @@ function StatsGrid() {
     (plan === "free" || plan === "pro");
 
   return hide ? null : (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
       {!dashboardProps && <TopLinks />}
       <Locations />
       <Devices />

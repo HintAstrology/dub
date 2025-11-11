@@ -22,6 +22,15 @@ import { areEqual, FixedSizeList } from "react-window";
 import { AnalyticsContext } from "./analytics-provider";
 import LinkPreviewTooltip from "./link-preview";
 
+const chartColors = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--primary))",
+];
+
 export default function BarList({
   tab,
   unit,
@@ -66,7 +75,7 @@ export default function BarList({
 
   const virtualize = filteredData.length > 100;
 
-  const itemProps = filteredData.map((data) => ({
+  const itemProps = filteredData.map((data, index) => ({
     ...data,
     maxValue,
     tab,
@@ -74,6 +83,7 @@ export default function BarList({
     setShowModal,
     barBackground,
     hoverBackground,
+    barColor: chartColors[index % chartColors.length],
   }));
 
   const bars = (
@@ -86,7 +96,7 @@ export default function BarList({
                 width={width}
                 height={height}
                 itemCount={filteredData.length}
-                itemSize={40}
+                itemSize={48}
                 itemData={itemProps}
               >
                 {VirtualLineItem}
@@ -137,6 +147,7 @@ export function LineItem({
   barBackground,
   hoverBackground,
   linkData,
+  barColor,
 }: {
   icon: ReactNode;
   title: string;
@@ -149,21 +160,18 @@ export function LineItem({
   barBackground: string;
   hoverBackground: string;
   linkData?: LinkProps;
+  barColor?: string;
 }) {
-  const lineItem = useMemo(() => {
-    return (
-      <div className="z-10 flex items-center space-x-4 overflow-hidden px-3">
-        {icon}
-        <div className="truncate text-sm text-neutral-800">
-          {linkData?.qr?.title || getPrettyUrl(title)}
-        </div>
-      </div>
-    );
-  }, [icon, tab, title, linkData]);
+  const displayTitle = useMemo(() => {
+    const text = linkData?.qr?.title || getPrettyUrl(title);
+    return text.length > 30 ? `${text.slice(0, 30)}...` : text;
+  }, [title, linkData]);
 
   const { saleUnit } = useContext(AnalyticsContext);
 
   const As = href ? Link : "div";
+
+  const barWidth = `${(value / (maxValue || 0)) * 100}%`;
 
   return (
     // @ts-ignore - we know if it's a Link it'll get its href
@@ -174,53 +182,40 @@ export function LineItem({
         onClick: () => setShowModal(false),
       })}
       className={cn(
-        `block min-w-0 border-l-2 border-transparent px-4 py-1 transition-all`,
-        href && hoverBackground,
+        `block min-w-0 border-l-2 border-transparent py-1.5 transition-all`,
+        href && "hover:bg-muted/50",
       )}
     >
-      <div className="group flex items-center justify-between">
-        <div className="relative z-10 flex h-8 w-full min-w-0 max-w-[calc(100%-2rem)] items-center">
-          {tab === "links" && linkData ? (
-            <Tooltip content={<LinkPreviewTooltip data={linkData} />}>
-              {lineItem}
-            </Tooltip>
-          ) : tab === "urls" ? (
-            <Tooltip
-              content={
-                <div className="overflow-auto px-4 py-2">
-                  <LinkifyTooltipContent>{title}</LinkifyTooltipContent>
-                </div>
-              }
-            >
-              {lineItem}
-            </Tooltip>
-          ) : (
-            lineItem
-          )}
+      <div className="group flex items-center justify-between gap-4">
+        <div className="relative flex h-9 min-w-0 flex-1 items-center">
           <motion.div
             style={{
-              width: `${(value / (maxValue || 0)) * 100}%`,
+              width: barWidth,
+              backgroundColor: barColor,
             }}
-            className={cn(
-              "absolute h-full origin-left rounded-md",
-              barBackground,
-            )}
+            className="absolute left-0 h-full origin-left rounded-[0_10px_10px_0]"
             transition={{ ease: "easeOut", duration: 0.3 }}
             initial={{ transform: "scaleX(0)" }}
             animate={{ transform: "scaleX(1)" }}
           />
+          <div className="relative z-10 flex items-center gap-3 px-3">
+            {icon}
+            <span className="truncate text-sm font-medium text-white mix-blend-difference">
+              {displayTitle}
+            </span>
+          </div>
         </div>
         <NumberFlow
           value={
             unit === "sales" && saleUnit === "saleAmount" ? value / 100 : value
           }
-          className="z-10 px-2 text-sm text-neutral-600"
+          className="z-10 shrink-0 text-sm font-medium text-neutral-600"
           format={
             unit === "sales" && saleUnit === "saleAmount"
               ? {
                   style: "currency",
                   currency: "USD",
-                  // @ts-ignore – trailingZeroDisplay is a valid option but TS is outdated
+                  // @ts-ignore – trailingZeroDisplay is a valid option but TS is outdated
                   trailingZeroDisplay: "stripIfInteger",
                 }
               : {

@@ -4,34 +4,19 @@ import {
   INTERVAL_DISPLAYS,
   VALID_ANALYTICS_FILTERS,
 } from "@/lib/analytics/constants";
+import { AnalyticsGroupByOptions, EventType } from "@/lib/analytics/types";
+import { editQueryString } from "@/lib/analytics/utils";
 import { getStartEndDates } from "@/lib/analytics/utils/get-start-end-dates";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { LinkProps } from "@/lib/types";
 import {
+  Button,
   DateRangePicker,
   Filter,
+  LinkLogo,
   TooltipContent,
   useRouterStuff,
 } from "@dub/ui";
-import {
-  APP_DOMAIN,
-  capitalize,
-  CONTINENTS,
-  COUNTRIES,
-  getApexDomain,
-  getNextPlan,
-  linkConstructor,
-  nFormatter,
-  REGIONS,
-} from "@dub/utils";
-import { Icon } from "@iconify/react";
-import { Switch } from "@radix-ui/themes";
-import {
-  ComponentProps,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
 import {
   Cube,
   FlagWavy,
@@ -43,21 +28,30 @@ import {
   OfficeBuilding,
   Sliders,
   Window,
+  Xmark,
 } from "@dub/ui/icons";
+import {
+  APP_DOMAIN,
+  capitalize,
+  cn,
+  CONTINENTS,
+  COUNTRIES,
+  fetcher,
+  getApexDomain,
+  getNextPlan,
+  linkConstructor,
+  nFormatter,
+  REGIONS,
+} from "@dub/utils";
+import { Icon } from "@iconify/react";
+import { Switch } from "@radix-ui/themes";
+import { ComponentProps, useMemo } from "react";
+import useSWR from "swr";
 import { LinkIcon } from "../links/link-icon";
 import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder/constants/get-qr-config";
 import ContinentIcon from "./continent-icon";
 import DeviceIcon from "./device-icon";
-import { cn } from "@dub/utils";
-import { LinkLogo } from "@dub/ui";
-import useSWR from "swr";
-import { editQueryString } from "@/lib/analytics/utils";
-import { fetcher } from "@dub/utils";
-import { AnalyticsGroupByOptions, EventType } from "@/lib/analytics/types";
 
-/**
- * Standalone filter option hook that doesn't depend on AnalyticsContext
- */
 function useStandaloneFilterOption(
   groupBy: AnalyticsGroupByOptions,
   options?: { cacheOnly?: boolean; filterKey?: string },
@@ -65,29 +59,39 @@ function useStandaloneFilterOption(
   queryString?: string,
   selectedTab?: EventType,
 ) {
-  const { slug } = useWorkspace() || {};
-  
-  const params = new URLSearchParams(
-    editQueryString(queryString || "", {
-      groupBy,
-      event: selectedTab || "clicks",
-    })
-  );
+  const params = useMemo(() => {
+    const p = new URLSearchParams(
+      editQueryString(queryString || "", {
+        groupBy,
+        event: selectedTab || "clicks",
+      }),
+    );
 
-  if (options?.filterKey) {
-    params.delete(options.filterKey);
-  }
+    if (options?.filterKey) {
+      p.delete(options.filterKey);
+    }
 
-  const baseApiPath = `/api/analytics/${slug}`;
+    if (workspaceId) {
+      p.set("workspaceId", workspaceId);
+    }
+
+    return p;
+  }, [queryString, groupBy, selectedTab, options?.filterKey, workspaceId]);
+
+  const baseApiPath = `/api/analytics`;
   const path = `${baseApiPath}?${params.toString()}`;
 
-  const { data, isLoading } = useSWR<any[]>(
-    slug && !options?.cacheOnly ? path : null,
+  const { data, isLoading, error } = useSWR<any[]>(
+    workspaceId && !options?.cacheOnly ? path : null,
     fetcher,
     {
       shouldRetryOnError: true,
       revalidateOnFocus: false,
-    }
+      dedupingInterval: 30000,
+      keepPreviousData: true,
+      errorRetryCount: 3,
+      errorRetryInterval: 1000,
+    },
   );
 
   return {
@@ -96,34 +100,26 @@ function useStandaloneFilterOption(
         ...d,
         count: d[selectedTab || "clicks"] as number,
       })) ?? null,
-    loading: !data && isLoading,
+    loading: isLoading && !error,
   };
 }
 
 export function AnalyticsFiltersHeader() {
   const workspace = useWorkspace();
   const { queryParams, searchParamsObj } = useRouterStuff();
-  
-  // Wait for workspace to load
-  if (!workspace) {
-    return null;
-  }
-  
-  const { createdAt, plan, id: workspaceId, slug } = workspace;
-  
-  // Compute start, end, interval directly from URL params
-  const start = searchParamsObj.start ? new Date(searchParamsObj.start) : undefined;
+
+  const { createdAt, plan, id: workspaceId, slug } = workspace || {};
+
+  const start = searchParamsObj.start
+    ? new Date(searchParamsObj.start)
+    : undefined;
   const end = searchParamsObj.end ? new Date(searchParamsObj.end) : undefined;
   const interval = start || end ? undefined : searchParamsObj.interval ?? "30d";
   const dashboardProps = undefined; // Only used in shared dashboards
-  
-  // Get selected tab from URL
-  const selectedTab = (searchParamsObj.event || "clicks") as EventType;
-  
-  // Build query string from URL params
-  const queryString = new URLSearchParams(searchParamsObj as any).toString();
 
-  const [requestedFilters, setRequestedFilters] = useState<string[]>([]);
+  const selectedTab = (searchParamsObj.event || "clicks") as EventType;
+
+  const queryString = new URLSearchParams(searchParamsObj as any).toString();
 
   const activeFilters = useMemo(() => {
     const { domain, key, root, folderId, ...params } = searchParamsObj;
@@ -154,76 +150,73 @@ export function AnalyticsFiltersHeader() {
     return filters;
   }, [searchParamsObj]);
 
-  const isRequested = useCallback(
-    (key: string) =>
-      requestedFilters.includes(key) ||
-      activeFilters.some((af) => af.key === key),
-    [requestedFilters, activeFilters]
-  );
-
   const { data: links } = useStandaloneFilterOption(
     "top_links",
-    { cacheOnly: !isRequested("link"), filterKey: "domain" },
+    { cacheOnly: false, filterKey: "domain" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: countries } = useStandaloneFilterOption(
     "countries",
-    { cacheOnly: !isRequested("country"), filterKey: "country" },
+    { cacheOnly: false, filterKey: "country" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: regions } = useStandaloneFilterOption(
     "regions",
-    { cacheOnly: !isRequested("region"), filterKey: "region" },
+    { cacheOnly: false, filterKey: "region" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: cities } = useStandaloneFilterOption(
     "cities",
-    { cacheOnly: !isRequested("city"), filterKey: "city" },
+    { cacheOnly: false, filterKey: "city" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: continents } = useStandaloneFilterOption(
     "continents",
-    { cacheOnly: !isRequested("continent"), filterKey: "continent" },
+    { cacheOnly: false, filterKey: "continent" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: devices } = useStandaloneFilterOption(
     "devices",
-    { cacheOnly: !isRequested("device"), filterKey: "device" },
+    { cacheOnly: false, filterKey: "device" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: browsers } = useStandaloneFilterOption(
     "browsers",
-    { cacheOnly: !isRequested("browser"), filterKey: "browser" },
+    { cacheOnly: false, filterKey: "browser" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: os } = useStandaloneFilterOption(
     "os",
-    { cacheOnly: !isRequested("os"), filterKey: "os" },
+    { cacheOnly: false, filterKey: "os" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
   const { data: urls } = useStandaloneFilterOption(
     "top_urls",
-    { cacheOnly: !isRequested("url"), filterKey: "url" },
+    { cacheOnly: false, filterKey: "url" },
     workspaceId,
     queryString,
-    selectedTab
+    selectedTab,
   );
+
+  if (!workspace) {
+    return null;
+  }
 
   const filters: ComponentProps<typeof Filter.Select>["filters"] = useMemo(
     () => [
@@ -255,7 +248,7 @@ export function AnalyticsFiltersHeader() {
                     label: qr?.title,
                     right: nFormatter(count, { full: true }),
                     data: { url },
-                  })
+                  }),
                 ) ?? null,
             },
             {
@@ -415,10 +408,10 @@ export function AnalyticsFiltersHeader() {
       browsers,
       os,
       urls,
-    ]
+    ],
   );
 
-  const onFilterSelect = async (key, value) => {
+  const onFilterSelect = (key: string, value: string) => {
     let del: string | string[] = "page";
     if (key === "qrType") {
       del = ["domain", "key", "page"];
@@ -441,10 +434,25 @@ export function AnalyticsFiltersHeader() {
     });
   };
 
+  const hasActiveFilters = activeFilters.length > 0;
+
+  const clearAllFilters = () => {
+    const filtersToDelete = activeFilters
+      .map((f) => (f.key === "link" ? ["domain", "key"] : f.key))
+      .flat();
+    queryParams({
+      del: filtersToDelete,
+      scroll: false,
+    });
+  };
+
   return (
-    <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:flex-nowrap lg:gap-2">
+    <div className="flex w-full flex-col gap-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap lg:gap-2">
       <Filter.Select
-        className="w-full sm:w-auto sm:min-w-[140px]"
+        className={cn(
+          "w-full text-secondary [&_svg]:text-secondary md:w-auto md:min-w-[140px]",
+          hasActiveFilters && "border-secondary"
+        )}
         filters={filters}
         activeFilters={activeFilters}
         onSelect={onFilterSelect}
@@ -454,12 +462,12 @@ export function AnalyticsFiltersHeader() {
             scroll: false,
           })
         }
-        onOpenFilter={(key) =>
-          setRequestedFilters((rf) => (rf.includes(key) ? rf : [...rf, key]))
-        }
       />
       <DateRangePicker
-        className="w-full sm:w-auto sm:min-w-[200px]"
+        className={cn(
+          "w-full text-secondary [&_svg]:text-secondary md:w-auto md:min-w-[200px]",
+          (start || end || interval) && "border-secondary"
+        )}
         align="end"
         value={
           start && end
@@ -515,7 +523,8 @@ export function AnalyticsFiltersHeader() {
           };
         })}
       />
-      <div className="flex items-center gap-2 sm:ml-auto">
+
+      <div className="flex items-center gap-2 md:ml-auto">
         <Switch
           id="unique"
           size="1"
@@ -534,10 +543,23 @@ export function AnalyticsFiltersHeader() {
             }
           }}
         />
-        <label htmlFor="unique" className="cursor-pointer whitespace-nowrap text-sm font-medium text-neutral-700">
+        <label
+          htmlFor="unique"
+          className="cursor-pointer whitespace-nowrap text-sm font-medium text-neutral-700"
+        >
           Unique Scans
         </label>
       </div>
+
+      {hasActiveFilters && (
+        <Button
+          variant="outline"
+          className="h-10 w-full gap-2 md:w-auto"
+          icon={<Xmark className="h-4 w-4" />}
+          onClick={clearAllFilters}
+          text="Clear"
+        />
+      )}
     </div>
   );
 }
@@ -560,4 +582,3 @@ function UpgradeTooltip({
     />
   );
 }
-

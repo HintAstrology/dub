@@ -190,15 +190,15 @@ export default function AnalyticsAreaChart({
   }
 
   return (
-    <Card className={cn("grid gap-6 p-3 lg:grid-cols-[2fr_2fr] border-none")}>
-      <div className="space-y-4 flex items-end">
-        <div className="h-96 w-full">
+    <Card className={cn("grid gap-4 p-3 sm:p-4 md:p-6 lg:grid-cols-[2fr_2fr] border-none")}>
+      <div className="space-y-4 flex items-end overflow-x-auto">
+        <div className="h-56 w-full min-w-[600px] sm:h-80 sm:min-w-0 md:h-96">
           <ChartContainer config={chartConfig} className="h-full w-full">
             <AreaChart
               data={rechartsData}
               margin={{
-                left: 12,
-                right: 12,
+                left: 0,
+                right: 0,
                 top: 12,
                 bottom: 12,
               }}
@@ -263,7 +263,7 @@ export default function AnalyticsAreaChart({
                 type="monotone"
                 fill="url(#fillArea)"
                 fillOpacity={1}
-                stroke={chartColor}
+                stroke="hsl(var(--foreground))"
                 strokeWidth={2}
               />
             </AreaChart>
@@ -272,7 +272,7 @@ export default function AnalyticsAreaChart({
       </div>
       <div className="flex flex-col gap-4 px-2">
         <CardContent className="grow p-0">
-          <div className="grid grid-cols-2 gap-3 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2">
             {MOCK_STATS_DATA.map((stat, index) => (
               <div
                 key={index}

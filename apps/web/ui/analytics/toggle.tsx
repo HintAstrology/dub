@@ -535,7 +535,7 @@ export default function Toggle({
   }
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-3 lg:px-10 pt-3">
+    <div className="mx-auto w-full max-w-screen-xl pt-3">
       <Filter.List
         filters={filters}
         activeFilters={[
