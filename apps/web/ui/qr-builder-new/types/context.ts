@@ -8,8 +8,8 @@ export type TQrType = EQRType | null;
 
 // Import form data types
 import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step.tsx";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { RefObject } from "react";
-import { TQrServerData } from "../helpers/data-converters";
 import {
   TAppLinkQRFormData,
   TFeedbackQRFormData,
@@ -65,7 +65,7 @@ export interface IQrBuilderContextType {
   isCustomizationStep: boolean;
   isEditMode: boolean;
   homepageDemo?: boolean;
-  
+
   // Dialog state (for mobile homepage demo)
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;

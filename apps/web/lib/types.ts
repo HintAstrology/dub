@@ -445,3 +445,12 @@ export type QRProps = Qr;
 export type NewQrProps = z.infer<typeof createQrBodySchema>;
 export type UpdateQrProps = Omit<NewQrProps, "id"> &
   z.infer<typeof updateQrBodySchema>;
+
+/**
+ * QR code data from database with all relations included
+ */
+export type TQrStorageData = QRProps & {
+  user: UserProps;
+  link: LinkProps;
+  file?: File;
+};

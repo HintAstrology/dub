@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { ERegistrationStep } from "./constants";
 import { RegisterProvider, useRegisterContext } from "./context";
 import { SignUpForm } from "./signup-form";
-import { VerifyEmailForm } from "./verify-email-form";
+// import { VerifyEmailForm } from "./verify-email-form";
 
 type SignUpContentProps = {
   sessionId: string;
@@ -69,7 +69,7 @@ function VerifyStep({ sessionId, authModal = false, setAuthModalMessage }) {
           </strong>
         </p>
       </motion.div>
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -82,7 +82,7 @@ function VerifyStep({ sessionId, authModal = false, setAuthModalMessage }) {
           authModal={authModal}
           setAuthModalMessage={setAuthModalMessage}
         />
-      </motion.div>
+      </motion.div> */}
     </>
   );
 }

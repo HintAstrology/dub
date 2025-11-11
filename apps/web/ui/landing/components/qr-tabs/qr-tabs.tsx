@@ -1,21 +1,19 @@
 "use client";
 
 import { saveQrDataToRedisAction } from "@/lib/actions/pre-checkout-flow/save-qr-data-to-redis.ts";
-import { Session } from '@/lib/auth';
+import { Session } from "@/lib/auth";
+import { QrTabsTitle } from "@/ui/landing/components/qr-tabs/components/qr-tabs-title";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
-import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
-import {
-  convertNewBuilderToStorageFormat,
-  TNewQRBuilderData,
-  TQRBuilderDataForStorage,
-} from "@/ui/qr-builder-new/helpers/data-converters";
+import { convertNewQRBuilderDataToServer } from "@/ui/qr-builder-new/helpers/data-converters";
+import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
-import { QrTabsTitle } from "@/ui/qr-builder/qr-tabs-title.tsx";
-import { useQrOperations } from '@/ui/qr-code/hooks/use-qr-operations';
+import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { useMediaQuery } from "@dub/ui";
-import { getSession } from 'next-auth/react';
+import { SHORT_DOMAIN } from "@dub/utils";
+import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { FC, forwardRef, Ref, useEffect, useState } from "react";
 
 interface IQRTabsProps {
@@ -30,7 +28,7 @@ export const QRTabs: FC<
   ({ sessionId, typeToScrollTo, handleResetTypeToScrollTo }, ref) => {
     const { AuthModal, showModal } = useAuthModal({ sessionId });
     const router = useRouter();
-    const { createQr } = useQrOperations();
+    const { createQr } = useNewQrOperations({ initialQrData: null });
 
     const { executeAsync: saveQrDataToRedis } = useAction(
       saveQrDataToRedisAction,
@@ -71,8 +69,8 @@ export const QRTabs: FC<
       setIsProcessingSignup(true);
 
       const existingSession = await getSession();
-      console.log("existingSession", existingSession);
-      const user = existingSession?.user as Session['user'] || undefined;
+
+      const user = (existingSession?.user as Session["user"]) || undefined;
 
       if (existingSession?.user) {
         const createdQrId = await createQr(data, user?.defaultWorkspace);
@@ -82,11 +80,13 @@ export const QRTabs: FC<
       }
 
       try {
-        const storageData = convertNewBuilderToStorageFormat(data);
+        const serverData = await convertNewQRBuilderDataToServer(data, {
+          domain: SHORT_DOMAIN!,
+        });
 
         await saveQrDataToRedis({
           sessionId,
-          qrData: storageData,
+          qrData: serverData,
         });
 
         showModal("signup");

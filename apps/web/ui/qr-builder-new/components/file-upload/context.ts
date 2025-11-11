@@ -1,5 +1,8 @@
 import * as React from "react";
-import { FILE_UPLOAD_ERRORS, ROOT_NAME } from "../../constants/file-upload";
+import {
+  FILE_UPLOAD_ERRORS,
+  ROOT_NAME,
+} from "../../constants/file-upload.constants";
 import { useLazyRef } from "../../hooks/use-lazy-ref";
 import type {
   FileUploadContextValue,

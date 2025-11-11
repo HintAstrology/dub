@@ -1,10 +1,10 @@
 import { QRBuilderInner } from "@/ui/qr-builder-new/components/qr-builder-inner.tsx";
 import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
+import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils/src";
 import { motion } from "framer-motion";
-import { QrBuilderButtons } from "./qr-builder-buttons";
-import { useMediaQuery } from "@dub/ui";
 import { useQRCodeStyling } from "../hooks/use-qr-code-styling";
+import { QrBuilderButtons } from "./qr-builder-buttons";
 
 export const QRBuilderWrapper = () => {
   const {
@@ -31,7 +31,7 @@ export const QRBuilderWrapper = () => {
   const showDecorations = isContentStep || isCustomizationStep;
 
   // QR code instance for mobile download button on step 2
-  const qrCode = useQRCodeStyling({
+  const { qrCode } = useQRCodeStyling({
     customizationData,
     defaultData: "https://getqr.com/qr-complete-setup",
   });
@@ -60,7 +60,7 @@ export const QRBuilderWrapper = () => {
         </>
       )}
 
-      <div className="relative ">
+      <div className="relative">
         <div
           className={cn(
             "flex w-full flex-col items-stretch justify-between gap-4 p-6 md:gap-6",

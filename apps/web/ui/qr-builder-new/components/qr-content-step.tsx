@@ -2,8 +2,8 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { useQrBuilderContext } from "../context/qr-builder-context";
-import { QrFormResolver } from "../forms/qr-form-resolver.tsx";
-import { QRFormRef } from "../forms/types";
+import { QRFormRef } from "../types/qr-form-ref";
+import { QrFormResolver } from "./qr-form-resolver/qr-form-resolver";
 
 export interface QRContentStepRef {
   validateForm: () => Promise<boolean>;
@@ -17,7 +17,6 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
     handleFormSubmit,
     formData,
     updateCurrentFormValues,
-    initialQrData,
     setIsFormValid,
   } = useQrBuilderContext();
   const formRef = useRef<QRFormRef>(null);
@@ -40,7 +39,8 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
 
   useEffect(() => {
     if (formRef.current?.form) {
-      const hasExistingData = formData || initialQrData;
+      const hasExistingData = formData;
+
       setIsFormValid(hasExistingData ? true : false);
 
       const subscription = formRef.current.form.watch((values) => {
@@ -52,7 +52,7 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
 
       return () => subscription.unsubscribe();
     }
-  }, [selectedQrType, updateCurrentFormValues, setIsFormValid, formData, initialQrData]);
+  }, [selectedQrType, updateCurrentFormValues, setIsFormValid, formData]);
 
   if (!selectedQrType) {
     return (
@@ -68,16 +68,6 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
       qrType={selectedQrType}
       onSubmit={handleFormSubmit}
       defaultValues={formData || undefined}
-      initialData={
-        initialQrData
-          ? {
-              qrType: initialQrData.qrType,
-              data: initialQrData.data,
-              link: initialQrData.link,
-              fileId: initialQrData.fileId,
-            }
-          : undefined
-      }
     />
   );
 });

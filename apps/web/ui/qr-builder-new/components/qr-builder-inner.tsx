@@ -2,17 +2,16 @@ import { QRBuilderSteps } from "@/ui/qr-builder-new/components/qr-builder-steps.
 import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
 import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
+import * as Dialog from "@radix-ui/react-dialog";
 import { Flex } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
-import { useMemo } from "react";
-import { Drawer } from "vaul";
-import { QRCodeDemoPlaceholder } from "../constants/qr-code-demo-placeholder.tsx";
+import { useCallback, useMemo } from "react";
 import { useQRCodeStyling } from "../hooks/use-qr-code-styling";
 import { QRCustomization } from "./customization";
 import { QRPreview } from "./customization/qr-preview";
 import { DownloadButton } from "./download-button";
 import { QrBuilderButtons } from "./qr-builder-buttons";
+import { QRCodeDemoPlaceholder } from "./qr-code-demo-placeholder.tsx";
 import { QRCodeDemoMap } from "./qr-code-demos/qr-code-demo-map";
 import { QrContentStep } from "./qr-content-step.tsx";
 import { QrTypeSelection } from "./qr-type-selection";
@@ -54,12 +53,17 @@ export const QRBuilderInner = () => {
 
   const shouldUseDialog = isMobile && homepageDemo && !isTypeStep;
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setBuilderStep(1);
-  };
+  const handleDialogOpenChange = useCallback(
+    (open: boolean) => {
+      setIsDialogOpen(open);
+      if (!open && !isTypeStep) {
+        setBuilderStep(1);
+      }
+    },
+    [setIsDialogOpen, isTypeStep, setBuilderStep],
+  );
 
-  const qrCode = useQRCodeStyling({
+  const { qrCode } = useQRCodeStyling({
     customizationData,
     defaultData: "https://getqr.com/qr-complete-setup",
   });
@@ -229,106 +233,119 @@ export const QRBuilderInner = () => {
       </Flex>
 
       {shouldUseDialog && (
-        <Drawer.Root
-          open={isDialogOpen}
-          dismissible={false}
-          onOpenChange={(open) => {
-            if (!open) {
-              handleDialogClose();
-            }
-          }}
-        >
-          <Drawer.Portal>
-            <Drawer.Overlay className="fixed inset-0 z-[100] bg-white" />
-           <Drawer.Content
-             className={cn(
-               "fixed inset-0 z-[101] flex h-[100svh] flex-col overflow-hidden",
-               "bg-white",
-             )}
-           >
-             <div className="flex h-full flex-col overflow-hidden">
-               {/* Header with close button and stepper */}
-               <div className="sticky top-0 z-10 flex-shrink-0 border-b bg-white p-3">
-                 <QRBuilderSteps />
-               </div>
+        <Dialog.Root open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-[99] bg-white" />
+            <Dialog.Content
+              className={cn(
+                "fixed inset-x-0 bottom-0 z-[100] flex h-dvh flex-col bg-white outline-none",
+                "[&_input]:!text-[16px] [&_textarea]:!text-[16px]",
+                "data-[state=open]:animate-in data-[state=closed]:animate-out",
+                "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+                "data-[state=closed]:duration-300 data-[state=open]:duration-300",
+              )}
+            >
+              <div
+                className="relative flex h-full w-full flex-col"
+                style={{ minHeight: "100dvh" }}
+              >
+                {/* Header with close button and stepper */}
+                <div className="flex-shrink-0 border-b bg-white p-3">
+                  <QRBuilderSteps />
+                </div>
 
-               <div className="flex-1 overflow-y-auto p-3 pb-[72px]">
-                 <Flex
-                   direction="column-reverse"
-                   gap="4"
-                   className="items-stretch"
-                 >
-                   <div className="flex w-full flex-col justify-between gap-4">
-                     <div className="flex w-full flex-col items-start justify-start gap-4">
-                       {stepContent}
-                     </div>
-                   </div>
+                <div
+                  className="flex-1 overflow-y-auto p-3 pb-[80px]"
+                  style={{
+                    WebkitOverflowScrolling: "touch",
+                    overscrollBehavior: "contain",
+                    minHeight: 0,
+                  }}
+                >
+                  <Flex
+                    direction="column-reverse"
+                    gap="4"
+                    className="w-full items-stretch"
+                    style={{ minWidth: 0 }}
+                  >
+                    <div
+                      className="flex w-full flex-col justify-between gap-4"
+                      style={{ minWidth: 0 }}
+                    >
+                      {stepContent}
+                    </div>
 
-                   <div className="relative flex h-auto shrink-0 items-start justify-center rounded-lg">
-                     <div className="mb-4 flex w-full flex-col items-center gap-4">
-                       {!isCustomizationStep ? (
-                         <div className="relative inline-block max-h-[200px] overflow-hidden">
-                           <motion.div
-                             key={
-                               currentQRType
-                                 ? `${currentQRType}-${hoveredQRType !== null ? "hovered" : "default"}`
-                                 : "placeholder"
-                             }
-                             initial="hidden"
-                             animate="visible"
-                             exit="exit"
-                             variants={{
-                               hidden: { opacity: 0, y: 20 },
-                               visible: { opacity: 1, y: 0 },
-                               exit: { opacity: 0, y: 20 },
-                             }}
-                             transition={{ duration: 0.3, ease: "easeInOut" }}
-                           >
-                             {!currentQRType ? (
-                               <QRCodeDemoPlaceholder />
-                             ) : (
-                               <>
-                                 {qrCodeDemo && (
-                                   <qrCodeDemo.Component {...demoProps} />
-                                 )}
-                               </>
-                             )}
-                           </motion.div>
-                         </div>
-                       ) : (
-                         <QRPreview
-                           homepageDemo={homepageDemo}
-                           customizationData={customizationData}
-                         />
-                       )}
-                     </div>
-                   </div>
-                 </Flex>
-               </div>
+                    <div
+                      className="relative flex h-auto shrink-0 items-start justify-center rounded-lg"
+                      style={{ minWidth: 0 }}
+                    >
+                      <div
+                        className="mb-4 flex w-full flex-col items-center gap-4"
+                        style={{ minWidth: 0 }}
+                      >
+                        {!isCustomizationStep ? (
+                          <div className="relative inline-block max-h-[200px] overflow-hidden">
+                            <motion.div
+                              key={
+                                currentQRType
+                                  ? `${currentQRType}-${hoveredQRType !== null ? "hovered" : "default"}`
+                                  : "placeholder"
+                              }
+                              initial="hidden"
+                              animate="visible"
+                              exit="exit"
+                              variants={{
+                                hidden: { opacity: 0, y: 20 },
+                                visible: { opacity: 1, y: 0 },
+                                exit: { opacity: 0, y: 20 },
+                              }}
+                              transition={{ duration: 0.3, ease: "easeInOut" }}
+                            >
+                              {!currentQRType ? (
+                                <QRCodeDemoPlaceholder />
+                              ) : (
+                                <>
+                                  {qrCodeDemo && (
+                                    <qrCodeDemo.Component {...demoProps} />
+                                  )}
+                                </>
+                              )}
+                            </motion.div>
+                          </div>
+                        ) : (
+                          <QRPreview
+                            homepageDemo={homepageDemo}
+                            customizationData={customizationData}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </Flex>
+                </div>
 
-               {/* Fixed footer with buttons */}
-               <div className="absolute bottom-0 left-0 right-0 border-t bg-white p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-                 <QrBuilderButtons
-                   step={builderStep || 1}
-                   onBack={handleBack}
-                   onContinue={handleContinue}
-                   isEdit={isEditMode}
-                   isProcessing={isProcessing}
-                   isFileUploading={isFileUploading}
-                   isFileProcessing={isFileProcessing}
-                   homepageDemo={homepageDemo}
-                   currentFormValues={currentFormValues}
-                   logoData={customizationData.logo}
-                   isFormValid={isFormValid}
-                   qrCode={qrCode}
-                   isMobile={isMobile}
-                 />
-               </div>
-             </div>
-           </Drawer.Content>
-         </Drawer.Portal>
-       </Drawer.Root>
-     )}
+                {/* Fixed footer with buttons */}
+                <div className="absolute bottom-0 left-0 right-0 z-50 border-t bg-white p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+                  <QrBuilderButtons
+                    step={builderStep || 1}
+                    onBack={handleBack}
+                    onContinue={handleContinue}
+                    isEdit={isEditMode}
+                    isProcessing={isProcessing}
+                    isFileUploading={isFileUploading}
+                    isFileProcessing={isFileProcessing}
+                    homepageDemo={homepageDemo}
+                    currentFormValues={currentFormValues}
+                    logoData={customizationData.logo}
+                    isFormValid={isFormValid}
+                    qrCode={qrCode}
+                    isMobile={isMobile}
+                  />
+                </div>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      )}
     </>
   );
 };

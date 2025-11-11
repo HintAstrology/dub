@@ -1,8 +1,8 @@
-import { TNewQRBuilderData } from "@/ui/qr-builder-new/helpers/data-converters";
-import { QRBuilderData } from "@/ui/qr-builder/types/types.ts";
+import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 
 export const createQRTrackingParams = (
-  qrBuilderData: QRBuilderData | TNewQRBuilderData,
+  qrBuilderData: TQrServerData | TNewQRBuilderData,
   qrId?: string,
 ) => {
   // Check if it's new builder format (has customizationData)

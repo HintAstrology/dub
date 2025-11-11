@@ -4,7 +4,7 @@ import { cn } from "@dub/utils";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { ITEM_METADATA_NAME } from "../../constants/file-upload";
+import { ITEM_METADATA_NAME } from "../../constants/file-upload.constants";
 import { formatBytes } from "../../helpers/file-upload";
 import type { FileUploadItemMetadataProps } from "../../types/file-upload";
 import { useFileUploadContext, useFileUploadItemContext } from "./context";
@@ -36,21 +36,28 @@ const FileUploadItemMetadata = React.forwardRef<
     if (filename.length <= maxLength) return filename;
 
     // Get file extension
-    const lastDotIndex = filename.lastIndexOf('.');
-    const extension = lastDotIndex > -1 ? filename.slice(lastDotIndex) : '';
-    const nameWithoutExt = lastDotIndex > -1 ? filename.slice(0, lastDotIndex) : filename;
+    const lastDotIndex = filename.lastIndexOf(".");
+    const extension = lastDotIndex > -1 ? filename.slice(lastDotIndex) : "";
+    const nameWithoutExt =
+      lastDotIndex > -1 ? filename.slice(0, lastDotIndex) : filename;
 
     // Calculate how many characters we can show
     const availableLength = maxLength - extension.length - 3; // 3 for "..."
     const halfLength = Math.floor(availableLength / 2);
 
     // Show start and end of filename with ellipsis in middle
-    return nameWithoutExt.slice(0, halfLength) + '...' + nameWithoutExt.slice(-halfLength) + extension;
+    return (
+      nameWithoutExt.slice(0, halfLength) +
+      "..." +
+      nameWithoutExt.slice(-halfLength) +
+      extension
+    );
   };
 
-  const rawName = isThumbnail && originalFileName
-    ? originalFileName
-    : itemContext.fileState.file.name;
+  const rawName =
+    isThumbnail && originalFileName
+      ? originalFileName
+      : itemContext.fileState.file.name;
   const displayName = truncateFilename(rawName);
 
   const displaySize =

@@ -8,7 +8,7 @@ import { QrTabsDetailed } from "@/ui/landing/components/qr-tabs-detailed/qr-tabs
 import { LogoScrollingBanner } from "@/ui/landing/components/qr-tabs/components/logo-scrolling-banner.tsx";
 import { ReviewsSection } from "@/ui/landing/components/reviews/reviews-section.tsx";
 import { Rating } from "@/ui/qr-rating/rating";
-import { EQRType } from "@/ui/qr-builder-new/constants/get-qr-config.ts";
+import { EQRType } from "../qr-builder-new/types/qr-type.ts";
 import { CTASection } from "./components/cta-section/cta-section.tsx";
 import { GetQRFeaturesCardsSection } from "./components/get-qr-features-cards/get-qr-features.tsx";
 import { GetQRInfoCardsSection } from "./components/get-qr-info-cards/get-qr-info.tsx";
@@ -26,7 +26,6 @@ export const LandingSectionsServer = ({
   handleFeatureClick,
   featureToOpen,
 }: ILandingSectionsServerProps) => {
-
   return (
     <>
       {/* 2. Rating */}
@@ -51,7 +50,7 @@ export const LandingSectionsServer = ({
       <PricingSection handleScrollButtonClick={handleScrollButtonClick} />
 
       {/* 7.5. Scrolling Banner - Hidden on mobile using CSS */}
-      <div className="hidden md:block">
+      <div>
         <LogoScrollingBanner />
       </div>
 
@@ -62,8 +61,8 @@ export const LandingSectionsServer = ({
       <FAQSection faqItems={FAQ_ITEMS_HOMEPAGE} />
 
       {/* 10. Footer */}
-      <Footer 
-        sessionId={sessionId} 
+      <Footer
+        sessionId={sessionId}
         handleScrollButtonClick={handleScrollButtonClick}
         handleFeatureClick={handleFeatureClick}
       />

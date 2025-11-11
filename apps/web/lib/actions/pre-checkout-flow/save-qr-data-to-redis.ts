@@ -1,6 +1,7 @@
 "use server";
 
 import { redis } from "@/lib/upstash";
+import { createQrBodySchema } from "@/lib/zod/schemas/qrs";
 import { ERedisArg } from "core/interfaces/redis.interface.ts";
 import z from "../../zod";
 import { actionClient } from "../safe-action";
@@ -9,28 +10,7 @@ import { actionClient } from "../safe-action";
 const schema = z.object({
   sessionId: z.string(),
   extraKey: z.string().optional().describe("Extra key to identify the data"),
-  qrData: z.object({
-    title: z.string(),
-    styles: z.object({}).passthrough(), // Logo stored in styles.image
-    frameOptions: z.object({
-      id: z.string(),
-      color: z.string().optional(),
-      textColor: z.string().optional(),
-      text: z.string().optional(),
-    }),
-    qrType: z.enum([
-      "website",
-      "pdf",
-      "image",
-      "video",
-      "whatsapp",
-      "social",
-      "wifi",
-      "app",
-      "feedback",
-    ]),
-    fileId: z.string().optional(), // For PDF/Image/Video QR content files ONLY
-  }),
+  qrData: createQrBodySchema,
 });
 
 // save qr data to redis in background

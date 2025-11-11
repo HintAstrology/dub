@@ -1,7 +1,5 @@
 import { initRedis } from "@/lib/actions/init-redis.ts";
 import { LandingSectionsClient } from "@/ui/landing/landing-sections-client.tsx";
-import { LandingSectionsServer } from "@/ui/landing/landing-sections-server.tsx";
-import { APP_HOSTNAMES, APP_URL } from '@dub/utils';
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { getUserCookieService } from "core/services/cookie/user-session.service.ts";
 import { NextPage } from "next";
