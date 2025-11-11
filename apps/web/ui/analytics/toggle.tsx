@@ -61,6 +61,7 @@ import { AnalyticsContext } from "./analytics-provider";
 import ContinentIcon from "./continent-icon";
 import DeviceIcon from "./device-icon";
 import { useAnalyticsFilterOption } from "./utils";
+import AnalyticsExport from "./analytics-export";
 
 export default function Toggle({
   page = "analytics",
@@ -550,7 +551,7 @@ export default function Toggle({
         >
           <div
             className={cn(
-              "flex w-full flex-col items-center justify-between gap-2 md:flex-row",
+              "flex w-full flex-col items-center justify-between gap-2 flex-nowrap md:flex-row",
               {
                 "flex-col md:flex-row": !key,
                 "items-center": key,
@@ -684,7 +685,7 @@ export default function Toggle({
                   },
                 )}
               />
-              <div className="flex h-10 w-full items-center gap-x-2 min-[500px]:w-fit">
+              <div className="flex items-center h-10 gap-x-2 w-full min-[500px]:w-fit flex-1">
                 <Switch
                   id="unique"
                   checked={!!searchParamsObj.unique}
@@ -704,6 +705,7 @@ export default function Toggle({
                 />
                 <label htmlFor="unique">Unique Scans</label>
               </div>
+              <AnalyticsExport />
             </div>
           </div>
         </div>
