@@ -1,11 +1,9 @@
 import { checkFeaturesAccessAuthLess } from "@/lib/actions/check-features-access-auth-less";
 import { getQrs } from "@/lib/api/qrs/get-qrs";
 import { getSession } from "@/lib/auth";
-import { redis } from "@/lib/upstash";
 import { PageContent } from "@/ui/layout/page-content";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
-import { ERedisArg } from "core/interfaces/redis.interface";
 import { getUserCookieService } from "core/services/cookie/user-session.service";
 import { Viewport } from "next";
 import WorkspaceQRsClient from "./custom-page-client";
