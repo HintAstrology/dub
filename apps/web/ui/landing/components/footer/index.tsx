@@ -97,9 +97,9 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
             <Logo />
           </div>
 
-          <h3 className="text-xl font-semibold text-neutral-900">
+          {/* <h3 className="text-xl font-semibold text-neutral-900">
             Ready to get started?
-          </h3>
+          </h3> */}
 
           {/* <div suppressHydrationWarning>
             <Button
