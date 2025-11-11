@@ -206,7 +206,7 @@ export const EmailSignIn: FC<Readonly<IEmailSignInProps>> = ({
               event: EAnalyticEvents.AUTH_ERROR,
               params: {
                 page_name: "landing",
-                auth_type: "login",
+                auth_type: "logsin",
                 auth_method: "email",
                 email: email,
                 event_category: "nonAuthorized",
@@ -274,15 +274,15 @@ export const EmailSignIn: FC<Readonly<IEmailSignInProps>> = ({
         )}
 
         <Button
-          text={`Continue with ${password ? "Password" : "Email"}`}
+          text={"Continue"}
           variant="primary"
-          icon={
-            password ? (
-              <InputPassword className="size-4 text-neutral-600" />
-            ) : (
-              <Mail className="size-4 text-white" />
-            )
-          }
+          // icon={
+          //   password ? (
+          //     <InputPassword className="size-4 text-neutral-600" />
+          //   ) : (
+          //     <Mail className="size-4 text-white" />
+          //   )
+          // }
           type="submit"
           /*
           {...(authMethod !== "email" && {

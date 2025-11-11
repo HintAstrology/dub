@@ -1,10 +1,7 @@
 import { useCallback, useMemo } from "react";
-import {
-  EQRType,
-  FILE_QR_TYPES,
-  LINKED_QR_TYPES,
-} from "../constants/get-qr-config";
+import { FILE_QR_TYPES, LINKED_QR_TYPES } from "../constants/get-qr-config";
 import { encodeQRData, parseQRData } from "../helpers/qr-data-handlers";
+import { EQRType } from "../types/qr-type";
 
 interface InitialData {
   qrType: EQRType;
@@ -56,7 +53,7 @@ export const useQRFormData = ({
 
       return parsed;
     } catch (error) {
-      console.error('Error parsing initial data:', error);
+      console.error("Error parsing initial data:", error);
       return {};
     }
   }, [qrType, initialData]);
@@ -142,45 +139,11 @@ export const useQRFormData = ({
     [qrType, parsedInitialData],
   );
 
-  // TODO QR_BUILDER_NEW: createLinkData method - will be needed later for link creation
-  // const createLinkData = useCallback((formData: Record<string, any>, fileId?: string) => {
-  //   const linkData: Record<string, any> = {};
-
-  //   if (formData.qrName) {
-  //     linkData.title = formData.qrName;
-  //   }
-
-  //   if (isFileType && fileId) {
-  //     linkData.url = `https://assets.getqr.com/qrs-content/${fileId}`;
-  //   } else if (isLinkType) {
-  //     switch (qrType) {
-  //       case EQRType.WEBSITE:
-  //         linkData.url = formData.websiteLink || '';
-  //         break;
-  //       case EQRType.APP_LINK:
-  //         linkData.url = formData.storeLink || '';
-  //         break;
-  //       case EQRType.SOCIAL:
-  //         linkData.url = formData.socialLink || '';
-  //         break;
-  //       case EQRType.FEEDBACK:
-  //         linkData.url = formData.link || '';
-  //         break;
-  //     }
-  //   } else {
-  //     const encodedData = encodeFormData(formData, fileId);
-  //     linkData.url = encodedData || 'https://dub.co';
-  //   }
-
-  //   return linkData;
-  // }, [qrType, isFileType, isLinkType, encodeFormData]);
-
   return {
     parsedInitialData,
     encodeFormData,
     parseFormData,
     getDefaultValues,
-    // createLinkData, // TODO QR_BUILDER_NEW: uncomment when needed
     isFileType,
     isLinkType,
   };

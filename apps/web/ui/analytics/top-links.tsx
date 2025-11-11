@@ -8,8 +8,8 @@ import { AnalyticsContext } from "./analytics-provider";
 import BarList from "./bar-list";
 import { useAnalyticsFilterOption } from "./utils";
 import { Icon } from "@iconify/react";
-import { QR_Icons } from "../qr-builder/constants/get-qr-config";
 import { Sliders } from "@dub/ui";
+import { QR_Icons } from "../qr-builder-new/constants/get-qr-config";
 
 export default function TopLinks() {
   const { queryParams, searchParams } = useRouterStuff();

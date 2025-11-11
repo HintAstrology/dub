@@ -1,10 +1,13 @@
-import { NewQrProps } from "@/lib/types";
+import { NewQrProps, UpdateQrProps } from "@/lib/types";
 import { Options } from "qr-code-styling";
 import { FRAMES } from "../constants/customization/frames";
-import { EQRType } from "../constants/get-qr-config";
+import { FILE_QR_TYPES } from "../constants/get-qr-config";
 import { TQRFormData } from "../types/context";
 import { IFrameData, IQRCustomizationData } from "../types/customization";
-import { TQrStorageData } from "../types/database";
+import { TNewQRBuilderData } from "../types/qr-builder-data";
+import { TQrServerData } from "../types/qr-server-data";
+import { EQRType } from "../types/qr-type";
+import { TQRUpdateResult } from "../types/update";
 import { encodeQRData, parseQRData } from "./qr-data-handlers";
 import {
   getCornerDotType,
@@ -14,80 +17,13 @@ import {
 } from "./qr-style-mappers";
 
 // ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
-
-/**
- * New builder internal data format - used throughout the builder
- */
-export type TNewQRBuilderData = {
-  qrType: EQRType;
-  formData: TQRFormData;
-  customizationData: IQRCustomizationData;
-  title?: string;
-  fileId?: string;
-};
-
-/**
- * Storage format for localStorage/Redis - compatible with old builder
- */
-export type TQRBuilderDataForStorage = {
-  title: string;
-  styles: Options;
-  frameOptions: {
-    id: string;
-    color: string;
-    textColor: string;
-    text: string;
-  };
-  logoOptions?: {
-    type: "suggested" | "uploaded";
-    id?: string;
-    fileId?: string;
-  };
-  qrType: EQRType;
-  fileId?: string;
-};
-
-/**
- * Server response format - QR data from API
- */
-export type TQrServerData = {
-  id: string;
-  title: string;
-  qrType: EQRType;
-  data: string;
-  styles: Options;
-  frameOptions: {
-    id: string;
-    color?: string;
-    textColor?: string;
-    text?: string;
-  };
-  logoOptions?: {
-    type: "suggested" | "uploaded";
-    id?: string;
-    fileId?: string;
-  };
-  fileId?: string;
-  link?: {
-    url: string;
-    key: string;
-    domain: string;
-    tagId?: string | null;
-    webhookIds?: string[];
-    shortLink?: string;
-  };
-};
-
-// ============================================================================
 // HELPER FUNCTIONS - QR STYLING OPTIONS
 // ============================================================================
 
-function buildQRStylingOptions(
+const buildQRStylingOptions = (
   customizationData: IQRCustomizationData,
   qrData: string,
-): Options {
+): Options => {
   const { style, shape, logo } = customizationData;
 
   const options: Options = {
@@ -145,12 +81,12 @@ function buildQRStylingOptions(
   }
 
   return options;
-}
+};
 
 /**
  * Converts frame data to frame options object
  */
-function buildFrameOptions(frameData: IFrameData) {
+const buildFrameOptions = (frameData: IFrameData) => {
   // Find the frame by ID and get its TYPE for storage
   const frame = FRAMES.find((f) => f.id === frameData.id);
   const frameType = frame?.type || "none";
@@ -163,14 +99,14 @@ function buildFrameOptions(frameData: IFrameData) {
   };
 
   return result;
-}
+};
 
 /**
  * Converts logo data to logo options object
  */
-function buildLogoOptions(
+const buildLogoOptions = (
   logoData: IQRCustomizationData["logo"],
-): TQrServerData["logoOptions"] {
+): TQrServerData["logoOptions"] => {
   if (logoData.type === "none") {
     return undefined;
   }
@@ -190,21 +126,21 @@ function buildLogoOptions(
   }
 
   return undefined;
-}
+};
 
 // ============================================================================
 // HELPER FUNCTIONS - EXTRACT/PARSE DATA
 // ============================================================================
 
-function extractLogoData(
-  logoOptions?: TQrServerData["logoOptions"],
+const extractLogoData = (
+  logoOptions?: TQrServerData["logoOptions"] | NewQrProps["logoOptions"],
   styles?: Options,
 ): {
   type: "none" | "suggested" | "uploaded";
   id?: string;
   iconSrc?: string;
   fileId?: string;
-} {
+} => {
   // Prioritize logoOptions if available (new format)
   if (logoOptions) {
     console.log("Using logoOptions");
@@ -273,12 +209,12 @@ function extractLogoData(
 
   // Otherwise it's an uploaded logo (legacy or blob URL)
   return { type: "uploaded" };
-}
+};
 
 /**
  * Get style ID from QRCodeStyling type
  */
-function getDotsStyleId(type: any): string {
+const getDotsStyleId = (type: any): string => {
   const typeMap: Record<string, string> = {
     square: "dots-square",
     dots: "dots-dots",
@@ -288,9 +224,9 @@ function getDotsStyleId(type: any): string {
     "extra-rounded": "dots-extra-rounded",
   };
   return typeMap[type] || "dots-square";
-}
+};
 
-function getCornerSquareStyleId(type: any): string {
+const getCornerSquareStyleId = (type: any): string => {
   const typeMap: Record<string, string> = {
     square: "corner-square-square",
     rounded: "corner-square-rounded",
@@ -298,9 +234,9 @@ function getCornerSquareStyleId(type: any): string {
     "classy-rounded": "corner-square-classy-rounded",
   };
   return typeMap[type] || "corner-square-square";
-}
+};
 
-function getCornerDotStyleId(type: any): string {
+const getCornerDotStyleId = (type: any): string => {
   const typeMap: Record<string, string> = {
     square: "corner-dot-square",
     dot: "corner-dot-dot",
@@ -309,17 +245,17 @@ function getCornerDotStyleId(type: any): string {
     classy: "corner-dot-classy",
   };
   return typeMap[type] || "corner-dot-square";
-}
+};
 
 /**
  * Extract customization data from server styles, frame options, and logo options
  * IMPORTANT: Storage has frame TYPE (e.g., "card"), but we need ID (e.g., "frame-card")
  */
-function extractCustomizationData(
+export const extractCustomizationData = (
   styles: Options,
   frameOptions: any,
-  logoOptions?: TQrServerData["logoOptions"],
-): IQRCustomizationData {
+  logoOptions?: TQrServerData["logoOptions"] | NewQrProps["logoOptions"],
+): IQRCustomizationData => {
   // Convert frame TYPE to ID by finding the frame in FRAMES array
   const frameType = frameOptions?.id || "none";
   const frame = FRAMES.find((f) => f.type === frameType);
@@ -345,7 +281,7 @@ function extractCustomizationData(
     },
     logo: extractLogoData(logoOptions, styles),
   };
-}
+};
 
 // ============================================================================
 // MAIN CONVERSION FUNCTIONS
@@ -354,10 +290,10 @@ function extractCustomizationData(
 /**
  * Convert new QR builder data to server API format
  */
-export async function convertNewQRBuilderDataToServer(
+export const convertNewQRBuilderDataToServer = async (
   builderData: TNewQRBuilderData,
   options: { domain: string },
-): Promise<NewQrProps> {
+): Promise<NewQrProps> => {
   const { qrType, formData, customizationData, title, fileId } = builderData;
   const { domain } = options;
 
@@ -392,18 +328,20 @@ export async function convertNewQRBuilderDataToServer(
   };
 
   return result;
-}
+};
 
 /**
  * Convert server QR data back to new builder format
  */
-export function convertServerQRToNewBuilder(
-  serverData: TQrServerData | TQrStorageData,
-): TNewQRBuilderData {
-
+export const convertServerQRToNewBuilder = (
+  serverData: TQrServerData,
+): TNewQRBuilderData => {
   // Parse QR data to form data using qr-data-handlers
   const sourceData = serverData.link?.url || serverData.data;
-  const formData = parseQRData(serverData.qrType as EQRType, sourceData) as TQRFormData;
+  const formData = parseQRData(
+    serverData.qrType as EQRType,
+    sourceData,
+  ) as TQRFormData;
 
   // Add qrName from title to formData
   if (serverData.title) {
@@ -424,59 +362,27 @@ export function convertServerQRToNewBuilder(
     title: serverData.title ?? "",
     fileId: serverData.fileId ?? undefined,
   };
-}
-
-/**
- * Convert new builder data to storage format (for localStorage/Redis)
- */
-export function convertNewBuilderToStorageFormat(
-  builderData: TNewQRBuilderData,
-): TQRBuilderDataForStorage {
-  const { qrType, formData, customizationData, title, fileId } = builderData;
-
-  // Encode form data to QR data string
-  const qrData = encodeQRData(qrType, formData, fileId);
-
-  // Build QR styling options
-  const styles = buildQRStylingOptions(customizationData, qrData);
-
-  // Build frame options
-  const frameOptions = buildFrameOptions(customizationData.frame);
-
-  // Build logo options
-  const logoOptions = buildLogoOptions(customizationData.logo);
-
-  const result = {
-    title:
-      title || `${qrType.charAt(0).toUpperCase() + qrType.slice(1)} QR Code`,
-    styles,
-    frameOptions,
-    logoOptions,
-    qrType,
-    fileId, // For PDF/Image/Video content files only
-  };
-
-  return result;
-}
-// ============================================================================
-// COMPATIBILITY FUNCTIONS FOR WORKSPACE OPERATIONS
-// ============================================================================
-
-import { UpdateQrProps } from "@/lib/types";
-import { FILE_QR_TYPES } from "../constants/get-qr-config";
-import { TQRUpdateResult } from "../types/update";
+};
 
 /**
  * Compare original QR data with new builder data and generate update payload
  * Used for determining what changed and building the update request
  */
-export async function convertNewQRForUpdate(
-  originalQR: TQrStorageData,
+// TODO: REMOVE THIS FUNCTION
+export const prepareQRUpdates = async (
+  originalQR: TQrServerData,
   newBuilderData: TNewQRBuilderData,
   options: {
     domain: string;
   },
-): Promise<TQRUpdateResult> {
+): Promise<TQRUpdateResult> => {
+  console.log("originalQR", JSON.stringify(originalQR));
+  console.log(
+    "newBuilderDataToUpdate",
+    JSON.stringify(
+      await convertNewQRBuilderDataToServer(newBuilderData, options),
+    ),
+  );
   const { domain } = options;
 
   // Convert new builder data to server format
@@ -489,6 +395,10 @@ export async function convertNewQRForUpdate(
   const titleChanged = newBuilderData.title !== originalQR.title;
   const qrTypeChanged = newBuilderData.qrType !== originalQR.qrType;
 
+  // Check if QR types are file-based
+  const originalQrHasFileQrType = FILE_QR_TYPES.includes(
+    originalQR.qrType as EQRType,
+  );
   const newQrDataHasFileQrType = FILE_QR_TYPES.includes(
     newBuilderData.qrType as EQRType,
   );
@@ -505,10 +415,26 @@ export async function convertNewQRForUpdate(
     );
   })();
 
-  // Check logo options changes
+  // Check logo options changes - need special handling for uploaded -> suggested transition
+  const originalLogoWasUploaded = originalQR.logoOptions?.type === "uploaded";
+  const newLogoIsSuggested = newServerData.logoOptions?.type === "suggested";
+  const logoTypeChanged = originalLogoWasUploaded && newLogoIsSuggested;
+
+  // Build logo options without fileId when transitioning from uploaded to suggested
+  // When serialized to JSON, undefined fields are omitted, which signals removal to the API
+  let finalLogoOptions = newServerData.logoOptions;
+  if (logoTypeChanged && finalLogoOptions) {
+    const { fileId, ...rest } = finalLogoOptions as any;
+    finalLogoOptions = rest;
+  }
+
+  // Normalize null/undefined for comparison
+  const normalizedOriginalLogo = originalQR.logoOptions ?? undefined;
+  const normalizedFinalLogo = finalLogoOptions ?? undefined;
+
   const logoOptionsChanged =
-    JSON.stringify(originalQR.logoOptions) !==
-    JSON.stringify(newServerData.logoOptions);
+    JSON.stringify(normalizedOriginalLogo) !==
+    JSON.stringify(normalizedFinalLogo);
 
   // Check data changes
   const originalData = originalQR?.link?.url || originalQR.data || "";
@@ -522,12 +448,39 @@ export async function convertNewQRForUpdate(
   delete originalStyles.data;
   delete newStyles.data;
 
-  const stylesChanged =
-    JSON.stringify(originalStyles) !== JSON.stringify(newStyles);
+  // Deep comparison helper for objects (handles different key orders and nested objects)
+  const deepEqual = (obj1: any, obj2: any): boolean => {
+    // Sort keys recursively for nested objects
+    const sortKeys = (obj: any): any => {
+      if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
+        return obj;
+      }
+      return Object.keys(obj)
+        .sort()
+        .reduce((result: any, key: string) => {
+          result[key] = sortKeys(obj[key]);
+          return result;
+        }, {});
+    };
 
-  // Check files changes
-  const hasNewFiles = !!newBuilderData.fileId;
-  const hasExistingFiles = !!originalQR.fileId;
+    return JSON.stringify(sortKeys(obj1)) === JSON.stringify(sortKeys(obj2));
+  };
+
+  const stylesChanged = !deepEqual(originalStyles, newStyles);
+
+  // Check files changes - detect both adding and removing files
+  // Normalize null/undefined for comparison
+  const normalizedOriginalFileId = originalQR.fileId ?? undefined;
+  const normalizedNewFileId = newBuilderData.fileId ?? undefined;
+  const filesChanged = normalizedNewFileId !== normalizedOriginalFileId;
+
+  // Determine fileId value:
+  // - If new QR type is not file-based, don't include fileId (undefined)
+  // - If new QR type is file-based, use the provided fileId
+  // When fileId is undefined, it will be omitted from JSON serialization
+  const finalFileId = newQrDataHasFileQrType
+    ? newBuilderData.fileId
+    : undefined;
 
   const hasChanges =
     titleChanged ||
@@ -536,10 +489,10 @@ export async function convertNewQRForUpdate(
     frameOptionsChanged ||
     logoOptionsChanged ||
     stylesChanged ||
-    hasNewFiles;
+    filesChanged;
 
-  const linkUrl =
-    hasNewFiles || (hasExistingFiles && newQrDataHasFileQrType) ? "" : newData;
+  // // For file-based QRs, link.url should be empty; otherwise use the new destination
+  // const linkUrl = newQrDataHasFileQrType ? "" : newData;
 
   const updateData: UpdateQrProps = {
     data: newData,
@@ -547,15 +500,25 @@ export async function convertNewQRForUpdate(
     title: newBuilderData.title,
     styles: newServerData.styles,
     frameOptions: newServerData.frameOptions,
-    logoOptions: newServerData.logoOptions,
-    fileId: newBuilderData.fileId || undefined,
+    logoOptions: finalLogoOptions,
+    fileId: finalFileId,
     link: {
-      url: linkUrl,
+      url: newData,
       domain,
       tagId: null,
       webhookIds: [],
     },
   };
+
+  console.log("changes", {
+    title: titleChanged,
+    data: dataChanged,
+    qrType: qrTypeChanged,
+    frameOptions: frameOptionsChanged,
+    styles: stylesChanged,
+    logoOptions: logoOptionsChanged,
+    files: filesChanged,
+  });
 
   return {
     hasChanges,
@@ -566,8 +529,8 @@ export async function convertNewQRForUpdate(
       frameOptions: frameOptionsChanged,
       styles: stylesChanged,
       logoOptions: logoOptionsChanged,
-      files: hasNewFiles,
+      files: filesChanged,
     },
     updateData,
   };
-}
+};

@@ -1,13 +1,19 @@
+import { getQrDataFromRedis } from "@/lib/actions/pre-checkout-flow/get-qr-data-from-redis";
+import { removeQrDataFromRedis } from "@/lib/actions/pre-checkout-flow/remove-qr-data-from-redis";
+import { createQrWithLinkUniversal } from "@/lib/api/qrs/create-qr-with-link-universal";
 import { convertSessionUserToCustomerBody, Session } from "@/lib/auth/utils.ts";
 import { isBlacklistedEmail } from "@/lib/edge-config";
+import { getWorkspace } from "@/lib/fetchers";
 import { isStored, storage } from "@/lib/storage";
-import { UserProps } from "@/lib/types";
-import { ratelimit } from "@/lib/upstash";
+import { NewQrProps, UserProps, WorkspaceProps } from "@/lib/types";
+import { ratelimit, redis } from "@/lib/upstash";
 import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
 import { prisma } from "@dub/prisma";
+import { APP_URL, R2_URL } from "@dub/utils";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { waitUntil } from "@vercel/functions";
 import { ECookieArg } from "core/interfaces/cookie.interface.ts";
+import { ERedisArg } from "core/interfaces/redis.interface";
 import {
   applyUserSession,
   getUserCookieService,
@@ -21,13 +27,12 @@ import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
 import { completeProgramApplications } from "../partners/complete-program-applications";
+import { createAutoLoginURL } from "./jwt-signin";
 import {
   exceededLoginAttemptsThreshold,
   incrementLoginAttempts,
 } from "./lock-account";
 import { validatePassword } from "./password";
-import { createAutoLoginURL } from './jwt-signin';
-import { APP_URL } from '@dub/utils';
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -50,7 +55,9 @@ export const authOptions: NextAuthOptions = {
               return;
             }
 
-            const loginUrl = process.env.NEXTAUTH_URL ? url : await createAutoLoginURL(user?.id as string);
+            const loginUrl = process.env.NEXTAUTH_URL
+              ? url
+              : await createAutoLoginURL(user?.id as string);
             console.log("loginUrl", loginUrl);
             console.log("process.env.NEXTAUTH_URL", process.env.NEXTAUTH_URL);
 
@@ -300,6 +307,47 @@ export const authOptions: NextAuthOptions = {
         ...customerUser,
         currency: { ...customerUser?.currency, ...userFromCookie?.currency },
       });
+
+      console.log("message.user", message.user);
+
+      const { qrData: qrDataFromLanding } = (await getQrDataFromRedis(
+        message.user.id,
+        "qr-from-landing",
+      )) as { qrData: NewQrProps | null };
+      console.log("qrDataFromLanding", qrDataFromLanding);
+
+      if (qrDataFromLanding) {
+        const workspace = await getWorkspace({
+          slug: (message.user as Session["user"]).defaultWorkspace as string,
+        });
+
+        console.log("workspace", workspace);
+
+        const linkUrl = qrDataFromLanding?.fileId
+          ? `${R2_URL}/qrs-content/${qrDataFromLanding.fileId}`
+          : (qrDataFromLanding!.styles!.data! as string);
+
+        const qrCreateResponse = await createQrWithLinkUniversal({
+          qrData: qrDataFromLanding,
+          linkData: {
+            url: linkUrl,
+          },
+          workspace: workspace as Pick<WorkspaceProps, "id" | "plan" | "flags">,
+          userId: message.user.id,
+        });
+
+        console.log("qrCreateResponse", qrCreateResponse);
+
+        removeQrDataFromRedis(message.user.id, "qr-from-landing");
+
+        await redis.set(
+          `${ERedisArg.NEW_QR_ID_REG}:${message.user.id}`,
+          qrCreateResponse.createdQr.id,
+          {
+            ex: 60 * 60 * 24 * 10, // 10 days
+          },
+        );
+      }
 
       if (message.isNewUser) {
         const email = message.user.email as string;

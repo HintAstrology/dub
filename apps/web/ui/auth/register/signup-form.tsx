@@ -2,15 +2,18 @@
 
 import { changePreSignupEmailAction } from "@/lib/actions/pre-checkout-flow/change-email";
 import { useLocalStorage } from "@dub/ui";
+import slugify from "@sindresorhus/slugify";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import {
   setPeopleAnalytic,
   setPeopleAnalyticOnce,
   trackClientEvents,
 } from "core/integration/analytic/services/analytic.service.ts";
+import { signIn } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
+import { showMessage } from "../helpers";
 import { SignUpEmail } from "./signup-email";
 import { SignUpOAuth } from "./signup-oauth";
 
@@ -40,7 +43,10 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
   );
 
   const { executeAsync, isPending } = useAction(changePreSignupEmailAction, {
-    async onSuccess() {
+    async onSuccess({ data }) {
+      if (data?.error === "email-exists") {
+        return;
+      }
       setErrorState({ message: null, method: null });
       setIsRedirecting(true);
       router.push("/paywall");
@@ -74,9 +80,11 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
       const result = await executeAsync({ email, signupMethod });
 
       if (result?.serverError) {
+        const errorCodeMatch = result.serverError.match(/^\[(.*?)\]/);
+        const errorCode = errorCodeMatch ? errorCodeMatch[1] : null;
         const errorMessage = result.serverError.replace(/^\[.*?\]\s*/, "");
 
-        if (errorMessage === "email-exists") {
+        if (errorCode === "email-exists") {
           trackClientEvents({
             event: EAnalyticEvents.AUTH_ERROR,
             params: {
@@ -108,13 +116,50 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
 
         setErrorState({ message: errorMessage, method: signupMethod });
       } else if (result?.data) {
-        const { signupMethod, email, userToken } = result.data;
+        const { signupMethod, email, userToken, error } = result.data;
+
+        if (error === "email-exists") {
+          if (signupMethod !== "email") {
+            const response = await signIn("credentials", {
+              email: email,
+              password: "defaultPassword12Secret",
+              redirect: false,
+            });
+            if (response?.ok) {
+              router.push(`/${slugify(email)}`);
+            }
+            return;
+          }
+          const response = await signIn("email", {
+            email,
+            redirect: false,
+            callbackUrl: `/workspaces`,
+          });
+          if (response?.ok) {
+            showMessage(
+              `You’re already registered. A login link has been emailed to you. After logging in, you’ll find your QR code waiting in your account`,
+              "success",
+            );
+          }
+          return;
+        }
+
         setPeopleAnalytic({
           signup_method: signupMethod,
           $email: email,
         });
 
         if (userToken) {
+          trackClientEvents({
+            event: EAnalyticEvents.GET_USER_TOKEN,
+            params: {
+              page_name: "landing",
+              email: email,
+              user_token: userToken,
+              event_category: "nonAuthorized",
+            },
+            sessionId,
+          });
           setPeopleAnalyticOnce({ user_token: userToken });
         }
 
@@ -132,26 +177,9 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
 
   return (
     <div className="flex flex-col gap-3 p-1">
-      <SignUpOAuth
-        sessionId={sessionId}
-        methods={methods}
-        onEmailSubmit={handleEmailSubmit}
-        isLoading={loadingState.google}
-        isDisabled={isAnyLoading}
-        error={errorState.method === "google" ? errorState.message : undefined}
-      />
-      {methods.includes("google") && methods.includes("email") && (
-        <div className="my-2 flex flex-shrink items-center justify-center gap-2">
-          <div className="border-border-500 grow basis-0 border-b" />
-          <span className="text-xs font-normal uppercase leading-none text-neutral-500">
-            or
-          </span>
-          <div className="border-border-500 grow basis-0 border-b" />
-        </div>
-      )}
       {methods.includes("email") && (
         <SignUpEmail
-         sessionId={sessionId}
+          sessionId={sessionId}
           onEmailSubmit={handleEmailSubmit}
           isLoading={loadingState.email}
           isDisabled={isAnyLoading}
@@ -162,6 +190,23 @@ export const SignUpForm: FC<Readonly<ISignUpFormProps>> = ({
           }
         />
       )}
+      {methods.includes("google") && methods.includes("email") && (
+        <div className="my-2 flex flex-shrink items-center justify-center gap-2">
+          <div className="border-border-500 grow basis-0 border-b" />
+          <span className="text-xs font-normal uppercase leading-none text-neutral-500">
+            or
+          </span>
+          <div className="border-border-500 grow basis-0 border-b" />
+        </div>
+      )}
+      <SignUpOAuth
+        sessionId={sessionId}
+        methods={methods}
+        onEmailSubmit={handleEmailSubmit}
+        isLoading={loadingState.google}
+        isDisabled={isAnyLoading}
+        error={errorState.method === "google" ? errorState.message : undefined}
+      />
     </div>
   );
 };

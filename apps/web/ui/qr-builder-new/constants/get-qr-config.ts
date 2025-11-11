@@ -8,24 +8,13 @@ import QrWebsiteFull from "@/ui/landing/assets/png/get-qr-website-full.png";
 import QrWhatsappFull from "@/ui/landing/assets/png/get-qr-whatsapp-full.png";
 import QrWifiFull from "@/ui/landing/assets/png/get-qr-wifi-full.png";
 import { StaticImageData } from "next/image";
+import { EQRType } from "../types/qr-type";
 
 export const QR_BUILDER_STEP_TITLES = [
   "Choose QR Code Type",
   "Complete the content",
   "Customize your QR",
 ];
-
-export enum EQRType {
-  WEBSITE = "website",
-  PDF = "pdf",
-  IMAGE = "image",
-  VIDEO = "video",
-  WHATSAPP = "whatsapp",
-  SOCIAL = "social",
-  WIFI = "wifi",
-  APP_LINK = "app",
-  FEEDBACK = "feedback",
-}
 
 export type QRType = {
   id: EQRType;
@@ -36,6 +25,18 @@ export type QRType = {
   content: string;
   yourContentColumnTitle: string;
   scrollTo?: EQRType;
+};
+
+export const QR_Icons = {
+  [EQRType.WEBSITE]: "streamline:web",
+  [EQRType.PDF]: "hugeicons:pdf-02",
+  [EQRType.WHATSAPP]: "basil:whatsapp-outline",
+  [EQRType.WIFI]: "streamline:wifi",
+  [EQRType.IMAGE]: "hugeicons:ai-image",
+  [EQRType.VIDEO]: "hugeicons:ai-video",
+  [EQRType.SOCIAL]: "solar:add-circle-broken",
+  [EQRType.APP_LINK]: "meteor-icons:link",
+  [EQRType.FEEDBACK]: "hugeicons:bubble-chat-favourite",
 };
 
 export const QR_TYPES: QRType[] = [

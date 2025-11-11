@@ -3,7 +3,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { TRIGGER_NAME } from "../../constants/file-upload";
+import { TRIGGER_NAME } from "../../constants/file-upload.constants";
 import { useAsRef } from "../../hooks/use-as-ref";
 import type { FileUploadTriggerProps } from "../../types/file-upload";
 import { useFileUploadContext } from "./context";

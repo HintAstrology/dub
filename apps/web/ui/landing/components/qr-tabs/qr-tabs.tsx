@@ -1,18 +1,20 @@
 "use client";
 
 import { saveQrDataToRedisAction } from "@/lib/actions/pre-checkout-flow/save-qr-data-to-redis.ts";
+import { Session } from "@/lib/auth";
+import { QrTabsTitle } from "@/ui/landing/components/qr-tabs/components/qr-tabs-title";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
-import { EQRType } from "@/ui/qr-builder/constants/get-qr-config.ts";
-import { QrBuilder } from "@/ui/qr-builder/qr-builder.tsx";
-import { QrTabsTitle } from "@/ui/qr-builder/qr-tabs-title.tsx";
-import { QRBuilderData } from "@/ui/qr-builder/types/types.ts";
-import { Rating } from "@/ui/qr-rating/rating.tsx";
-import { useLocalStorage, useMediaQuery } from "@dub/ui";
-import { useAction } from "next-safe-action/hooks";
-import { FC, forwardRef, Ref, useEffect, useState } from "react";
-import { LogoScrollingBanner } from "./components/logo-scrolling-banner.tsx";
+import { convertNewQRBuilderDataToServer } from "@/ui/qr-builder-new/helpers/data-converters";
+import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
-import { convertNewBuilderToStorageFormat, TNewQRBuilderData } from "@/ui/qr-builder-new/helpers/data-converters.ts";
+import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
+import { useMediaQuery } from "@dub/ui";
+import { SHORT_DOMAIN } from "@dub/utils";
+import { getSession } from "next-auth/react";
+import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
+import { FC, forwardRef, Ref, useEffect, useState } from "react";
 
 interface IQRTabsProps {
   sessionId: string;
@@ -24,17 +26,15 @@ export const QRTabs: FC<
   Readonly<IQRTabsProps> & { ref?: Ref<HTMLDivElement> }
 > = forwardRef(
   ({ sessionId, typeToScrollTo, handleResetTypeToScrollTo }, ref) => {
-    console.log("qr tabs");
     const { AuthModal, showModal } = useAuthModal({ sessionId });
+    const router = useRouter();
+    const { createQr } = useNewQrOperations({ initialQrData: null });
 
     const { executeAsync: saveQrDataToRedis } = useAction(
       saveQrDataToRedisAction,
     );
 
     const [isProcessingSignup, setIsProcessingSignup] = useState(false);
-
-    const [qrDataToCreate, setQrDataToCreate] =
-      useLocalStorage<QRBuilderData | null>(`qr-data-to-create`, null);
 
     const { isMobile } = useMediaQuery();
 
@@ -64,29 +64,29 @@ export const QRTabs: FC<
       };
     }, [isMobile]);
 
-    const handleSaveQR = async (data: QRBuilderData) => {
-      const newDataJSON = JSON.stringify(data);
-      const qrDataToCreateJSON = JSON.stringify(qrDataToCreate) ?? "{}";
-
-      if (newDataJSON !== qrDataToCreateJSON) {
-        setQrDataToCreate(data);
-        saveQrDataToRedis({ sessionId, qrData: data });
-      }
-
-      showModal("signup");
-    };
-
     const handleNewBuilderDownload = async (data: TNewQRBuilderData) => {
       if (isProcessingSignup) return;
       setIsProcessingSignup(true);
 
+      const existingSession = await getSession();
+
+      const user = (existingSession?.user as Session["user"]) || undefined;
+
+      if (existingSession?.user) {
+        const createdQrId = await createQr(data, user?.defaultWorkspace);
+        console.log("createdQrId", createdQrId);
+        router.push(`/?qrId=${createdQrId}`);
+        return;
+      }
+
       try {
-        const storageData = convertNewBuilderToStorageFormat(data);
-        setQrDataToCreate(storageData);
+        const serverData = await convertNewQRBuilderDataToServer(data, {
+          domain: SHORT_DOMAIN!,
+        });
 
         await saveQrDataToRedis({
           sessionId,
-          qrData: storageData,
+          qrData: serverData,
         });
 
         showModal("signup");
@@ -99,37 +99,23 @@ export const QRTabs: FC<
     };
 
     return (
-      <section className="bg-primary-100 w-full px-3 py-10 lg:py-14">
+      <>
         <div
-          className="mx-auto flex max-w-[992px] flex-col items-center justify-center gap-6 lg:gap-12"
+          className="mx-auto flex w-full max-w-7xl flex-col items-center justify-center"
           ref={ref}
         >
           <QrTabsTitle />
-
           <QRBuilderNew
             homepageDemo={true}
             sessionId={sessionId}
             onSave={handleNewBuilderDownload}
-            // typeToScrollTo={typeToScrollTo}
-            // handleResetTypeToScrollTo={handleResetTypeToScrollTo}
-          />
-
-          {/* <QrBuilder
-            sessionId={sessionId}
-            handleSaveQR={handleSaveQR}
-            homepageDemo
             typeToScrollTo={typeToScrollTo}
-            key={typeToScrollTo}
             handleResetTypeToScrollTo={handleResetTypeToScrollTo}
-          /> */}
-
-          <Rating />
-
-          {!isMobile && <LogoScrollingBanner />}
+          />
         </div>
 
         <AuthModal />
-      </section>
+      </>
     );
   },
 );

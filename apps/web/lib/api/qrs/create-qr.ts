@@ -1,5 +1,6 @@
 import { NewQrProps } from "@/lib/types";
-import { EQRType } from "@/ui/qr-builder/constants/get-qr-config";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { prisma } from "@dub/prisma";
 import { createId } from "../utils";
 
@@ -13,7 +14,7 @@ export async function createQr(
     frameOptions,
     logoOptions,
     fileId,
-  }: NewQrProps,
+  }: NewQrProps | TQrServerData,
   url: string,
   linkId: string,
   userId: string | null,
@@ -25,7 +26,7 @@ export async function createQr(
       data: qrType === EQRType.WIFI ? data : url,
       title,
       description,
-      styles,
+      styles: styles as any,
       frameOptions,
       logoOptions,
       linkId,

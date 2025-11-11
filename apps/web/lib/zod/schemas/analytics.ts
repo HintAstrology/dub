@@ -8,7 +8,8 @@ import {
   intervals,
 } from "@/lib/analytics/constants";
 import z from "@/lib/zod";
-import { EQRType, QR_TYPES } from "@/ui/qr-builder/constants/get-qr-config";
+import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import {
   CONTINENT_CODES,
   COUNTRY_CODES,
