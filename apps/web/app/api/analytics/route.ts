@@ -73,7 +73,7 @@ export const GET = withWorkspace(
     } = parsedParams;
 
     let link: Link | null = null;
-    
+
     event = (oldEvent || event) as EventType;
     groupBy = (oldType || groupBy) as EventType;
 
