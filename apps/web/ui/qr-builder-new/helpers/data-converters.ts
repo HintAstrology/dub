@@ -376,6 +376,13 @@ export const prepareQRUpdates = async (
     domain: string;
   },
 ): Promise<TQRUpdateResult> => {
+  console.log("originalQR", JSON.stringify(originalQR));
+  console.log(
+    "newBuilderDataToUpdate",
+    JSON.stringify(
+      await convertNewQRBuilderDataToServer(newBuilderData, options),
+    ),
+  );
   const { domain } = options;
 
   // Convert new builder data to server format
