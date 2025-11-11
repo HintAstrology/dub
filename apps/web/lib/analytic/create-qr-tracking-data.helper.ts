@@ -1,7 +1,5 @@
-import {
-  TNewQRBuilderData,
-  TQrServerData,
-} from "@/ui/qr-builder-new/helpers/data-converters";
+import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 
 export const createQRTrackingParams = (
   qrBuilderData: TQrServerData | TNewQRBuilderData,

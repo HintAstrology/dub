@@ -1,7 +1,8 @@
 import { QRBuilderWrapper } from "./components/qr-builder-wrapper.tsx";
 import { QrBuilderProvider } from "./context/index.ts";
-import { TNewQRBuilderData, TQrServerData } from "./helpers/data-converters.ts";
 import { TStepState } from "./types/context.ts";
+import { TNewQRBuilderData } from "./types/qr-builder-data.ts";
+import { TQrServerData } from "./types/qr-server-data.ts";
 import { EQRType } from "./types/qr-type.ts";
 
 interface QRBuilderNewProps {

@@ -3,7 +3,7 @@ import { convertSessionUserToCustomerBody, getSession } from "@/lib/auth";
 import { PageContent } from "@/ui/layout/page-content";
 import { getMostScannedQr } from "@/ui/plans/actions/getMostScannedQr";
 import { PlansContent } from "@/ui/plans/plans-content.tsx";
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { MaxWidthWrapper } from "@dub/ui";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker/page-viewed-tracker.component";
 import { NextPage } from "next";

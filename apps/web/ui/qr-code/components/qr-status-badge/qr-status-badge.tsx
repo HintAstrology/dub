@@ -1,4 +1,4 @@
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { QRCardAnalyticsBadge } from "./qr-code-card-analytics-badge";
 import { QRCardStatus } from "./qr-code-card-status";
 

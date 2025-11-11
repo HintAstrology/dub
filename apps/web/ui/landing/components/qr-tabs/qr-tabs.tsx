@@ -4,12 +4,10 @@ import { saveQrDataToRedisAction } from "@/lib/actions/pre-checkout-flow/save-qr
 import { Session } from "@/lib/auth";
 import { QrTabsTitle } from "@/ui/landing/components/qr-tabs/components/qr-tabs-title";
 import { useAuthModal } from "@/ui/modals/auth-modal.tsx";
-import {
-  convertNewQRBuilderDataToServer,
-  TNewQRBuilderData,
-} from "@/ui/qr-builder-new/helpers/data-converters";
+import { convertNewQRBuilderDataToServer } from "@/ui/qr-builder-new/helpers/data-converters";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
+import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { useMediaQuery } from "@dub/ui";
 import { SHORT_DOMAIN } from "@dub/utils";

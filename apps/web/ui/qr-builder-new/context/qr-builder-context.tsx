@@ -18,11 +18,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { DEFAULT_QR_CUSTOMIZATION } from "../constants/default-qr-customization.constants";
-import {
-  convertServerQRToNewBuilder,
-  TNewQRBuilderData,
-  TQrServerData,
-} from "../helpers/data-converters";
+import { convertServerQRToNewBuilder } from "../helpers/data-converters";
 import {
   IQrBuilderContextType,
   TDestinationData,
@@ -31,6 +27,8 @@ import {
   TStepState,
 } from "../types/context";
 import { IQRCustomizationData } from "../types/customization";
+import { TNewQRBuilderData } from "../types/qr-builder-data";
+import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 
 // Create context

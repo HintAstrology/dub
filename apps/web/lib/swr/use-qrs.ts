@@ -1,4 +1,4 @@
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { useRouterStuff } from "@dub/ui";
 import { fetcher } from "@dub/utils";
 import { useSession } from "next-auth/react";

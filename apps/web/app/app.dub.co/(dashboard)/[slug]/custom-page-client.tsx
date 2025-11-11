@@ -5,7 +5,7 @@ import { Session } from "@/lib/auth/utils";
 import useQrs from "@/lib/swr/use-qrs.ts";
 import { UserProvider } from "@/ui/contexts/user";
 import { CreateQRButton, QRBuilderNewModal } from "@/ui/modals/qr-builder-new";
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import QrCodeSort from "@/ui/qr-code/components/qr-code-sort";
 import QrCodesContainer from "@/ui/qr-code/qr-codes-container.tsx";
 import { QrCodesDisplayProvider } from "@/ui/qr-code/qr-codes-display-provider.tsx";
@@ -153,44 +153,3 @@ function WorkspaceQRs({
     </>
   );
 }
-
-// function TrialOfferWithQRPreviewWrapper({
-//   initialQrs,
-//   featuresAccess,
-//   user,
-// }: {
-//   initialQrs: TQrStorageData[];
-//   featuresAccess: FeaturesAccess;
-//   user: ICustomerBody | null;
-// }) {
-//   const firstQr = initialQrs?.[0] || null;
-//   const { isSubscribed } = featuresAccess;
-
-//   const { TrialOfferWithQRPreviewModal, setShowTrialOfferModal } =
-//     useTrialOfferWithQRPreviewModal({
-//       user,
-//       firstQr,
-//     });
-
-//   useEffect(() => {
-//     if (!isSubscribed) {
-//       // TODO: uncomment this when we will prepare subscription for old users
-//       // && !featuresAccess.subscriptionId,
-
-//       setShowTrialOfferModal(true);
-//     } else {
-//       trackClientEvents({
-//         event: EAnalyticEvents.PAGE_VIEWED,
-//         params: {
-//           page_name: "dashboard",
-//           content_group: "my_qr_codes",
-//           event_category: "Authorized",
-//           email: user?.email,
-//         },
-//         sessionId: user?.id,
-//       });
-//     }
-//   }, [isSubscribed]);
-
-//   return <TrialOfferWithQRPreviewModal />;
-// }

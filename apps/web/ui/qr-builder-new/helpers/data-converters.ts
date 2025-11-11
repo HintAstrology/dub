@@ -4,6 +4,8 @@ import { FRAMES } from "../constants/customization/frames";
 import { FILE_QR_TYPES } from "../constants/get-qr-config";
 import { TQRFormData } from "../types/context";
 import { IFrameData, IQRCustomizationData } from "../types/customization";
+import { TNewQRBuilderData } from "../types/qr-builder-data";
+import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 import { TQRUpdateResult } from "../types/update";
 import { encodeQRData, parseQRData } from "./qr-data-handlers";
@@ -13,79 +15,6 @@ import {
   getDotsType,
   getSuggestedLogoSrc,
 } from "./qr-style-mappers";
-
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
-
-/**
- * New builder internal data format - used throughout the builder
- */
-export type TNewQRBuilderData = {
-  qrType: EQRType;
-  formData: TQRFormData;
-  customizationData: IQRCustomizationData;
-  title?: string;
-  fileId?: string;
-};
-
-/**
- * Storage format for localStorage/Redis - compatible with old builder
- */
-export type TQRBuilderDataForStorage = {
-  title: string;
-  styles: Options;
-  frameOptions: {
-    id: string;
-    color: string;
-    textColor: string;
-    text: string;
-  };
-  logoOptions?: {
-    type: "suggested" | "uploaded";
-    id?: string;
-    fileId?: string;
-  };
-  qrType: EQRType;
-  fileId?: string;
-};
-
-/**
- * Server response format - QR data from API
- */
-export type TQrServerData = {
-  createdAt?: string;
-  updatedAt?: string;
-  archived?: boolean;
-  description?: string | null;
-  id: string;
-  title: string;
-  qrType: EQRType;
-  data: string;
-  styles: Options;
-  frameOptions: {
-    id: string;
-    color?: string;
-    textColor?: string;
-    text?: string;
-  };
-  logoOptions?: {
-    type: "suggested" | "uploaded";
-    id?: string;
-    fileId?: string;
-  };
-  fileId?: string;
-  file?: File;
-  link: {
-    url: string;
-    key: string;
-    domain: string;
-    tagId?: string | null;
-    webhookIds?: string[];
-    shortLink?: string;
-    clicks?: number;
-  };
-};
 
 // ============================================================================
 // HELPER FUNCTIONS - QR STYLING OPTIONS
@@ -204,7 +133,7 @@ const buildLogoOptions = (
 // ============================================================================
 
 const extractLogoData = (
-  logoOptions?: TQrServerData["logoOptions"],
+  logoOptions?: TQrServerData["logoOptions"] | NewQrProps["logoOptions"],
   styles?: Options,
 ): {
   type: "none" | "suggested" | "uploaded";
@@ -325,7 +254,7 @@ const getCornerDotStyleId = (type: any): string => {
 export const extractCustomizationData = (
   styles: Options,
   frameOptions: any,
-  logoOptions?: TQrServerData["logoOptions"],
+  logoOptions?: TQrServerData["logoOptions"] | NewQrProps["logoOptions"],
 ): IQRCustomizationData => {
   // Convert frame TYPE to ID by finding the frame in FRAMES array
   const frameType = frameOptions?.id || "none";

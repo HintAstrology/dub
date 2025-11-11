@@ -7,9 +7,9 @@ import { PaymentComponent } from "@/ui/plans/components/payment-component.tsx";
 import { PlansFeatures } from "@/ui/plans/components/plans-features.tsx";
 import { PlansHeading } from "@/ui/plans/components/plans-heading.tsx";
 import { PopularQrInfo } from "@/ui/plans/components/popular-qr-info.tsx";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { ICustomerBody } from "core/integration/payment/config";
 import { FC, useRef } from "react";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 
 interface IPlansContentProps {
   user: ICustomerBody;

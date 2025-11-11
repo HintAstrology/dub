@@ -4,6 +4,7 @@ import { Session } from "@/lib/auth";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal";
 import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { QRCardDetails } from "@/ui/qr-code/components/qr-code-card-details";
 import { QRCardTitle } from "@/ui/qr-code/components/qr-code-card-title";
 import { QrCardType } from "@/ui/qr-code/components/qr-code-card-type";
@@ -14,7 +15,6 @@ import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-q
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
 import { useEffect } from "react";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeTitleColumnProps {

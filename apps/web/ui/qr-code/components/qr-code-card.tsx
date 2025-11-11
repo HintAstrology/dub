@@ -1,7 +1,7 @@
 import { Session } from "@/lib/auth/utils";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { CardList } from "@dub/ui";
 import { FC } from "react";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters.ts";
 import { QrCodeCardInner } from "./qr-code-card-inner.tsx";
 
 interface IQrCodeCardProps {

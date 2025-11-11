@@ -27,19 +27,7 @@ export const POST = withWorkspace(
 
     try {
       const { createdQr, createdLink } = await createQrWithLinkUniversal({
-        qrData: {
-          qrType: qr.qrType,
-          data: qr.data,
-          title: `${qr.title} (Copy)`,
-          description: qr.description ?? undefined,
-          styles: qr.styles as Record<string, any> | undefined,
-          logoOptions: qr.logoOptions as Record<string, any> | undefined,
-          frameOptions: qr.frameOptions as Record<string, any> | undefined,
-          fileId: qr.fileId ?? undefined,
-          link: {
-            url: qr.link?.url ?? "",
-          },
-        },
+        qrData: { ...qr, title: `${qr.title} (Copy)` },
         linkData: {
           url: qr.link?.url ?? "",
         },

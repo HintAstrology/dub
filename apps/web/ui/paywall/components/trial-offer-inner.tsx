@@ -1,12 +1,10 @@
 "use client";
 
 import { createUserAccountAction } from "@/lib/actions/create-user-account";
+import { NewQrProps } from "@/lib/types";
 import { showMessage } from "@/ui/auth/helpers";
 import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
-import {
-  extractCustomizationData,
-  TQRBuilderDataForStorage,
-} from "@/ui/qr-builder-new/helpers/data-converters";
+import { extractCustomizationData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { useQRCodeStyling } from "@/ui/qr-builder-new/hooks/use-qr-code-styling";
 import { FiveStarsComponent } from "@/ui/shared/five-stars.component";
 import { Button, useLocalStorage, useMediaQuery } from "@dub/ui";
@@ -20,6 +18,7 @@ import { Check, Gift } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
+import { Options } from "qr-code-styling";
 import { FC, useMemo, useState } from "react";
 import { MOCK_QR } from "../constants/mock-qr";
 import { AvatarsComponent } from "./avatars.component";
@@ -35,7 +34,7 @@ const FEATURES = [
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  qrDataToCreate: TQRBuilderDataForStorage | null;
+  qrDataToCreate: NewQrProps | null;
   isPaidTraffic: boolean;
 }
 
@@ -59,7 +58,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
 
   const customizationData = useMemo(() => {
     return extractCustomizationData(
-      memoizedQrData.styles,
+      memoizedQrData.styles as Options,
       memoizedQrData.frameOptions,
       memoizedQrData.logoOptions,
     );

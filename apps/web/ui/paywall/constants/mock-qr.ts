@@ -1,4 +1,4 @@
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { APP_DOMAIN } from "@dub/utils";
 
 export const MOCK_QR: TQrServerData = {
@@ -35,8 +35,8 @@ export const MOCK_QR: TQrServerData = {
   // fileId: null,
   // createdAt: new Date(),
   // updatedAt: new Date(),
-  // userId: "demo-user-id",
-  // linkId: "demo-link-id",
+  userId: "demo-user-id",
+  linkId: "demo-link-id",
   // workspaceId: "demo-workspace-id",
   // user: {} as any,
   link: {

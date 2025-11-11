@@ -1,9 +1,9 @@
 "use server";
 
 import { actionClient } from "@/lib/actions/safe-action";
+import { NewQrProps } from "@/lib/types";
 import z from "@/lib/zod";
 import { emailSchema } from "@/lib/zod/schemas/auth";
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
 import { prisma } from "@dub/prisma";
 import {
   getUserCookieService,
@@ -57,7 +57,7 @@ export const changePreSignupEmailAction = actionClient
       if (qrData) {
         await saveQrDataToRedisAction({
           sessionId: dbUser.id,
-          qrData: qrData as TQrServerData,
+          qrData: qrData as NewQrProps,
           extraKey: "qr-from-landing",
         });
       }

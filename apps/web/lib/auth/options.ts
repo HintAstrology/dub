@@ -5,9 +5,8 @@ import { convertSessionUserToCustomerBody, Session } from "@/lib/auth/utils.ts";
 import { isBlacklistedEmail } from "@/lib/edge-config";
 import { getWorkspace } from "@/lib/fetchers";
 import { isStored, storage } from "@/lib/storage";
-import { UserProps, WorkspaceProps } from "@/lib/types";
+import { NewQrProps, UserProps, WorkspaceProps } from "@/lib/types";
 import { ratelimit, redis } from "@/lib/upstash";
-import { TQRBuilderDataForStorage } from "@/ui/qr-builder-new/helpers/data-converters";
 import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
 import { prisma } from "@dub/prisma";
 import { APP_URL, R2_URL } from "@dub/utils";
@@ -314,7 +313,7 @@ export const authOptions: NextAuthOptions = {
       const { qrData: qrDataFromLanding } = (await getQrDataFromRedis(
         message.user.id,
         "qr-from-landing",
-      )) as { qrData: TQRBuilderDataForStorage | null };
+      )) as { qrData: NewQrProps | null };
       console.log("qrDataFromLanding", qrDataFromLanding);
 
       if (qrDataFromLanding) {
@@ -329,19 +328,7 @@ export const authOptions: NextAuthOptions = {
           : (qrDataFromLanding!.styles!.data! as string);
 
         const qrCreateResponse = await createQrWithLinkUniversal({
-          qrData: {
-            data: qrDataFromLanding?.styles?.data as string,
-            qrType: qrDataFromLanding?.qrType as any,
-            title: qrDataFromLanding?.title,
-            description: undefined,
-            styles: qrDataFromLanding?.styles,
-            logoOptions: qrDataFromLanding?.logoOptions,
-            frameOptions: qrDataFromLanding?.frameOptions,
-            fileId: qrDataFromLanding?.fileId,
-            link: {
-              url: linkUrl,
-            },
-          },
+          qrData: qrDataFromLanding,
           linkData: {
             url: linkUrl,
           },

@@ -1,9 +1,8 @@
 "use server";
 
 import { verifyAndCreateUser } from "@/lib/actions/verify-and-create-user.ts";
-import { WorkspaceProps } from "@/lib/types.ts";
+import { NewQrProps, WorkspaceProps } from "@/lib/types.ts";
 import { ratelimit, redis } from "@/lib/upstash";
-import { TQRBuilderDataForStorage } from "@/ui/qr-builder-new/helpers/data-converters";
 import { R2_URL } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
 import { getUserCookieService } from "core/services/cookie/user-session.service.ts";
@@ -99,7 +98,7 @@ export const createUserAccountAction = actionClient
 
     const { qrData } = await getQrDataFromRedis(sessionId!);
 
-    const qrDataToCreate = qrData as TQRBuilderDataForStorage;
+    const qrDataToCreate = qrData as NewQrProps;
 
     waitUntil(
       Promise.all([
@@ -111,19 +110,7 @@ export const createUserAccountAction = actionClient
                   : (qrDataToCreate!.styles!.data! as string);
 
                 const qrCreateResponse = await createQrWithLinkUniversal({
-                  qrData: {
-                    data: qrDataToCreate?.styles?.data as string,
-                    qrType: qrDataToCreate?.qrType as any,
-                    title: qrDataToCreate?.title,
-                    description: undefined,
-                    styles: qrDataToCreate?.styles,
-                    logoOptions: qrDataToCreate?.logoOptions,
-                    frameOptions: qrDataToCreate?.frameOptions,
-                    fileId: qrDataToCreate?.fileId,
-                    link: {
-                      url: linkUrl,
-                    },
-                  },
+                  qrData: qrDataToCreate,
                   linkData: {
                     url: linkUrl,
                   },

@@ -3,6 +3,7 @@
 import { Session } from "@/lib/auth/utils";
 import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal.tsx";
 import useQrs from "@/lib/swr/use-qrs.ts";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import QrCodeCardPlaceholder from "@/ui/qr-code/components/qr-code-card-placeholder.tsx";
 import { QrCodesDisplayContext } from "@/ui/qr-code/qr-codes-display-provider.tsx";
 import { CardList, MaxWidthWrapper } from "@dub/ui";
@@ -16,7 +17,6 @@ import {
   useContext,
   useState,
 } from "react";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters.ts";
 import { AnimatedEmptyState } from "../shared/animated-empty-state";
 import { QrCodeCard } from "./components/qr-code-card.tsx";
 

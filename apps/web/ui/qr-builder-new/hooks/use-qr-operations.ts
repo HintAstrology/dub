@@ -6,12 +6,10 @@ import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-q
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { FILE_QR_TYPES } from "../constants/get-qr-config";
-import {
-  convertNewQRBuilderDataToServer,
-  TNewQRBuilderData,
-  TQrServerData,
-} from "../helpers/data-converters";
+import { convertNewQRBuilderDataToServer } from "../helpers/data-converters";
 import { TQRFormData } from "../types/context";
+import { TNewQRBuilderData } from "../types/qr-builder-data";
+import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 
 interface IUseNewQrOperationsProps {

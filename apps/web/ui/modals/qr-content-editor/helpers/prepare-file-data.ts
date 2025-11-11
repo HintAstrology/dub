@@ -1,9 +1,9 @@
 import { getFileContent } from "@/lib/actions/get-file-content.ts";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import {
   compressImage,
   createCompressedImageFile,
 } from "@/ui/utils/compress-image.ts";
-import { TQrServerData } from "../../../qr-builder-new/helpers/data-converters";
 
 /**
  * Prepares image file with compression

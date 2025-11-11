@@ -1,9 +1,10 @@
+import { TQrStorageData } from "@/lib/types";
 import z from "@/lib/zod";
 import { getLinksQuerySchemaBase } from "@/lib/zod/schemas/links";
 import { prisma } from "@dub/prisma";
 import { Prisma } from "@prisma/client";
 
-export async function getQrs(
+export const getQrs = async (
   {
     search,
     sort, // Deprecated
@@ -19,8 +20,8 @@ export async function getQrs(
   }: {
     includeUser?: boolean;
     includeFile?: boolean;
-  } = {}
-) {
+  } = {},
+): Promise<TQrStorageData[]> => {
   // support legacy sort param
   if (sort && sort !== "createdAt") {
     sortBy = sort;
@@ -52,7 +53,7 @@ export async function getQrs(
       ],
     }),
     ...(userId && { userId }),
-  }
+  };
 
   const selectOptions = {
     id: true,
@@ -101,16 +102,16 @@ export async function getQrs(
         createdAt: true,
       },
     },
-  }
+  };
 
   const queryOptions: Prisma.QrFindManyArgs = {
     where: whereOptions,
     select: selectOptions,
   };
-  
+
   if (sortBy !== "type") {
     queryOptions.orderBy = needsLinkJoin
-      ? { link: { [actualSortBy]: sortOrder } } 
+      ? { link: { [actualSortBy]: sortOrder } }
       : { [actualSortBy || "createdAt"]: sortOrder };
     queryOptions.take = pageSize;
     queryOptions.skip = (page - 1) * pageSize;
@@ -119,24 +120,24 @@ export async function getQrs(
   const allQrs = await prisma.qr.findMany(queryOptions);
 
   const qrs =
-  sortBy === "type"
-    ? allQrs
-        .sort((a, b) => b.qrType.localeCompare(a.qrType))
-        .slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize)
-    : allQrs;
+    sortBy === "type"
+      ? allQrs
+          .sort((a, b) => b.qrType.localeCompare(a.qrType))
+          .slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize)
+      : allQrs;
 
   const dbEndTime = performance.now();
   const dbExecutionTime = Math.round(dbEndTime - dbStartTime);
-  
+
   console.log(`🗄️  Database Query Performance: ${dbExecutionTime}ms`);
   console.log(`📋 Query details:`, {
     userId,
-    search: search ? `"${search}"` : 'none',
+    search: search ? `"${search}"` : "none",
     sortBy: actualSortBy,
     page,
     pageSize,
-    resultsCount: qrs.length
+    resultsCount: qrs.length,
   });
 
-  return qrs;
-}
+  return qrs as TQrStorageData[];
+};

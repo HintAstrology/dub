@@ -1,12 +1,12 @@
 import { useQRContentEditor } from "@/ui/modals/qr-content-editor";
 import { LINKED_QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { getDisplayContent } from "@/ui/qr-builder-new/helpers/qr-data-handlers";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Tooltip } from "@dub/ui";
 import { cn, getPrettyUrl } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
 import { memo } from "react";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 
 export const QRCardDetails = memo(
   ({

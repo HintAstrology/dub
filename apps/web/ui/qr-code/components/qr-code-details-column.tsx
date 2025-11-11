@@ -1,9 +1,9 @@
 import { Session } from "@/lib/auth/utils";
 import { QRType } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { QrCardType } from "@/ui/qr-code/components/qr-code-card-type";
 import { QrCodeControls } from "@/ui/qr-code/components/qr-code-controls";
 import QRCodeStyling from "qr-code-styling";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeDetailsColumnProps {

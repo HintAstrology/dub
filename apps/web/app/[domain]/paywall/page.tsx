@@ -1,10 +1,10 @@
 import { getQrDataFromRedis } from "@/lib/actions/pre-checkout-flow/get-qr-data-from-redis";
 import { getSession } from "@/lib/auth";
+import { NewQrProps } from "@/lib/types";
 import { DashboardPlug } from "@/ui/paywall/components/dashboard-plug";
 import { SidebarPlug } from "@/ui/paywall/components/sidebar-plug";
 import { TrialOfferModal } from "@/ui/paywall/components/trial-offer-modal";
 import { UserTokenReadingComponent } from "@/ui/paywall/components/user-token-reading";
-import { TQRBuilderDataForStorage } from "@/ui/qr-builder-new/helpers/data-converters";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { getUserCookieService } from "core/services/cookie/user-session.service";
 import { decodeUserMarketingToken } from "core/services/user-marketing-token.service";
@@ -53,7 +53,7 @@ const PaywallPage: NextPage<IPaywallPageProps> = async ({ searchParams }) => {
 
       <TrialOfferModal
         user={user}
-        qrDataToCreate={qrDataToCreate as TQRBuilderDataForStorage}
+        qrDataToCreate={qrDataToCreate as NewQrProps}
         isPaidTraffic={isPaidTraffic}
       />
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { QrBuilderProvider } from "@/ui/qr-builder-new/context";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { Modal } from "@dub/ui";
 import { Theme } from "@radix-ui/themes";
 import {
@@ -10,7 +11,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 import { QrContentEditorInnerModal } from "./components/qr-content-editor-inner.modal";
 
 export type QRContentEditorData = Record<string, string | File[] | undefined>;

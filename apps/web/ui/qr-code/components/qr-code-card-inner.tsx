@@ -1,11 +1,9 @@
 import { Session } from "@/lib/auth";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { FC, useMemo } from "react";
 import { QR_TYPES } from "../../qr-builder-new/constants/get-qr-config";
-import {
-  extractCustomizationData,
-  TQrServerData,
-} from "../../qr-builder-new/helpers/data-converters";
+import { extractCustomizationData } from "../../qr-builder-new/helpers/data-converters";
 import { useQRCodeStyling } from "../../qr-builder-new/hooks/use-qr-code-styling";
 import { QrCodeDetailsColumn } from "./qr-code-details-column";
 import { QrCodeTitleColumn } from "./qr-code-title-column";

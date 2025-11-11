@@ -4,6 +4,7 @@ import { useArchiveQRModal } from "@/ui/modals/archive-qr-modal.tsx";
 import { useDeleteQRModal } from "@/ui/modals/delete-qr-modal.tsx";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal.tsx";
 import { TStepState } from "@/ui/qr-builder-new/types/context";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { QrCodesListContext } from "@/ui/qr-code/qr-codes-container.tsx";
 import { Button, Popover } from "@dub/ui";
 import { Download } from "@dub/ui/icons";
@@ -24,7 +25,6 @@ import QRCodeStyling from "qr-code-styling";
 import { useContext, useState } from "react";
 import { useDuplicateQRModal } from "../../modals/duplicate-qr-modal";
 import { QRBuilderNewModal } from "../../modals/qr-builder-new";
-import { TQrServerData } from "../../qr-builder-new/helpers/data-converters";
 import { ThreeDots } from "../../shared/icons";
 
 interface QrCodeControlsProps {

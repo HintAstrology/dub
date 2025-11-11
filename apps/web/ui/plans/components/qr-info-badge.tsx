@@ -1,7 +1,7 @@
 "use client";
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
-import { TQrServerData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { cn } from "@dub/utils/src";
 import { FC } from "react";
 

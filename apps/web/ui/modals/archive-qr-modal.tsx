@@ -1,3 +1,4 @@
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Flex, Text, Theme } from "@radix-ui/themes";
@@ -10,7 +11,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { TQrServerData } from "../qr-builder-new/helpers/data-converters";
 import { useNewQrOperations } from "../qr-builder-new/hooks/use-qr-operations";
 
 type ArchiveQRModalProps = {
