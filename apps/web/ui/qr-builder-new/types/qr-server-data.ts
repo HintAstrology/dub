@@ -23,7 +23,7 @@ export type TQrServerData = {
     type: "suggested" | "uploaded";
     id?: string;
     fileId?: string;
-  };
+  } | null;
   linkId: string;
   fileId?: string;
   userId?: string;

@@ -71,7 +71,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
     // Show loading state while file data is being loaded
     if (isEdit && isFileBasedQR && isLoadingFileData) {
       return (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex w-full items-center justify-center py-12">
           <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
         </div>
       );

@@ -1,7 +1,6 @@
 import { NewQrProps, UpdateQrProps } from "@/lib/types";
 import { Options } from "qr-code-styling";
 import { FRAMES } from "../constants/customization/frames";
-import { FILE_QR_TYPES } from "../constants/get-qr-config";
 import { TQRFormData } from "../types/context";
 import { IFrameData, IQRCustomizationData } from "../types/customization";
 import { TNewQRBuilderData } from "../types/qr-builder-data";
@@ -108,7 +107,7 @@ const buildLogoOptions = (
   logoData: IQRCustomizationData["logo"],
 ): TQrServerData["logoOptions"] => {
   if (logoData.type === "none") {
-    return undefined;
+    return null;
   }
 
   if (logoData.type === "suggested") {
@@ -125,7 +124,7 @@ const buildLogoOptions = (
     };
   }
 
-  return undefined;
+  return null;
 };
 
 // ============================================================================
@@ -143,7 +142,6 @@ const extractLogoData = (
 } => {
   // Prioritize logoOptions if available (new format)
   if (logoOptions) {
-    console.log("Using logoOptions");
     if (logoOptions.type === "suggested") {
       const iconSrc = logoOptions.id
         ? getSuggestedLogoSrc(logoOptions.id)
@@ -284,6 +282,53 @@ export const extractCustomizationData = (
 };
 
 // ============================================================================
+// HELPER FUNCTIONS - DEEP COMPARISON
+// ============================================================================
+
+/**
+ * Deep comparison of two objects/values
+ * Returns true if objects are equal, false otherwise
+ * Handles nested objects, arrays, and primitive values
+ */
+const deepEqual = (obj1: any, obj2: any): boolean => {
+  // Handle same reference
+  if (obj1 === obj2) return true;
+
+  // Handle null/undefined
+  if (obj1 == null || obj2 == null) return obj1 === obj2;
+
+  // Handle different types
+  if (typeof obj1 !== typeof obj2) return false;
+
+  // Handle primitive types
+  if (typeof obj1 !== "object") return obj1 === obj2;
+
+  // Handle arrays
+  if (Array.isArray(obj1) && Array.isArray(obj2)) {
+    if (obj1.length !== obj2.length) return false;
+    return obj1.every((item, index) => deepEqual(item, obj2[index]));
+  }
+
+  // One is array, other is not
+  if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
+
+  // Handle objects
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  // Different number of keys
+  if (keys1.length !== keys2.length) return false;
+
+  // Check if all keys and values match
+  return keys1.every((key) => {
+    // Check if key exists in both objects
+    if (!Object.prototype.hasOwnProperty.call(obj2, key)) return false;
+    // Recursively compare values
+    return deepEqual(obj1[key], obj2[key]);
+  });
+};
+
+// ============================================================================
 // MAIN CONVERSION FUNCTIONS
 // ============================================================================
 
@@ -292,10 +337,8 @@ export const extractCustomizationData = (
  */
 export const convertNewQRBuilderDataToServer = async (
   builderData: TNewQRBuilderData,
-  options: { domain: string },
 ): Promise<NewQrProps> => {
   const { qrType, formData, customizationData, title, fileId } = builderData;
-  const { domain } = options;
 
   const data = encodeQRData(qrType, formData, fileId);
 
@@ -317,13 +360,10 @@ export const convertNewQRBuilderDataToServer = async (
     title: qrTitle,
     styles,
     frameOptions,
-    logoOptions,
+    logoOptions: logoOptions || undefined,
     fileId: fileId || undefined,
     link: {
       url: linkUrl,
-      domain,
-      tagId: null,
-      webhookIds: [],
     },
   };
 
@@ -368,169 +408,93 @@ export const convertServerQRToNewBuilder = (
  * Compare original QR data with new builder data and generate update payload
  * Used for determining what changed and building the update request
  */
-// TODO: REMOVE THIS FUNCTION
 export const prepareQRUpdates = async (
   originalQR: TQrServerData,
   newBuilderData: TNewQRBuilderData,
-  options: {
-    domain: string;
-  },
 ): Promise<TQRUpdateResult> => {
-  console.log("originalQR", JSON.stringify(originalQR));
-  console.log(
-    "newBuilderDataToUpdate",
-    JSON.stringify(
-      await convertNewQRBuilderDataToServer(newBuilderData, options),
-    ),
-  );
-  const { domain } = options;
-
   // Convert new builder data to server format
-  const newServerData = await convertNewQRBuilderDataToServer(
-    newBuilderData,
-    options,
+  const newServerData = await convertNewQRBuilderDataToServer(newBuilderData);
+
+  console.log(
+    "prepareQRUpdates original data/new data",
+    originalQR,
+    newServerData,
   );
 
   // Check what changed
-  const titleChanged = newBuilderData.title !== originalQR.title;
-  const qrTypeChanged = newBuilderData.qrType !== originalQR.qrType;
+  const titleChanged = newServerData.title !== originalQR.title;
+  const qrTypeChanged = newServerData.qrType !== originalQR.qrType;
 
-  // Check if QR types are file-based
-  const originalQrHasFileQrType = FILE_QR_TYPES.includes(
-    originalQR.qrType as EQRType,
-  );
-  const newQrDataHasFileQrType = FILE_QR_TYPES.includes(
-    newBuilderData.qrType as EQRType,
+  // Check frame options changes using deep comparison
+  const frameOptionsChanged = !deepEqual(
+    originalQR?.frameOptions,
+    newServerData.frameOptions,
   );
 
-  // Check frame options changes
-  const frameOptionsChanged = (() => {
-    const originalFrame = originalQR.frameOptions as any;
-    const newFrame = newServerData.frameOptions;
+  // Check logo options changes using deep comparison
+  const logoOptionsChanged = !deepEqual(
+    originalQR?.logoOptions,
+    newServerData.logoOptions,
+  );
 
-    const fieldsToCheck = ["id", "color", "text", "textColor"] as const;
+  const destinationChanged = originalQR.link.url !== newServerData.link.url;
+  const isWifiQrType = newServerData.qrType === EQRType.WIFI;
 
-    return fieldsToCheck.some(
-      (field) => newFrame?.[field] !== originalFrame?.[field],
-    );
-  })();
+  // Check styles changes using deep comparison
+  const stylesChanged = !deepEqual(originalQR.styles, newServerData.styles);
 
-  // Check logo options changes - need special handling for uploaded -> suggested transition
-  const originalLogoWasUploaded = originalQR.logoOptions?.type === "uploaded";
-  const newLogoIsSuggested = newServerData.logoOptions?.type === "suggested";
-  const logoTypeChanged = originalLogoWasUploaded && newLogoIsSuggested;
-
-  // Build logo options without fileId when transitioning from uploaded to suggested
-  // When serialized to JSON, undefined fields are omitted, which signals removal to the API
-  let finalLogoOptions = newServerData.logoOptions;
-  if (logoTypeChanged && finalLogoOptions) {
-    const { fileId, ...rest } = finalLogoOptions as any;
-    finalLogoOptions = rest;
-  }
-
-  // Normalize null/undefined for comparison
-  const normalizedOriginalLogo = originalQR.logoOptions ?? undefined;
-  const normalizedFinalLogo = finalLogoOptions ?? undefined;
-
-  const logoOptionsChanged =
-    JSON.stringify(normalizedOriginalLogo) !==
-    JSON.stringify(normalizedFinalLogo);
-
-  // Check data changes
-  const originalData = originalQR?.link?.url || originalQR.data || "";
-  const newData = newServerData.data || "";
-  const dataChanged = newData !== originalData;
-
-  // Check styles changes (excluding data field)
-  const originalStyles = { ...(originalQR.styles as Options) };
-  const newStyles = { ...newServerData.styles };
-
-  delete originalStyles.data;
-  delete newStyles.data;
-
-  // Deep comparison helper for objects (handles different key orders and nested objects)
-  const deepEqual = (obj1: any, obj2: any): boolean => {
-    // Sort keys recursively for nested objects
-    const sortKeys = (obj: any): any => {
-      if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
-        return obj;
-      }
-      return Object.keys(obj)
-        .sort()
-        .reduce((result: any, key: string) => {
-          result[key] = sortKeys(obj[key]);
-          return result;
-        }, {});
-    };
-
-    return JSON.stringify(sortKeys(obj1)) === JSON.stringify(sortKeys(obj2));
-  };
-
-  const stylesChanged = !deepEqual(originalStyles, newStyles);
-
-  // Check files changes - detect both adding and removing files
-  // Normalize null/undefined for comparison
-  const normalizedOriginalFileId = originalQR.fileId ?? undefined;
-  const normalizedNewFileId = newBuilderData.fileId ?? undefined;
-  const filesChanged = normalizedNewFileId !== normalizedOriginalFileId;
-
-  // Determine fileId value:
-  // - If new QR type is not file-based, don't include fileId (undefined)
-  // - If new QR type is file-based, use the provided fileId
-  // When fileId is undefined, it will be omitted from JSON serialization
-  const finalFileId = newQrDataHasFileQrType
-    ? newBuilderData.fileId
-    : undefined;
+  const hasNewFiles =
+    originalQR?.fileId !== newServerData?.fileId && !!newServerData?.fileId;
 
   const hasChanges =
-    titleChanged ||
-    dataChanged ||
-    qrTypeChanged ||
-    frameOptionsChanged ||
-    logoOptionsChanged ||
-    stylesChanged ||
-    filesChanged;
-
-  // // For file-based QRs, link.url should be empty; otherwise use the new destination
-  // const linkUrl = newQrDataHasFileQrType ? "" : newData;
+    titleChanged || //
+    destinationChanged || //
+    qrTypeChanged || //
+    frameOptionsChanged || //
+    logoOptionsChanged || //
+    stylesChanged || //
+    hasNewFiles; //
 
   const updateData: UpdateQrProps = {
-    data: newData,
+    data: isWifiQrType ? newServerData.link.url : newServerData.data,
+    link: { url: newServerData.link.url },
     qrType: newBuilderData.qrType,
-    title: newBuilderData.title,
-    styles: newServerData.styles,
-    frameOptions: newServerData.frameOptions,
-    logoOptions: finalLogoOptions,
-    fileId: finalFileId,
-    link: {
-      url: newData,
-      domain,
-      tagId: null,
-      webhookIds: [],
-    },
+    ...(titleChanged && { title: newServerData.title }),
+    ...(frameOptionsChanged && { frameOptions: newServerData.frameOptions }),
+    ...(logoOptionsChanged && { logoOptions: newServerData.logoOptions }),
+    ...(stylesChanged && { styles: newServerData.styles }),
+    ...(hasNewFiles && { fileId: newServerData.fileId }),
   };
 
-  console.log("changes", {
+  const changes = {
     title: titleChanged,
-    data: dataChanged,
+    data: destinationChanged,
     qrType: qrTypeChanged,
     frameOptions: frameOptionsChanged,
-    styles: stylesChanged,
     logoOptions: logoOptionsChanged,
-    files: filesChanged,
+    styles: stylesChanged,
+    files: hasNewFiles,
+  };
+
+  // console.log("changes", {
+  //   title: titleChanged,
+  //   data: dataChanged,
+  //   qrType: qrTypeChanged,
+  //   frameOptions: frameOptionsChanged,
+  //   styles: stylesChanged,
+  //   logoOptions: logoOptionsChanged,
+  //   files: hasNewFiles,
+  // });
+
+  console.log("{ updateData, hasChanges, changes }", {
+    updateData,
+    hasChanges,
+    changes,
   });
 
   return {
     hasChanges,
-    changes: {
-      title: titleChanged,
-      data: dataChanged,
-      qrType: qrTypeChanged,
-      frameOptions: frameOptionsChanged,
-      styles: stylesChanged,
-      logoOptions: logoOptionsChanged,
-      files: filesChanged,
-    },
+    changes,
     updateData,
   };
 };

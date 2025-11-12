@@ -98,6 +98,7 @@ export function QrBuilderProvider({
   const [formData, setFormData] = useState<TQRFormData | null>(
     initialState.formData,
   );
+
   const [currentFormValues, setCurrentFormValues] = useState<
     Record<string, any>
   >(() => {
@@ -134,6 +135,7 @@ export function QrBuilderProvider({
   const contentStepRef = useRef<QRContentStepRef>(null);
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
+  const previousQrTypeRef = useRef<TQrType>(selectedQrType);
 
   const isTypeStep = builderStep === 1;
   const isContentStep = builderStep === 2;
@@ -274,6 +276,7 @@ export function QrBuilderProvider({
 
   const handleFormSubmit = useCallback(
     (data: TQRFormData) => {
+      console.log("handleFormSubmit data", data);
       setFormData(data);
       console.log("Form submitted:", data);
       handleNextStep();
@@ -444,6 +447,26 @@ export function QrBuilderProvider({
       setIsDialogOpen(true);
     }
   }, [isMobile, homepageDemo, isTypeStep]);
+
+  // Reset form data when QR type changes (but not on initial load)
+  useEffect(() => {
+    const previousType = previousQrTypeRef.current;
+
+    // If type actually changed (and it's not null to null)
+    if (
+      previousType !== selectedQrType &&
+      previousType !== null &&
+      selectedQrType !== null
+    ) {
+      // Clear form data when switching between different QR types
+      setFormData(null);
+      setCurrentFormValues({});
+      setIsFormValid(false);
+    }
+
+    // Update ref for next comparison
+    previousQrTypeRef.current = selectedQrType;
+  }, [selectedQrType]);
 
   const contextValue: IQrBuilderContextType = {
     // States

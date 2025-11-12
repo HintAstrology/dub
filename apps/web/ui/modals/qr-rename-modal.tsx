@@ -37,11 +37,6 @@ function QRRenameModal({
       return;
     }
 
-    if (name === qrCode.title) {
-      setShowQRRenameModal(false);
-      return;
-    }
-
     setIsProcessing(true);
 
     try {

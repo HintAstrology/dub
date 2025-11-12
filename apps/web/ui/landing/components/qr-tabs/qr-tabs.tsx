@@ -10,7 +10,6 @@ import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
 import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { useMediaQuery } from "@dub/ui";
-import { SHORT_DOMAIN } from "@dub/utils";
 import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -80,9 +79,7 @@ export const QRTabs: FC<
       }
 
       try {
-        const serverData = await convertNewQRBuilderDataToServer(data, {
-          domain: SHORT_DOMAIN!,
-        });
+        const serverData = await convertNewQRBuilderDataToServer(data);
 
         await saveQrDataToRedis({
           sessionId,

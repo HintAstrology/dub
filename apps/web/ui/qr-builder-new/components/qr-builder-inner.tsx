@@ -323,7 +323,7 @@ export const QRBuilderInner = () => {
                   </Flex>
                 </div>
 
-                {/* Fixed footer with buttons */}
+                {/* Fixed footer with buttons for mobile mode on landing page */}
                 <div className="absolute bottom-0 left-0 right-0 z-50 border-t bg-white p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
                   <QrBuilderButtons
                     step={builderStep || 1}

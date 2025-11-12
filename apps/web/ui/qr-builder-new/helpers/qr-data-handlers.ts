@@ -1,4 +1,3 @@
-import { APP_DOMAIN } from "@dub/utils";
 import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 
@@ -74,21 +73,21 @@ export const qrTypeDataEncoders = {
   [EQRType.PDF]: (_values: Record<string, any>, fileId?: string) => {
     if (fileId) {
       // Construct a valid URL for QR rendering
-      return `${APP_DOMAIN}/qrs-content/${fileId}`;
+      return `${process.env.NEXT_PUBLIC_STORAGE_BASE_URL}/qrs-content/${fileId}`;
     }
     return "";
   },
 
   [EQRType.IMAGE]: (_values: Record<string, any>, fileId?: string) => {
     if (fileId) {
-      return `${APP_DOMAIN}/qrs-content/${fileId}`;
+      return `${process.env.NEXT_PUBLIC_STORAGE_BASE_URL}/qrs-content/${fileId}`;
     }
     return "";
   },
 
   [EQRType.VIDEO]: (_values: Record<string, any>, fileId?: string) => {
     if (fileId) {
-      return `${APP_DOMAIN}/qrs-content/${fileId}`;
+      return `${process.env.NEXT_PUBLIC_STORAGE_BASE_URL}/qrs-content/${fileId}`;
     }
     return "";
   },

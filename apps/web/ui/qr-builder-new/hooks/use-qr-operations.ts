@@ -1,7 +1,6 @@
 import { mutatePrefix } from "@/lib/swr/mutate.ts";
 import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useToastWithUndo } from "@dub/ui";
-import { SHORT_DOMAIN } from "@dub/utils";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -38,9 +37,7 @@ export const useNewQrOperations = ({
         }
 
         // Convert new builder data to server format
-        const serverData = await convertNewQRBuilderDataToServer(builderData, {
-          domain: SHORT_DOMAIN!,
-        });
+        const serverData = await convertNewQRBuilderDataToServer(builderData);
 
         const res = await fetch(
           `/api/qrs?workspaceId=${projectSlug ? projectSlug : workspaceId}`,
@@ -91,9 +88,6 @@ export const useNewQrOperations = ({
         const { updateData, hasChanges, changes } = await prepareQRUpdates(
           initialQrData!,
           builderData,
-          {
-            domain: SHORT_DOMAIN!,
-          },
         );
 
         if (!hasChanges) {
@@ -113,8 +107,10 @@ export const useNewQrOperations = ({
         );
 
         if (res.status === 200) {
-          await mutatePrefix(["/api/qrs", "/api/links"]);
+          await mutatePrefix(["/api/qrs"]);
+
           const responseData = await res.json();
+
           toast.success("Successfully updated QR!");
           return responseData;
         } else {
@@ -142,21 +138,11 @@ export const useNewQrOperations = ({
         return true;
       }
 
-      const isFileQrType = FILE_QR_TYPES.includes(initialQrData!.qrType);
-
-      const originalQRCopy = structuredClone(initialQrData);
-
-      originalQRCopy!.title = newTitle;
-
-      delete originalQRCopy!.createdAt;
-      delete originalQRCopy!.updatedAt;
-      delete originalQRCopy!.description;
-      delete originalQRCopy!.file;
-      delete originalQRCopy!.logoOptions;
-
-      if (!isFileQrType) {
-        delete originalQRCopy!.fileId;
-      }
+      const body = {
+        data: initialQrData!.data,
+        title: newTitle,
+        link: { url: initialQrData!.link?.url },
+      };
 
       try {
         const res = await fetch(
@@ -166,7 +152,7 @@ export const useNewQrOperations = ({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(originalQRCopy),
+            body: JSON.stringify(body),
           },
         );
 
@@ -201,15 +187,15 @@ export const useNewQrOperations = ({
     ) => {
       const { encodedData, fileId } = formData;
 
-      const originalDestination = initialQrData!.link?.url;
+      const originalDestinationLink = initialQrData!.link?.url;
 
       const isWifiQrType = selectedQrType === EQRType.WIFI;
       const isFileQrType = FILE_QR_TYPES.includes(initialQrData!.qrType);
 
       const isDestinationChanged =
-        !isFileQrType && encodedData !== originalDestination;
+        !isFileQrType && encodedData !== originalDestinationLink;
       const isWifiDestinationChanged =
-        isWifiQrType && encodedData !== originalDestination;
+        isWifiQrType && encodedData !== originalDestinationLink;
       const isFileChanged = isFileQrType && fileId !== initialQrData!.fileId;
 
       const hasChanges =
@@ -221,27 +207,12 @@ export const useNewQrOperations = ({
         return true;
       }
 
-      const originalQRCopy = structuredClone(initialQrData);
-
-      originalQRCopy!.link.url = encodedData;
-
-      if (isWifiDestinationChanged) {
-        originalQRCopy!.data = encodedData;
-      }
-
-      if (isFileChanged) {
-        originalQRCopy!.fileId = fileId;
-      }
-
-      delete originalQRCopy!.createdAt;
-      delete originalQRCopy!.updatedAt;
-      delete originalQRCopy!.description;
-      delete originalQRCopy!.file;
-      delete originalQRCopy!.logoOptions;
-
-      if (!isFileQrType) {
-        delete originalQRCopy!.fileId;
-      }
+      const body = {
+        data: isWifiDestinationChanged ? encodedData : initialQrData!.data,
+        link: { url: encodedData },
+        fileId,
+        qrType: initialQrData!.qrType,
+      };
 
       try {
         const res = await fetch(
@@ -251,7 +222,7 @@ export const useNewQrOperations = ({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(originalQRCopy),
+            body: JSON.stringify(body),
           },
         );
 
