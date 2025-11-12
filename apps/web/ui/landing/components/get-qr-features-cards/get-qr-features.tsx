@@ -122,8 +122,8 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
                       className="border-border/50 !bg-white relative h-full overflow-hidden rounded-3xl border p-8 shadow"
                     >
                       {/* Decorative corner accents */}
-                      <div className="from-primary/15 absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl to-transparent" />
-                      <div className="from-secondary/15 absolute bottom-0 left-0 h-28 w-28 bg-gradient-to-tr to-transparent" />
+                      {/* <div className="from-primary/15 absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl to-transparent" /> */}
+                      {/* <div className="from-secondary/15 absolute bottom-0 left-0 h-28 w-28 bg-gradient-to-tr to-transparent" /> */}
 
                       <div className="relative flex flex-col gap-6">
                         <div className="flex items-start gap-6">
