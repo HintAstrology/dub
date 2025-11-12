@@ -135,6 +135,7 @@ export function QrBuilderProvider({
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef<number | null>(null);
+  const [isGoingBack, setIsGoingBack] = useState<boolean>(false);
 
   const isTypeStep = builderStep === 1;
   const isContentStep = builderStep === 2;
@@ -179,6 +180,9 @@ export function QrBuilderProvider({
   }, [initialQrData]);
 
   const handleNextStep = useCallback(() => {
+    // Mark that we're going forward (enable animation)
+    setIsGoingBack(false);
+
     // Store scroll position before step change
     scrollPositionRef.current = window.scrollY;
 
@@ -203,6 +207,13 @@ export function QrBuilderProvider({
           toast.error("Please fix the errors in step 2 before continuing");
           return;
         }
+      }
+
+      // Mark direction based on step comparison
+      if (newStep < (builderStep || 1)) {
+        setIsGoingBack(true);
+      } else {
+        setIsGoingBack(false);
       }
 
       // Store scroll position before step change
@@ -274,6 +285,9 @@ export function QrBuilderProvider({
 
   const handleBack = useCallback(() => {
     const newStep = Math.max((builderStep || 1) - 1, 1);
+
+    // Mark that we're going back to disable animation
+    setIsGoingBack(true);
 
     // Track back button click
     trackClientEvents({
@@ -462,7 +476,15 @@ export function QrBuilderProvider({
         });
       });
     }
-  }, [builderStep]);
+
+    // Reset isGoingBack flag after step change completes
+    if (isGoingBack) {
+      const timeoutId = setTimeout(() => {
+        setIsGoingBack(false);
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [builderStep, isGoingBack]);
 
   const contextValue: IQrBuilderContextType = {
     // States
@@ -529,6 +551,9 @@ export function QrBuilderProvider({
     contentStepRef,
     qrBuilderButtonsWrapperRef,
     qrBuilderContentWrapperRef,
+    
+    // Navigation state
+    isGoingBack,
   };
 
   return (

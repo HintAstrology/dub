@@ -23,6 +23,7 @@ export const QRBuilderWrapper = () => {
     currentFormValues,
     customizationData,
     isFormValid,
+    isGoingBack,
   } = useQrBuilderContext();
 
   const { isMobile } = useMediaQuery();
@@ -40,12 +41,16 @@ export const QRBuilderWrapper = () => {
     <motion.div
       ref={qrBuilderContentWrapperRef}
       key={`builder-step-${builderStep}`}
-      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+      initial={isGoingBack ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: 0.4,
-        ease: [0.4, 0, 0.2, 1],
-      }}
+      transition={
+        isGoingBack
+          ? { duration: 0 }
+          : {
+              duration: 0.4,
+              ease: [0.4, 0, 0.2, 1],
+            }
+      }
       className={cn(
         "mx-auto flex h-full w-full flex-col justify-between",
         !isTypeStep &&

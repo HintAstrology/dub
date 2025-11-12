@@ -100,4 +100,7 @@ export interface IQrBuilderContextType {
   contentStepRef: RefObject<QRContentStepRef>;
   qrBuilderButtonsWrapperRef: RefObject<HTMLDivElement>;
   qrBuilderContentWrapperRef: RefObject<HTMLDivElement>;
+  
+  // Navigation state
+  isGoingBack: boolean;
 }

@@ -86,7 +86,7 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
                   <Button
                     variant="outline"
                     onClick={handleOpenLogin}
-                    className="border-primary text-primary hover:bg-primary hover:text-white text-base font-medium transition-all duration-200"
+                    className="border-secondary text-secondary hover:bg-secondary hover:text-white text-base font-medium transition-all duration-200"
                     size="lg"
                   >
                     Log In
