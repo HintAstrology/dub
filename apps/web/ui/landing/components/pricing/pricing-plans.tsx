@@ -34,7 +34,7 @@ export const PricingSection: FC<IPricingSectionProps> = ({
         </p>
       </div>
 
-      <div className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:items-end lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:items-end lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
         {PRICING_PLANS.map((plan, index) => (
           <div key={index} className="h-full min-w-[85vw] flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-2 lg:min-w-0">
             <Card
