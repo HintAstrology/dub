@@ -14,6 +14,20 @@ import {
 } from "@/lib/zod/schemas/analytics";
 import { Link } from "@dub/prisma/client";
 import { NextResponse } from "next/server";
+import { utils, write } from 'xlsx';
+
+function convertToCSV(data: any[]) {
+  const headers = Object.keys(data[0] || {}).join(',');
+  const rows = data.map((row) => Object.values(row).join(',')).join('\n');
+  return `${headers}\n${rows}`;
+}
+
+async function convertToXLSX(data: any[]) {
+  const wb = utils.book_new();
+  const ws = utils.json_to_sheet(data);
+  utils.book_append_sheet(wb, ws, 'Analytics');
+  return write(wb, { type: 'buffer', bookType: 'xlsx' });
+}
 
 type Endpoint =
   | "count"
@@ -31,7 +45,6 @@ type Endpoint =
   | "referer_urls"
   | "top_links"
   | "top_urls"
-  | "top_types"
   | "utm_sources"
   | "utm_mediums"
   | "utm_campaigns"
@@ -39,7 +52,7 @@ type Endpoint =
   | "utm_contents";
 
 // GET /api/analytics – get analytics
-export const GET = withWorkspace(
+export const GET = withWorkspace( // @ts-ignore
   async ({ params, searchParams, workspace, session }) => {
     throwIfClicksUsageExceeded(workspace);
 
@@ -60,7 +73,7 @@ export const GET = withWorkspace(
 
     let {
       event,
-      groupBy,
+      format,
       interval,
       start,
       end,
@@ -69,13 +82,11 @@ export const GET = withWorkspace(
       domain,
       key,
       folderId,
-      qrType,
     } = parsedParams;
 
     let link: Link | null = null;
 
     event = (oldEvent || event) as EventType;
-    groupBy = (oldType || groupBy) as EventType;
 
     if (domain) {
       await getDomainOrThrow({ workspace, domain: domain as string });
@@ -129,15 +140,45 @@ export const GET = withWorkspace(
     const response = await getAnalytics({
       ...parsedParams,
       event,
-      groupBy,
+      groupBy: 'download',
       ...(link && { linkId: link.id }),
       workspaceId: workspace.id,
       isDeprecatedClicksEndpoint,
       dataAvailableFrom: workspace.createdAt,
       folderIds,
     });
+    
+    // map response to desired columns`
+    const mappedData = response.map((row) => ({
+      'QR name': row.qr_name || '',
+      'QR type': row.qr_type || '',
+      'Date of QR scanning': row.timestamp,
+      'Scans by country': row.country,
+      'Scans by city': row.city,
+      'Scans by region': row.region,
+      'Scans by continent': row.continent,
+      'Scans by device': row.device,
+      'Scans by OS': row.os,
+      'Scans by browser': row.browser,
+      'Scans by destination url': row.url,
+    }));
 
-    return NextResponse.json(response);
+    if (format === 'csv' || format === 'xlsx') {
+      const headers = new Headers({
+        'Content-Disposition': `attachment; filename="analytics.${format}"`,
+        'Content-Type':
+          format === 'csv'
+            ? 'text/csv; charset=utf-8'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+    
+      const content =
+        format === 'csv'
+          ? convertToCSV(mappedData)
+          : await convertToXLSX(mappedData);
+    
+      return new NextResponse(content, { headers });
+    }
   },
   {
     requiredPermissions: ["analytics.read"],

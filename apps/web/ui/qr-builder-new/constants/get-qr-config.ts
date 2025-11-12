@@ -27,6 +27,18 @@ export type QRType = {
   scrollTo?: EQRType;
 };
 
+export const QR_Icons = {
+  [EQRType.WEBSITE]: "streamline:web",
+  [EQRType.PDF]: "hugeicons:pdf-02",
+  [EQRType.WHATSAPP]: "basil:whatsapp-outline",
+  [EQRType.WIFI]: "streamline:wifi",
+  [EQRType.IMAGE]: "hugeicons:ai-image",
+  [EQRType.VIDEO]: "hugeicons:ai-video",
+  [EQRType.SOCIAL]: "solar:add-circle-broken",
+  [EQRType.APP_LINK]: "meteor-icons:link",
+  [EQRType.FEEDBACK]: "hugeicons:bubble-chat-favourite",
+};
+
 export const QR_TYPES: QRType[] = [
   {
     id: EQRType.WEBSITE,

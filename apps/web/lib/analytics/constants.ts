@@ -133,12 +133,14 @@ export const VALID_ANALYTICS_ENDPOINTS = [
   "devices",
   "browsers",
   "os",
+  "download",
   "trigger", // deprecated, but keeping for now for backwards compatibility
   "triggers",
   "referers",
   "referer_urls",
   "top_links",
   "top_urls",
+  "top_types",
   "utm_sources",
   "utm_mediums",
   "utm_campaigns",
@@ -201,7 +203,7 @@ export const TRIGGER_DISPLAY = {
 };
 export const TRIGGER_TYPES = ["qr", "link"] as const;
 
-export const EVENT_TYPES = ["clicks", "leads", "sales"] as const;
+export const EVENT_TYPES = ["clicks", "leads", "sales", "types"] as const;
 
 export const ANALYTICS_VIEWS = ["timeseries", "funnel"] as const;
 export const ANALYTICS_SALE_UNIT = ["sales", "saleAmount"] as const;
@@ -225,6 +227,7 @@ export const OLD_ANALYTICS_ENDPOINTS = [
   "referer",
   "top_links",
   "top_urls",
+  "top_types"
 ] as const;
 
 export const OLD_TO_NEW_ANALYTICS_ENDPOINTS = {
@@ -239,4 +242,5 @@ export const OLD_TO_NEW_ANALYTICS_ENDPOINTS = {
   referer: "referers",
   top_links: "top_links",
   top_urls: "top_urls",
+  top_types: "top_types"
 } as const;
