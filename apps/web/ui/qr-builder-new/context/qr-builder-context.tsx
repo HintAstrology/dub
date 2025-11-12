@@ -134,6 +134,7 @@ export function QrBuilderProvider({
   const contentStepRef = useRef<QRContentStepRef>(null);
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef<number | null>(null);
 
   const isTypeStep = builderStep === 1;
   const isContentStep = builderStep === 2;
@@ -178,16 +179,11 @@ export function QrBuilderProvider({
   }, [initialQrData]);
 
   const handleNextStep = useCallback(() => {
-    // Prevent scroll on step change
-    const scrollPosition = window.scrollY;
+    // Store scroll position before step change
+    scrollPositionRef.current = window.scrollY;
 
     // @ts-ignore
     setBuilderStep((prev) => Math.min(prev + 1, 3));
-
-    // Restore scroll position after state update
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
-    });
   }, []);
 
   const handleChangeStep = useCallback(
@@ -209,16 +205,11 @@ export function QrBuilderProvider({
         }
       }
 
-      // Prevent scroll on step change
-      const scrollPosition = window.scrollY;
+      // Store scroll position before step change
+      scrollPositionRef.current = window.scrollY;
 
       setTypeSelectionError("");
       setBuilderStep(newStep as TStepState);
-
-      // Restore scroll position after state update
-      requestAnimationFrame(() => {
-        window.scrollTo(0, scrollPosition);
-      });
 
       // Reset form validity appropriately
       if (newStep !== 2) {
@@ -444,6 +435,34 @@ export function QrBuilderProvider({
       setIsDialogOpen(true);
     }
   }, [isMobile, homepageDemo, isTypeStep]);
+
+  // Preserve scroll position when step changes
+  useEffect(() => {
+    if (scrollPositionRef.current !== null) {
+      const savedPosition = scrollPositionRef.current;
+      
+      // Restore scroll position after DOM updates
+      const restoreScroll = () => {
+        if (Math.abs(window.scrollY - savedPosition) > 1) {
+          window.scrollTo({
+            top: savedPosition,
+            left: 0,
+            behavior: 'instant' as ScrollBehavior,
+          });
+        }
+      };
+      
+      // Try multiple times to ensure it sticks
+      requestAnimationFrame(() => {
+        restoreScroll();
+        requestAnimationFrame(() => {
+          restoreScroll();
+          // Clear the ref after restoring
+          scrollPositionRef.current = null;
+        });
+      });
+    }
+  }, [builderStep]);
 
   const contextValue: IQrBuilderContextType = {
     // States

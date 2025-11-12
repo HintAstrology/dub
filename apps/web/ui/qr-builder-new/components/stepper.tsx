@@ -58,12 +58,14 @@ export default function Stepper({
                   <Avatar className="size-10">
                     <AvatarFallback
                       className={cn("transition-colors", {
+                        "bg-white border border-primary/10 text-primary":
+                          (isActive && step.number === 3) || (!isActive && step.number === 3 && isClickable),
                         "!bg-primary !text-primary-foreground shadow-sm":
-                          isActive,
+                          isActive && step.number !== 3,
                         "bg-muted text-muted-foreground opacity-50":
                           !isActive && step.number === 1,
                         "bg-white border border-secondary/20 text-muted-foreground opacity-50":
-                          !isActive && (step.number === 2 || step.number === 3),
+                          !isActive && (step.number === 2 || (step.number === 3 && !isClickable)),
                       })}
                     >
                       {isCompleted ? (
@@ -89,8 +91,8 @@ export default function Stepper({
                     <div className="hidden flex-col items-start md:flex">
                       <span
                         className={cn("text-sm font-medium", {
-                          "text-foreground": isActive,
-                          "text-muted-foreground opacity-50": !isActive,
+                          "text-foreground": isActive || step.number === 3,
+                          "text-muted-foreground opacity-50": !isActive && step.number !== 3,
                         })}
                       >
                         Step {step.number}

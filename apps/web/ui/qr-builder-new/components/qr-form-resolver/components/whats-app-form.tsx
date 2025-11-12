@@ -101,7 +101,7 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
               {openAccordion === "details" && !contentOnly && (
                 <Separator className="mb-3" />
               )}
-              <AccordionContent className="pt-2">
+              <AccordionContent className="space-y-4 pt-2">
                 <BaseFormField
                   name="number"
                   label="WhatsApp Number"

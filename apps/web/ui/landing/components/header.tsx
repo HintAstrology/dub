@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Session } from "@/lib/auth";
 import { useAuthModal } from "@/ui/modals/auth-modal";
 import { Logo } from "@/ui/shared/logo.tsx";
@@ -85,26 +84,14 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
               <>
                 {!isFromPaywall && (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={handleOpenLogin}
-                    className="hover:text-secondary p-0 text-base font-medium text-neutral-200 transition-colors duration-300 hover:bg-transparent"
+                    className="border-primary text-primary hover:bg-primary hover:text-white text-base font-medium transition-all duration-200"
                     size="lg"
                   >
                     Log In
                   </Button>
                 )}
-                <Separator
-                  orientation="vertical"
-                  className="!h-6 max-md:hidden"
-                />
-
-                <Button
-                  onClick={handleScrollToQRGenerationBlock}
-                  className="bg-secondary hover:bg-secondary/90 hidden sm:inline-flex text-white"
-                  size="lg"
-                >
-                  Create QR code
-                </Button>
               </>
             ) : (
               <Button

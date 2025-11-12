@@ -162,7 +162,7 @@ export const FileUploadField = ({
             >
               <FileUploadDropzone
                 className={cn(
-                  "border-border hover:border-secondary hover:bg-muted/30 min-h-[240px] w-full cursor-pointer px-6 py-12 transition-all duration-200",
+                  "border-border hover:border-secondary hover:bg-muted/30 min-h-[130px] w-full cursor-pointer px-6 py-8 transition-all duration-200",
                   {
                     "border-red-500 hover:border-red-500":
                       fieldState.error || uploadError,

@@ -9,7 +9,7 @@ export const QrTabsTitle: FC = () => {
         // highlightedTitlePart="QR Code"
       />
       <p className="text-muted-foreground hidden max-w-4xl text-center text-base sm:block md:text-lg">
-        Create your QR and unlock scan analytics with one platform.
+        Unlock scan analytics with one platform.
       </p>
     </div>
   );

@@ -227,7 +227,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
         </div>
       </div>
 
-      <Separator />
+      {/* <Separator /> */}
 
       {/* Bottom section with copyright and payments */}
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-2 pb-0 sm:px-6">

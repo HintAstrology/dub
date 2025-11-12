@@ -122,8 +122,8 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
                       className="border-border/50 from-background via-background to-muted/20 relative h-full overflow-hidden rounded-3xl border bg-gradient-to-br p-8 shadow backdrop-blur-sm transition-all duration-500"
                     >
                       {/* Decorative corner accents */}
-                      <div className="from-primary/10 absolute right-0 top-0 h-32 w-32 bg-gradient-to-bl to-transparent" />
-                      <div className="from-secondary/10 absolute bottom-0 left-0 h-32 w-32 bg-gradient-to-tr to-transparent" />
+                      <div className="from-primary/15 absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl to-transparent" />
+                      <div className="from-secondary/15 absolute bottom-0 left-0 h-28 w-28 bg-gradient-to-tr to-transparent" />
 
                       <div className="relative flex flex-col gap-6">
                         <div className="flex items-start gap-6">
@@ -189,9 +189,9 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
                     className="mt-0"
                   >
                     <div className="border-border/50 from-background via-background to-muted/20 relative h-full overflow-hidden rounded-3xl border bg-gradient-to-br p-8 shadow backdrop-blur-sm sm:p-10 lg:p-12">
-                      {/* Decorative corner accents */}
-                      <div className="from-primary/10 absolute right-0 top-0 h-32 w-32 bg-gradient-to-bl to-transparent" />
-                      <div className="from-secondary/10 absolute bottom-0 left-0 h-32 w-32 bg-gradient-to-tr to-transparent" />
+                      {/* Decorative corner accents
+                      <div className="from-primary/15 absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl to-transparent" />
+                      <div className="from-secondary/15 absolute bottom-0 left-0 h-28 w-28 bg-gradient-to-tr to-transparent" /> */}
 
                       <div className="relative flex flex-col gap-6 sm:gap-8">
                         <div className="flex items-start gap-6">

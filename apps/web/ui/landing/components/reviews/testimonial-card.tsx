@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Testimonial } from "@/hooks/use-reviews";
 
@@ -20,7 +19,9 @@ export const TestimonialCard = ({
           {/* Quote section with styled background */}
           <div className="relative">
             <div className="bg-primary/10 absolute -left-2 -top-2 h-10 w-10 rounded-full blur-xl" />
-            <p className="text-primary relative text-3xl font-serif leading-none">&ldquo;</p>
+            <p className="text-primary relative font-serif text-3xl leading-none">
+              &ldquo;
+            </p>
             <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-gray-700">
               {testimonial.content}
             </p>
@@ -32,17 +33,22 @@ export const TestimonialCard = ({
 
         {/* Author section */}
         <div className="flex items-center gap-2">
-          <Avatar className="ring-primary/20 size-9 ring-2 ring-offset-1">
+          <div className="ring-primary/20 size-9 bg-gray-100 ring-2 ring-offset-1 rounded-full flex items-center justify-center text-xs font-semibold">
+            {testimonial.name
+              .split(" ", 2)
+              .map((n) => n[0])
+              .join("")}
+          </div>
+          {/* <Avatar className="ring-primary/20 size-9 bg-gray-100 ring-2 ring-offset-1">
             <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-            <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-              {testimonial.name
-                .split(" ", 2)
-                .map((n) => n[0])
-                .join("")}
+            <AvatarFallback className="bg-gray-100 text-gray-600 text-xs font-semibold">
+             
             </AvatarFallback>
-          </Avatar>
+          </Avatar> */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900">{testimonial.name}</h4>
+            <h4 className="text-sm font-semibold text-gray-900">
+              {testimonial.name}
+            </h4>
             <p className="text-xs text-gray-500">{testimonial.role}</p>
           </div>
         </div>
