@@ -62,10 +62,7 @@ const buildQRStylingOptions = (
   if (logo.type === "uploaded") {
     if (logo.fileId) {
       // Use full URL for uploaded file (same pattern as QR content files)
-      const storageBaseUrl =
-        process.env.NEXT_PUBLIC_STORAGE_BASE_URL ||
-        "https://dev-assets.getqr.com";
-      options.image = `${storageBaseUrl}/qrs-content/${logo.fileId}`;
+      options.image = `${process.env.NEXT_PUBLIC_STORAGE_BASE_URL}/qrs-content/${logo.fileId}`;
     }
   } else if (logo.type === "suggested" && logo.id && logo.id !== "logo-none") {
     // For suggested logos, always use iconSrc if available
