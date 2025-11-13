@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { fetchExistingLogoFileData } from "@/ui/qr-builder-new/helpers/prepare-file-data";
 import { cn } from "@dub/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Upload, X } from "lucide-react";
+import { LoaderCircle, Upload, X } from "lucide-react";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -61,6 +62,36 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
   const uploadedLogoFiles = useWatch({ control, name: FILE_UPLOAD_FIELD_NAME });
   const previousFilesRef = useRef<File[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isLoadingExistingFile, setIsLoadingExistingFile] = useState(false);
+  const hasLoadedInitialFile = useRef(false);
+
+  // Load existing file when component mounts if fileId exists
+  useEffect(() => {
+    if (hasLoadedInitialFile.current) return;
+    if (!logoData.fileId) return;
+    if (logoData.type !== "uploaded") return;
+
+    const loadExistingFile = async () => {
+      setIsLoadingExistingFile(true);
+      try {
+        const preparedFile = await fetchExistingLogoFileData(logoData);
+
+        if (preparedFile) {
+          methods.setValue(FILE_UPLOAD_FIELD_NAME, [preparedFile]);
+          // Update previousFilesRef to prevent the second useEffect from triggering
+          previousFilesRef.current = [preparedFile];
+          hasLoadedInitialFile.current = true;
+          console.log("LogoSelector: File loaded and set in form");
+        }
+      } catch (error) {
+        console.error("Failed to load existing logo file:", error);
+      } finally {
+        setIsLoadingExistingFile(false);
+      }
+    };
+
+    loadExistingFile();
+  }, [logoData.fileId, logoData.type, methods]);
 
   // File upload hook
   const { uploadFile, isUploading, uploadProgress } = useFileUpload({
@@ -99,6 +130,17 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
 
     if (lastFile !== previousLastFile) {
       if (lastFile) {
+        // Check if this file is already uploaded (has fileId in metadata)
+        const isAlreadyUploaded = (lastFile as any).fileId;
+
+        if (isAlreadyUploaded) {
+          console.log("LogoSelector: File already uploaded, skipping upload", {
+            fileId: (lastFile as any).fileId,
+          });
+          previousFilesRef.current = uploadedLogoFiles || [];
+          return;
+        }
+
         // Validate file size
         if (lastFile.size > MAX_LOGO_FILE_SIZE) {
           toast.error("Logo file size must be less than 5MB");
@@ -112,6 +154,8 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
           methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
           return;
         }
+
+        console.log("LogoSelector: New file selected, uploading...");
 
         // Set file temporarily (for preview) and reset suggested logo selection
         onLogoChange({
@@ -180,10 +224,24 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
   //   methods.trigger(FILE_UPLOAD_FIELD_NAME);
   // }, [methods]);
 
+  // Show loading indicator while existing file is being loaded
+  if (isLoadingExistingFile) {
+    return (
+      <motion.div
+        layout
+        className="flex w-full max-w-[788px] flex-col gap-4 pb-6"
+      >
+        <div className="flex w-full items-center justify-center py-12">
+          <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       layout
-      className="flex max-w-[788px] w-full flex-col gap-4 pb-6"
+      className="flex w-full max-w-[788px] flex-col gap-4 pb-6"
     >
       <StylePicker
         label="Select a logo"
@@ -274,9 +332,10 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
                     >
                       <FileUploadDropzone
                         className={cn(
-                          "border-border hover:border-secondary hover:bg-muted/30 w-full h-[140px] cursor-pointer py-12 px-6 transition-all duration-200",
+                          "border-border hover:border-secondary hover:bg-muted/30 h-[140px] w-full cursor-pointer px-6 py-12 transition-all duration-200",
                           {
-                            "border-red-500 hover:border-red-500": fieldState.error || uploadError,
+                            "border-red-500 hover:border-red-500":
+                              fieldState.error || uploadError,
                           },
                         )}
                       >
@@ -286,10 +345,11 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
                           </div>
                           <div className="flex flex-col gap-1">
                             <p className="text-neutral text-base font-medium">
-                            Click to upload or drag & drop your logo
+                              Click to upload or drag & drop your logo
                             </p>
                             <p className="text-muted-foreground text-xs">
-                              Max size: {formatFileSize(MAX_LOGO_FILE_SIZE)} • .jpg, .png, .svg, etc.
+                              Max size: {formatFileSize(MAX_LOGO_FILE_SIZE)} •
+                              .jpg, .png, .svg, etc.
                             </p>
                           </div>
                         </div>

@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@dub/utils";
 import { Flex, Responsive } from "@radix-ui/themes";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { FC, useCallback } from "react";
 import QRCodeStyling from "qr-code-styling";
+import { FC, useCallback } from "react";
 import { DownloadButton } from "./download-button";
 
 interface IQrBuilderButtonsProps {
@@ -60,14 +60,22 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
     if (homepageDemo || isContentStep) return "Customize QR";
 
     return "Create QR Code";
-  }, [isFileUploading, isFileProcessing, isEdit, isLastStep, homepageDemo, isContentStep]);
+  }, [
+    isFileUploading,
+    isFileProcessing,
+    isEdit,
+    isLastStep,
+    homepageDemo,
+    isContentStep,
+  ]);
 
   const buttonText = getButtonText();
 
   const isLoading = isProcessing || isFileUploading || isFileProcessing;
 
   // Show download button on customization step (step 3) on mobile
-  const showDownloadOnCustomizationStep = isCustomizationStep && isMobile && qrCode;
+  const showDownloadOnCustomizationStep =
+    isCustomizationStep && isMobile && qrCode;
 
   return (
     <Flex
@@ -99,7 +107,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
 
       {showDownloadOnCustomizationStep && (
         <div className="flex-[3]">
-          <DownloadButton qrCode={qrCode} disabled={false} />
+          <DownloadButton />
         </div>
       )}
 
@@ -112,7 +120,8 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
             "border-secondary text-secondary hover:bg-secondary/10 w-full shrink",
             {
               "border-neutral-400 text-neutral-400": isProcessing,
-              "bg-secondary hover:bg-secondary/90 text-white border-secondary": isMobile && isContentStep,
+              "bg-secondary hover:bg-secondary/90 border-secondary text-white":
+                isMobile && isContentStep,
             },
           )}
           onClick={onContinue}
