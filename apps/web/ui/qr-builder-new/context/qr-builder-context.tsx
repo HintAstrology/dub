@@ -309,7 +309,6 @@ export function QrBuilderProvider({
   // Methods
   const onSave = useCallback(
     async (providedFormData?: TQRFormData) => {
-      console.log("onSave providedFormData", providedFormData);
       const dataToSave = providedFormData || formData;
 
       if (!selectedQrType || !dataToSave) {

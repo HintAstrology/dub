@@ -107,7 +107,10 @@ const buildLogoOptions = (
   logoData: IQRCustomizationData["logo"],
 ): TQrServerData["logoOptions"] => {
   if (logoData.type === "none") {
-    return null;
+    return {
+      type: "suggested",
+      id: "logo-none",
+    };
   }
 
   if (logoData.type === "suggested") {
@@ -124,7 +127,10 @@ const buildLogoOptions = (
     };
   }
 
-  return null;
+  return {
+    type: "suggested",
+    id: "logo-none",
+  };
 };
 
 // ============================================================================

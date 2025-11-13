@@ -27,16 +27,13 @@ export const DownloadButton = () => {
     console.log("handleSave");
     // If on content step, validate and get form data without changing step
     if (isContentStep && contentStepRef.current) {
-      console.log("isContentStep and contentStepRef.current");
       const isValid = await contentStepRef.current.form.trigger();
-      console.log("isValid", isValid);
       if (!isValid) {
         toast.error("Please fill in all required fields correctly");
         return;
       }
 
       const formValues = contentStepRef.current.getValues();
-      console.log("formValues", formValues);
       setFormData(formValues as any);
 
       await onSave(formValues as any);
