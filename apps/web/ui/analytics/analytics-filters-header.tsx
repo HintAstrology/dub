@@ -48,9 +48,10 @@ import { Switch } from "@radix-ui/themes";
 import { ComponentProps, useMemo } from "react";
 import useSWR from "swr";
 import { LinkIcon } from "../links/link-icon";
+import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
+import AnalyticsExport from "./analytics-export";
 import ContinentIcon from "./continent-icon";
 import DeviceIcon from "./device-icon";
-import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
 
 function useStandaloneFilterOption(
   groupBy: AnalyticsGroupByOptions,
@@ -448,10 +449,12 @@ export function AnalyticsFiltersHeader() {
 
   return (
     <div className="flex w-full flex-col gap-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap lg:gap-2">
+      <AnalyticsExport />
+
       <Filter.Select
         className={cn(
-          "w-full text-secondary [&_svg]:text-secondary md:w-auto md:min-w-[140px]",
-          hasActiveFilters && "border-secondary"
+          "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[140px]",
+          hasActiveFilters && "border-secondary",
         )}
         filters={filters}
         activeFilters={activeFilters}
@@ -465,8 +468,8 @@ export function AnalyticsFiltersHeader() {
       />
       <DateRangePicker
         className={cn(
-          "w-full text-secondary [&_svg]:text-secondary md:w-auto md:min-w-[200px]",
-          (start || end || interval) && "border-secondary"
+          "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[200px]",
+          (start || end || interval) && "border-secondary",
         )}
         align="end"
         value={

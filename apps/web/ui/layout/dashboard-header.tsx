@@ -2,12 +2,19 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AnalyticsFiltersHeader } from "@/ui/analytics/analytics-filters-header";
+import { QRHeaderControls } from "@/ui/layout/qr-header-controls";
 import { usePathname } from "next/navigation";
 import { cn } from "@dub/utils";
+import { Session } from "@/lib/auth/utils";
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  user?: Session["user"];
+}
+
+export function DashboardHeader({ user }: DashboardHeaderProps) {
   const pathname = usePathname();
   const isAnalyticsPage = pathname?.endsWith("/analytics");
+  const isQRCodesPage = pathname?.match(/\/[^/]+$/) && !pathname?.includes("/analytics") && !pathname?.includes("/settings") && !pathname?.includes("/account");
 
   return (
     <header className={cn(
@@ -23,12 +30,22 @@ export function DashboardHeader() {
               Statistics
             </h1>
           )}
+          {isQRCodesPage && (
+            <h1 className="text-lg font-semibold text-neutral-900">
+              My QR Codes
+            </h1>
+          )}
         </div>
 
-        {/* Right side - Filters */}
+        {/* Right side - Filters/Controls */}
         {isAnalyticsPage && (
           <div className="flex w-full items-center gap-2 md:w-auto">
             <AnalyticsFiltersHeader />
+          </div>
+        )}
+        {isQRCodesPage && user && (
+          <div className="flex w-full items-center gap-2 md:w-auto">
+            <QRHeaderControls user={user} />
           </div>
         )}
       </div>

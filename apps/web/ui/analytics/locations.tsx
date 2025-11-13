@@ -8,13 +8,12 @@ import {
 } from "@dub/ui/icons";
 import { X } from "@/ui/shared/icons";
 import { CONTINENTS, COUNTRIES, REGIONS } from "@dub/utils";
-import { motion } from "framer-motion";
-import { useContext, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
-import BarList from "./bar-list";
+import AnalyticsPieChartWithLists from "./analytics-pie-chart-with-lists";
 import ContinentIcon from "./continent-icon";
 import { useAnalyticsFilterOption } from "./utils";
 
@@ -36,33 +35,33 @@ export default function Locations() {
     "countries" | "cities" | "continents" | "regions"
   >("countries");
   const [showModal, setShowModal] = useState(false);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
 
-  const { data } = useAnalyticsFilterOption(tab);
-  const singularTabName = SINGULAR_ANALYTICS_ENDPOINTS[tab];
+  // Fetch data for each tab
+  const { data: countriesData } = useAnalyticsFilterOption("countries");
+  const { data: citiesData } = useAnalyticsFilterOption("cities");
+  const { data: regionsData } = useAnalyticsFilterOption("regions");
+  const { data: continentsData } = useAnalyticsFilterOption("continents");
+  
+  // Get data for current tab
+  const data = tab === "countries" ? countriesData 
+    : tab === "cities" ? citiesData
+    : tab === "regions" ? regionsData
+    : continentsData;
   
   const selectedTabData = tabs.find(t => t.value === tab) || tabs[0];
   const hasMore = (data?.length ?? 0) > EXPAND_LIMIT;
 
-  useLayoutEffect(() => {
-    const activeIndex = tabs.findIndex(t => t.value === tab);
-    const activeTabElement = tabRefs.current[activeIndex];
-
-    if (activeTabElement) {
-      const { offsetLeft, offsetWidth } = activeTabElement;
-      setUnderlineStyle({
-        left: offsetLeft,
-        width: offsetWidth,
-      });
-    }
-  }, [tab]);
-
-  const getBarListData = () => {
-    return data
+  const getBarListData = (tabValue: typeof tab) => {
+    const tabData = tabValue === "countries" ? countriesData 
+      : tabValue === "cities" ? citiesData
+      : tabValue === "regions" ? regionsData
+      : continentsData;
+    const singularTabName = SINGULAR_ANALYTICS_ENDPOINTS[tabValue];
+    
+    return tabData
       ?.map((d) => ({
         icon:
-          tab === "continents" ? (
+          tabValue === "continents" ? (
             <ContinentIcon
               display={d.continent}
               className="size-3"
@@ -75,11 +74,11 @@ export default function Locations() {
             />
           ),
         title:
-          tab === "continents"
+          tabValue === "continents"
             ? CONTINENTS[d.continent]
-            : tab === "countries"
+            : tabValue === "countries"
               ? COUNTRIES[d.country]
-              : tab === "regions"
+              : tabValue === "regions"
                 ? REGIONS[d.region] || d.region.split("-")[1]
                 : d.city,
         href: queryParams({
@@ -115,85 +114,64 @@ export default function Locations() {
           </button>
         </div>
         {data && data.length > 0 && (
-          <BarList
-            tab={singularTabName}
-            data={getBarListData()}
+          <AnalyticsPieChartWithLists
+            data={getBarListData(tab)}
             unit={selectedTab}
             maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
-            barBackground="bg-blue-100"
-            hoverBackground="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent hover:border-blue-500"
-            setShowModal={setShowModal}
+            showName={true}
           />
         )}
       </Modal>
 
       <Card className="gap-4 pt-6">
-        <CardContent className="relative">
+        <CardContent className="relative px-6">
           <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)} className="w-full">
-            <div className="mb-4 flex items-center justify-between gap-2">
-              <div className="relative w-full flex-1 overflow-x-auto scrollbar-hide">
-                <TabsList className="relative flex w-max justify-start rounded-none border-b bg-transparent p-0">
-                  {tabs.map(({ icon: Icon, name, value }, index) => (
-                    <TabsTrigger
-                      key={value}
-                      value={value}
-                      ref={(el) => {
-                        tabRefs.current[index] = el;
-                      }}
-                      className="relative z-10 flex items-center gap-1.5 rounded-none border-0 bg-transparent px-3 data-[state=active]:bg-transparent data-[state=active]:text-secondary data-[state=active]:shadow-none"
-                    >
-                      <Icon className="h-4 w-4" />
-                      {name}
-                    </TabsTrigger>
-                  ))}
-                  <motion.div
-                    className="absolute bottom-0 z-20 h-0.5 bg-secondary"
-                    layoutId="underline-locations"
-                    style={{
-                      left: underlineStyle.left,
-                      width: underlineStyle.width,
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 40,
-                    }}
-                  />
-                </TabsList>
-              </div>
-              <div className="flex shrink-0 items-center gap-1 text-neutral-500">
-                <p className="whitespace-nowrap text-xs uppercase">
-                  {selectedTab === "clicks" ? "scans" : selectedTab}
-                </p>
-              </div>
+            <div className="mb-6">
+              <TabsList className="bg-background gap-1 border p-1">
+                {tabs.map(({ icon: Icon, name, value }) => (
+                  <TabsTrigger
+                    key={value}
+                    value={value}
+                    className="flex items-center gap-1.5 data-[state=active]:bg-secondary dark:data-[state=active]:bg-secondary data-[state=active]:text-white dark:data-[state=active]:text-white dark:data-[state=active]:border-transparent"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
             </div>
 
-            {tabs.map((tabItem) => (
-              <TabsContent key={tabItem.value} value={tabItem.value}>
-                {data ? (
-                  data.length > 0 ? (
-                    <BarList
-                      tab={singularTabName}
-                      data={getBarListData()}
-                      unit={selectedTab}
-                      maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
-                      barBackground="bg-blue-100"
-                      hoverBackground="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent hover:border-blue-500"
-                      setShowModal={setShowModal}
-                      limit={EXPAND_LIMIT}
-                    />
+            {tabs.map((tabItem) => {
+              const tabData = tabItem.value === "countries" ? countriesData 
+                : tabItem.value === "cities" ? citiesData
+                : tabItem.value === "regions" ? regionsData
+                : continentsData;
+              const tabMaxValue = Math.max(...(tabData?.map((d) => d[dataKey] ?? 0) ?? [0]));
+              
+              return (
+                <TabsContent key={tabItem.value} value={tabItem.value}>
+                  {tabData ? (
+                    tabData.length > 0 ? (
+                      <AnalyticsPieChartWithLists
+                        data={getBarListData(tabItem.value)}
+                        unit={selectedTab}
+                        maxValue={tabMaxValue}
+                        limit={EXPAND_LIMIT}
+                        showName={true}
+                      />
+                    ) : (
+                      <div className="flex h-[300px] items-center justify-center">
+                        <p className="text-sm text-neutral-600">No data available</p>
+                      </div>
+                    )
                   ) : (
                     <div className="flex h-[300px] items-center justify-center">
-                      <p className="text-sm text-neutral-600">No data available</p>
+                      <AnalyticsLoadingSpinner />
                     </div>
-                  )
-                ) : (
-                  <div className="flex h-[300px] items-center justify-center">
-                    <AnalyticsLoadingSpinner />
-                  </div>
-                )}
-              </TabsContent>
-            ))}
+                  )}
+                </TabsContent>
+              );
+            })}
           </Tabs>
 
           <div className="px-6">

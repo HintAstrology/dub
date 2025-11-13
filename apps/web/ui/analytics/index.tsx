@@ -58,8 +58,8 @@ function StatsGrid() {
     (plan === "free" || plan === "pro");
 
   return hide ? null : (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-      {!dashboardProps && <TopLinks />}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full">
+      {!dashboardProps && <div className="lg:col-span-2"><TopLinks /></div>}
       <Locations />
       <Devices />
       {/* <Referer /> */}

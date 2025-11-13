@@ -1,3 +1,5 @@
+"use client";
+
 import { useLocalStorage } from "@dub/ui";
 import { useSearchParams } from "next/navigation";
 import {

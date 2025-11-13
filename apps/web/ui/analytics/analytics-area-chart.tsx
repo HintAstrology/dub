@@ -2,7 +2,7 @@ import { formatDateTooltip } from "@/lib/analytics/format-date-tooltip";
 import { EventType } from "@/lib/analytics/types";
 import { editQueryString } from "@/lib/analytics/utils";
 import useWorkspace from "@/lib/swr/use-workspace";
-import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
+import { cn, currencyFormatter, fetcher, nFormatter, COUNTRIES } from "@dub/utils";
 import { subDays } from "date-fns";
 import { useContext, useMemo } from "react";
 import useSWR from "swr";
@@ -63,58 +63,15 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-// Mock data for stats - replace with API data later
-const MOCK_STATS_DATA = [
-  {
-    icon: <QrCodeIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Total Scans",
-    value: "12,543",
-    change: "+1.2K",
-  },
-  {
-    icon: <UsersIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Unique Scans",
-    value: "8,234",
-    change: "+856",
-  },
- 
-  {
-    icon: <LayoutGridIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Top QR Type",
-    value: "URL",
-    change: "65%",
-  },
-  {
-    icon: <SmartphoneIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Top Device",
-    value: "iPhone",
-    change: "45%",
-  },
-  {
-    icon: <ChromeIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Top Browser",
-    value: "Chrome",
-    change: "52%",
-  },
-  {
-    icon: <MonitorIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Top OS",
-    value: "iOS",
-    change: "48%",
-  },
-  {
-    icon: <GlobeIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Top Country",
-    value: "United States",
-    change: "38%",
-  },
-  {
-    icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
-    title: "Top QR Name",
-    value: "Product-2024 Qr code",
-    change: "2.3K scans",
-  },
-];
+interface DashboardStats {
+  totalClicks: number;
+  uniqueClicks: number;
+  topDevice: { name: string; value: number; percentage: number } | null;
+  topBrowser: { name: string; value: number; percentage: number } | null;
+  topOS: { name: string; value: number; percentage: number } | null;
+  topCountry: { name: string; value: number; percentage: number } | null;
+  topLink: { name: string; value: number } | null;
+}
 
 export default function AnalyticsAreaChart({
   resource,
@@ -154,6 +111,14 @@ export default function AnalyticsAreaChart({
     },
   );
 
+  const { data: stats } = useSWR<DashboardStats>(
+    !demo && `${baseApiPath}/stats?${queryString}`,
+    fetcher,
+    {
+      shouldRetryOnError: !requiresUpgrade,
+    },
+  );
+
   const chartData = useMemo(
     () =>
       demo
@@ -170,16 +135,114 @@ export default function AnalyticsAreaChart({
     [data, demo],
   );
 
-  // Transform data for recharts format
   const rechartsData = useMemo(
     () => transformToRechartsData(chartData, resource, saleUnit),
     [chartData, resource, saleUnit]
   );
 
-  // Get chart configuration
   const dataKey = getDataKey(resource);
   const chartColor = getChartColor(resource);
   const yAxisConfig = getYAxisConfig(rechartsData, dataKey);
+
+  const statsData = useMemo(() => {
+    if (demo) {
+      return [
+        {
+          icon: <QrCodeIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Total Scans",
+          value: "12,543",
+          change: "+1.2K",
+        },
+        {
+          icon: <UsersIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Unique Scans",
+          value: "8,234",
+          change: "+856",
+        },
+        {
+          icon: <LayoutGridIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Top QR Type",
+          value: "URL",
+          change: "65%",
+        },
+        {
+          icon: <SmartphoneIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Top Device",
+          value: "iPhone",
+          change: "45%",
+        },
+        {
+          icon: <ChromeIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Top Browser",
+          value: "Chrome",
+          change: "52%",
+        },
+        {
+          icon: <MonitorIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Top OS",
+          value: "iOS",
+          change: "48%",
+        },
+        {
+          icon: <GlobeIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Top Country",
+          value: "United States",
+          change: "38%",
+        },
+        {
+          icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
+          title: "Top QR Name",
+          value: "Product-2024 Qr code",
+          change: "2.3K scans",
+        },
+      ];
+    }
+
+    return [
+      {
+        icon: <QrCodeIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Total Scans",
+        value: stats ? nFormatter(stats.totalClicks, { full: true }) : "0",
+        change: stats ? nFormatter(stats.totalClicks) : "0",
+      },
+      {
+        icon: <UsersIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Unique Scans",
+        value: stats ? nFormatter(stats.uniqueClicks, { full: true }) : "0",
+        change: stats ? nFormatter(stats.uniqueClicks) : "0",
+      },
+      {
+        icon: <SmartphoneIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Top Device",
+        value: stats?.topDevice?.name || "-",
+        change: stats?.topDevice ? `${stats.topDevice.percentage}%` : "0%",
+      },
+      {
+        icon: <ChromeIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Top Browser",
+        value: stats?.topBrowser?.name || "-",
+        change: stats?.topBrowser ? `${stats.topBrowser.percentage}%` : "0%",
+      },
+      {
+        icon: <MonitorIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Top OS",
+        value: stats?.topOS?.name || "-",
+        change: stats?.topOS ? `${stats.topOS.percentage}%` : "0%",
+      },
+      {
+        icon: <GlobeIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Top Country",
+        value: stats?.topCountry ? (COUNTRIES[stats.topCountry.name] || stats.topCountry.name) : "-",
+        change: stats?.topCountry ? `${stats.topCountry.percentage}%` : "0%",
+      },
+      {
+        icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Top QR Name",
+        value: stats?.topLink?.name || "-",
+        change: stats?.topLink ? `${nFormatter(stats.topLink.value)} scans` : "0 scans",
+      },
+    ];
+  }, [stats, demo]);
 
   if (!chartData) {
     return (
@@ -205,8 +268,8 @@ export default function AnalyticsAreaChart({
             >
               <defs>
                 <linearGradient id="fillArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={chartColor} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={chartColor} stopOpacity={0.1} />
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -263,7 +326,7 @@ export default function AnalyticsAreaChart({
                 type="monotone"
                 fill="url(#fillArea)"
                 fillOpacity={1}
-                stroke="hsl(var(--foreground))"
+                stroke="hsl(var(--primary))"
                 strokeWidth={2}
               />
             </AreaChart>
@@ -273,7 +336,7 @@ export default function AnalyticsAreaChart({
       <div className="flex flex-col gap-4 px-2">
         <CardContent className="grow p-0">
           <div className="grid grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2">
-            {MOCK_STATS_DATA.map((stat, index) => (
+            {statsData.map((stat, index) => (
               <div
                 key={index}
                 className="bg-muted flex flex-col gap-2 rounded-lg p-2"

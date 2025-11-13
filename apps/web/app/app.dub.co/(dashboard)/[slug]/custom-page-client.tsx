@@ -2,15 +2,11 @@
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { Session } from "@/lib/auth/utils";
-import useQrs from "@/lib/swr/use-qrs.ts";
 import { UserProvider } from "@/ui/contexts/user";
 import { CreateQRButton, QRBuilderNewModal } from "@/ui/modals/qr-builder-new";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
-import QrCodeSort from "@/ui/qr-code/components/qr-code-sort";
 import QrCodesContainer from "@/ui/qr-code/qr-codes-container.tsx";
-import { QrCodesDisplayProvider } from "@/ui/qr-code/qr-codes-display-provider.tsx";
-import { SearchBoxPersisted } from "@/ui/shared/search-box";
-import { Button, MaxWidthWrapper } from "@dub/ui";
+import { Button } from "@dub/ui";
 import { ShieldAlert } from "@dub/ui/icons";
 import { ICustomerBody } from "core/integration/payment/config";
 import { motion } from "framer-motion";
@@ -35,13 +31,11 @@ export default function WorkspaceQRsClient({
   return (
     <UserProvider user={user}>
       <NewQrProvider newQrId={newQrId}>
-        <QrCodesDisplayProvider>
-          <WorkspaceQRs
-            initialQrs={initialQrs}
-            featuresAccess={featuresAccess}
-            user={user}
-          />
-        </QrCodesDisplayProvider>
+        <WorkspaceQRs
+          initialQrs={initialQrs}
+          featuresAccess={featuresAccess}
+          user={user}
+        />
       </NewQrProvider>
     </UserProvider>
   );
@@ -57,7 +51,6 @@ function WorkspaceQRs({
   user: Session["user"];
 }) {
   const router = useRouter();
-  const { isValidating } = useQrs({}, {}, true); // listenOnly mode
   const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
 
   return (
@@ -111,43 +104,20 @@ function WorkspaceQRs({
             </div>
           </div>
         )}
-        {featuresAccess.isSubscribed && (
-          <div className="flex flex-wrap items-center justify-between gap-2 lg:flex-nowrap">
-            <div className="flex w-full grow gap-2 md:w-auto">
-              <div className="grow basis-0 md:grow-0">
-                <QrCodeSort />
-              </div>
-            </div>
-            <div className="flex gap-x-2 max-md:w-full">
-              <div className="w-full md:w-56 lg:w-64">
-                <SearchBoxPersisted
-                  loading={isValidating}
-                  inputClassName="h-10"
-                />
-              </div>
+      </div>
 
-              <div className="grow-0">
+      <QrCodesContainer
+        CreateQrCodeButton={
+          featuresAccess
+            ? () => (
                 <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-6">
-        <QrCodesContainer
-          CreateQrCodeButton={
-            featuresAccess
-              ? () => (
-                  <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
-                )
-              : () => <></>
-          }
-          featuresAccess={featuresAccess.featuresAccess}
-          initialQrs={initialQrs}
-          user={user}
-        />
-      </div>
+              )
+            : () => <></>
+        }
+        featuresAccess={featuresAccess.featuresAccess}
+        initialQrs={initialQrs}
+        user={user}
+      />
     </>
   );
 }

@@ -1,5 +1,5 @@
-import { IconMenu, Popover } from "@dub/ui";
-import { cn } from "@dub/utils";
+import { Button } from "@/components/ui/button";
+import { Popover } from "@dub/ui";
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { useDownloadAnalyticsFiltered } from "./utils";
@@ -25,41 +25,38 @@ export default function AnalyticsExport() {
   }
 
   return (
-    <div className="w-full min-[500px]:w-fit" >
+    <div className="w-full" >
       <Popover
         content={
-          <div className="w-full p-2 md:w-40">
+          <div className="w-full p-2 flex flex-col">
             {sortOptions.map(({ display, slug }) => (
-              <button
+              <Button
                 key={slug}
+                variant="ghost"
+                className="w-max justify-start"
                 onClick={() => {
                   onDownloadClick(slug)
                   setOpenPopover(false);
                 }}
-                className="hover:bg-border-100 active:bg-secondary-100 flex w-full items-center justify-between space-x-2 rounded-md px-1 py-2"
               >
-                <IconMenu
-                  text={display}
-                  icon={<Download className="h-4 w-4" />}
-                />
-              </button>
+                <Download className="h-4 w-4" />
+                {display}
+              </Button>
             ))}
           </div>
         }
         align="end"
         openPopover={openPopover}
         setOpenPopover={setOpenPopover}
-      > 
-        <button
+      >
+        <Button
+          variant="default"
+          size="default"
+          className="bg-secondary hover:bg-secondary/90"
           onClick={() => setOpenPopover(!openPopover)}
-          className={cn(
-            "group flex h-10 cursor-pointer appearance-none items-center gap-x-2 truncate rounded-md border pl-3 pr-[18px] text-sm outline-none transition-all",
-            "border-neutral-200/20 bg-white text-neutral-900 placeholder-neutral-400",
-            "focus-visible:border-neutral-200/40 data-[state=open]:border-neutral-200/40 data-[state=open]:ring-4 data-[state=open]:ring-neutral-200/40",
-          )}
         >
           Download data
-        </button>
+        </Button>
       </Popover>
     </div>
   );

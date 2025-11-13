@@ -15,6 +15,7 @@ import {
   SetStateAction,
   createContext,
   useContext,
+  useMemo,
   useState,
 } from "react";
 import { AnimatedEmptyState } from "../shared/animated-empty-state";
@@ -32,25 +33,71 @@ export default function QrCodesContainer({
   user: Session["user"];
 }) {
   const { viewMode, sortBy } = useContext(QrCodesDisplayContext);
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") || undefined;
 
   const { qrs: clientQrs, isValidating } = useQrs(
     {
-      sortBy,
       showArchived: true,
+      search,
     },
     {},
     false,
-    true,
+    true, // Skip first load - use initialQrs
   );
 
-  const qrs = clientQrs || initialQrs;
+  const allQrs = clientQrs || initialQrs;
+
+  // Sort client-side based on sortBy from context
+  // This will automatically re-sort when sortBy changes due to useMemo dependency
+  const qrs = useMemo(() => {
+    if (!allQrs) return allQrs;
+    
+    const sorted = [...allQrs];
+    const sortValue = sortBy || "createdAt";
+    
+    switch (sortValue) {
+      case "createdAt":
+        sorted.sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bTime - aTime;
+        });
+        break;
+      case "clicks":
+        sorted.sort((a, b) => 
+          (b.link?.clicks || 0) - (a.link?.clicks || 0)
+        );
+        break;
+      case "lastClicked":
+        // Note: lastClicked may not be available in link type, fallback to createdAt
+        sorted.sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bTime - aTime;
+        });
+        break;
+      case "type":
+        sorted.sort((a, b) => b.qrType.localeCompare(a.qrType));
+        break;
+      default:
+        // Default to createdAt desc
+        sorted.sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bTime - aTime;
+        });
+    }
+    
+    return sorted;
+  }, [allQrs, sortBy]);
 
   return (
     <MaxWidthWrapper className="grid gap-y-2">
       <QrCodesList
         CreateQrCodeButton={CreateQrCodeButton}
         qrCodes={qrs}
-        loading={isValidating || !qrs}
+        loading={isValidating}
         compact={viewMode === "rows"}
         featuresAccess={featuresAccess}
         user={user}

@@ -44,11 +44,6 @@ const WorkspaceQRsPage = async () => {
   return (
     <>
       <PageContent>
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-foreground">
-            My QR Codes
-          </h1>
-        </div>
         <WorkspaceQRsClient
           initialQrs={qrs as unknown as TQrServerData[]}
           featuresAccess={featuresAccess}
