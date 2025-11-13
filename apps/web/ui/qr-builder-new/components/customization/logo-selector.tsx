@@ -1,9 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getFileContent } from "@/lib/actions/get-file-content.ts";
-import {
-  compressImage,
-  createCompressedImageFile,
-} from "@/ui/utils/compress-image.ts";
+import { fetchExistingLogoFileData } from "@/ui/qr-builder-new/helpers/prepare-file-data";
 import { cn } from "@dub/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoaderCircle, Upload, X } from "lucide-react";
@@ -35,59 +31,6 @@ const formatFileSize = (bytes: number) => {
   const sizes = ["Bytes", "KB", "MB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-};
-
-/**
- * Prepares existing logo file from fileId
- */
-const prepareLogoFile = async (
-  logoData: ILogoData,
-): Promise<File | undefined> => {
-  console.log("prepareLogoFile: Starting", {
-    fileId: logoData.fileId,
-    fileName: logoData.file?.name,
-  });
-
-  if (!logoData.fileId) {
-    console.log("prepareLogoFile: Missing fileId");
-    return undefined;
-  }
-
-  // Use default values if file metadata is not available
-  const fileName = logoData.file?.name || "logo.png";
-  const fileSize = logoData.file?.size || 0;
-
-  try {
-    console.log("prepareLogoFile: Fetching file content...");
-    const result = await getFileContent(logoData.fileId);
-
-    if (!result.success) {
-      console.log("prepareLogoFile: getFileContent failed", result);
-      return undefined;
-    }
-
-    console.log("prepareLogoFile: Compressing image...");
-    const compressedBlob = await compressImage(result.data);
-
-    console.log("prepareLogoFile: Creating compressed file...");
-    const compressedFile = createCompressedImageFile(
-      compressedBlob,
-      fileName,
-      logoData.fileId,
-      fileSize,
-    );
-
-    console.log("prepareLogoFile: Success", {
-      fileName: compressedFile.name,
-      fileId: (compressedFile as any).fileId,
-      size: compressedFile.size,
-    });
-
-    return compressedFile;
-  } catch (error) {
-    console.warn("prepareLogoFile: Failed", error);
-    return undefined;
-  }
 };
 
 interface LogoFormValues {
@@ -128,17 +71,10 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     if (!logoData.fileId) return;
     if (logoData.type !== "uploaded") return;
 
-    console.log("LogoSelector: Loading existing file", {
-      fileId: logoData.fileId,
-      fileName: logoData.file?.name,
-      type: logoData.type,
-    });
-
     const loadExistingFile = async () => {
       setIsLoadingExistingFile(true);
       try {
-        const preparedFile = await prepareLogoFile(logoData);
-        console.log("LogoSelector: Prepared file", preparedFile);
+        const preparedFile = await fetchExistingLogoFileData(logoData);
 
         if (preparedFile) {
           methods.setValue(FILE_UPLOAD_FIELD_NAME, [preparedFile]);

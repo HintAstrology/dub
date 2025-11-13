@@ -1,6 +1,6 @@
 "use client";
 
-import { prepareFileDataForModal } from "@/ui/modals/qr-content-editor/helpers/prepare-file-data";
+import { fetchExistingFileData } from "@/ui/qr-builder-new/helpers/prepare-file-data";
 import { LoaderCircle } from "lucide-react";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 
@@ -48,7 +48,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       const loadFileData = async () => {
         setIsLoadingFileData(true);
         try {
-          const data = await prepareFileDataForModal(initialQrData!);
+          const data = await fetchExistingFileData(initialQrData!);
 
           setFileData(data);
         } catch (error) {

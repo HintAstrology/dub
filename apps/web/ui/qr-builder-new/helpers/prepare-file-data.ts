@@ -1,4 +1,5 @@
 import { getFileContent } from "@/lib/actions/get-file-content.ts";
+import { ILogoData } from "@/ui/qr-builder-new/types/customization";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import {
   compressImage,
@@ -89,7 +90,7 @@ const prepareVideoFile = (
  * Prepares file data for QR content editor modal
  * Creates File objects with metadata for file upload fields
  */
-export const prepareFileDataForModal = async (
+export const fetchExistingFileData = async (
   qr: TQrServerData,
 ): Promise<Record<string, File[]> | undefined> => {
   const { qrType, fileId, file } = qr;
@@ -117,6 +118,44 @@ export const prepareFileDataForModal = async (
     return result;
   } catch (error) {
     console.error(`Failed to prepare file data for QR ${qr.id}:`, error);
+    return undefined;
+  }
+};
+
+/**
+ * Prepares existing logo file from fileId
+ */
+export const fetchExistingLogoFileData = async (
+  logoData: ILogoData,
+): Promise<File | undefined> => {
+  if (!logoData.fileId) {
+    return undefined;
+  }
+
+  // Use default values if file metadata is not available
+  const fileName = logoData.file?.name || "logo.png";
+  const fileSize = logoData.file?.size || 0;
+
+  try {
+    const result = await getFileContent(logoData.fileId);
+
+    if (!result.success) {
+      console.log("prepareLogoFile: getFileContent failed", result);
+      return undefined;
+    }
+
+    const compressedBlob = await compressImage(result.data);
+
+    const compressedFile = createCompressedImageFile(
+      compressedBlob,
+      fileName,
+      logoData.fileId,
+      fileSize,
+    );
+
+    return compressedFile;
+  } catch (error) {
+    console.warn("prepareLogoFile: Failed", error);
     return undefined;
   }
 };
