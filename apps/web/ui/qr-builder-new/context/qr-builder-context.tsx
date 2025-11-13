@@ -307,45 +307,49 @@ export function QrBuilderProvider({
   }, [builderStep, handleChangeStep, homepageDemo, user, sessionId]);
 
   // Methods
-  const onSave = useCallback(async () => {
-    const dataToSave = formData;
+  const onSave = useCallback(
+    async (providedFormData?: TQRFormData) => {
+      console.log("onSave providedFormData", providedFormData);
+      const dataToSave = providedFormData || formData;
 
-    if (!selectedQrType || !dataToSave) {
-      toast.error("Please complete all required fields");
-      return;
-    }
+      if (!selectedQrType || !dataToSave) {
+        toast.error("Please complete all required fields");
+        return;
+      }
 
-    if (!onSaveProp) {
-      console.error("onSave prop not provided to QrBuilderProvider");
-      toast.error("Save functionality not configured");
-      return;
-    }
+      if (!onSaveProp) {
+        console.error("onSave prop not provided to QrBuilderProvider");
+        toast.error("Save functionality not configured");
+        return;
+      }
 
-    setIsProcessing(true);
+      setIsProcessing(true);
 
-    try {
-      const builderData: TNewQRBuilderData = {
-        qrType: selectedQrType,
-        formData: dataToSave,
-        customizationData,
-        title: formData?.qrName || `${selectedQrType} QR Code`,
-        fileId: (dataToSave as any)?.fileId || initialState.fileId,
-      };
+      try {
+        const builderData: TNewQRBuilderData = {
+          qrType: selectedQrType,
+          formData: dataToSave,
+          customizationData,
+          title: dataToSave?.qrName || `${selectedQrType} QR Code`,
+          fileId: (dataToSave as any)?.fileId || initialState.fileId,
+        };
 
-      await onSaveProp(builderData);
-    } catch (error) {
-      console.error("Error saving QR:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [
-    selectedQrType,
-    formData,
-    customizationData,
-    initialState.qrTitle,
-    initialState.fileId,
-    onSaveProp,
-  ]);
+        await onSaveProp(builderData);
+      } catch (error) {
+        console.error("Error saving QR:", error);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [
+      selectedQrType,
+      formData,
+      customizationData,
+      initialState.qrTitle,
+      initialState.fileId,
+      onSaveProp,
+    ],
+  );
 
   const handleContinue = useCallback(async () => {
     if (isCustomizationStep) {
@@ -389,14 +393,21 @@ export function QrBuilderProvider({
         sessionId: sessionId || user?.id,
       });
 
+      const formValues = contentStepRef.current.getValues();
+      setFormData(formValues as any);
+      console.log(
+        "Saving form data before moving to customization step:",
+        formValues,
+      );
+
       // Save the current form values to formData state before moving to next step
-      if (currentFormValues && Object.keys(currentFormValues).length > 0) {
-        setFormData(currentFormValues as TQRFormData);
-        console.log(
-          "Saving form data before moving to customization step:",
-          currentFormValues,
-        );
-      }
+      // if (currentFormValues && Object.keys(currentFormValues).length > 0) {
+      //   setFormData(currentFormValues as TQRFormData);
+      //   console.log(
+      //     "Saving form data before moving to customization step:",
+      //     currentFormValues,
+      //   );
+      // }
     }
 
     handleNextStep();

@@ -62,9 +62,6 @@ export const QrContentEditorInnerModal: FC<
     async (data: TQRFormData) => {
       setIsSaving(true);
       try {
-        console.log("Form submitted with data:", data);
-        console.log("QR Code:", initialQrData);
-
         await updateQRDestination(
           data as TQRFormData & { encodedData: string; fileId?: string },
         );

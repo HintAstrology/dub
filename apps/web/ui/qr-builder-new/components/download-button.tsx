@@ -1,19 +1,10 @@
 import { Button } from "@/components/ui/button";
-import QRCodeStyling from "qr-code-styling";
+import { Loader2 } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { useQrBuilderContext } from "../context";
 
-interface DownloadButtonProps {
-  qrCode: QRCodeStyling | null;
-  disabled?: boolean;
-}
-
-export const DownloadButton = ({
-  qrCode,
-  disabled = false,
-}: DownloadButtonProps) => {
+export const DownloadButton = () => {
   const {
     homepageDemo,
     isEditMode,
@@ -33,15 +24,19 @@ export const DownloadButton = ({
     !customizationData.logo?.fileId;
 
   const handleSave = useCallback(async () => {
+    console.log("handleSave");
     // If on content step, validate and get form data without changing step
     if (isContentStep && contentStepRef.current) {
+      console.log("isContentStep and contentStepRef.current");
       const isValid = await contentStepRef.current.form.trigger();
+      console.log("isValid", isValid);
       if (!isValid) {
         toast.error("Please fill in all required fields correctly");
         return;
       }
 
       const formValues = contentStepRef.current.getValues();
+      console.log("formValues", formValues);
       setFormData(formValues as any);
 
       await onSave(formValues as any);
@@ -50,12 +45,7 @@ export const DownloadButton = ({
 
     // Directly save/create the QR code without navigating steps
     await onSave();
-  }, [
-    isContentStep,
-    contentStepRef,
-    setFormData,
-    onSave,
-  ]);
+  }, [isContentStep, contentStepRef, setFormData, onSave]);
 
   const getButtonText = useCallback(() => {
     if (isFileUploading) return "Uploading...";

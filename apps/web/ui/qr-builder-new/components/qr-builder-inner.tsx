@@ -219,12 +219,7 @@ export const QRBuilderInner = () => {
                   className="w-full"
                   style={{ maxWidth: isCustomizationStep ? "300px" : "270px" }}
                 >
-                  <DownloadButton
-                    qrCode={isCustomizationStep ? qrCode : null}
-                    disabled={
-                      !selectedQrType || (isContentStep && !isFormValid)
-                    }
-                  />
+                  <DownloadButton />
                 </div>
               )}
             </div>
