@@ -55,7 +55,7 @@ export const useNewQrOperations = ({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ ...serverData, link: false }),
+            body: JSON.stringify(serverData),
           },
         );
 
