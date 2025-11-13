@@ -3,6 +3,7 @@ import { DubApiError } from "@/lib/api/errors";
 import { createQrWithLinkUniversal } from "@/lib/api/qrs/create-qr-with-link-universal";
 import { getQr } from "@/lib/api/qrs/get-qr";
 import { withWorkspace } from "@/lib/auth";
+import { NewQrProps } from "@/lib/types";
 import { sendWorkspaceWebhook } from "@/lib/webhook/publish";
 import { linkEventSchema } from "@/lib/zod/schemas/links";
 import { waitUntil } from "@vercel/functions";
@@ -27,7 +28,7 @@ export const POST = withWorkspace(
 
     try {
       const { createdQr, createdLink } = await createQrWithLinkUniversal({
-        qrData: { ...qr, title: `${qr.title} (Copy)` },
+        qrData: { ...(qr as NewQrProps), title: `${qr.title} (Copy)` },
         linkData: {
           url: qr.link?.url ?? "",
         },

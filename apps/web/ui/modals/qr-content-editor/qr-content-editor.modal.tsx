@@ -1,5 +1,6 @@
 "use client";
 
+import { Session } from "@/lib/auth";
 import { QrBuilderProvider } from "@/ui/qr-builder-new/context";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { Modal } from "@dub/ui";
@@ -19,12 +20,14 @@ type QRContentEditorModalProps = {
   qrCode: TQrServerData;
   showQRContentEditorModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  user: Session["user"];
 };
 
 export function QRContentEditorModal({
   qrCode,
   showQRContentEditorModal,
   setShowModal,
+  user,
 }: QRContentEditorModalProps) {
   if (!qrCode.qrType) {
     return null;
@@ -41,14 +44,20 @@ export function QRContentEditorModal({
     >
       <Theme>
         <QrBuilderProvider initialQrData={qrCode}>
-          <QrContentEditorInnerModal setShowModal={setShowModal} />
+          <QrContentEditorInnerModal user={user} setShowModal={setShowModal} />
         </QrBuilderProvider>
       </Theme>
     </Modal>
   );
 }
 
-export const useQRContentEditor = ({ qrCode }: { qrCode: TQrServerData }) => {
+export const useQRContentEditor = ({
+  qrCode,
+  user,
+}: {
+  qrCode: TQrServerData;
+  user: Session["user"];
+}) => {
   const [showQRContentEditorModal, setShowQRContentEditorModal] =
     useState(false);
 
@@ -58,9 +67,10 @@ export const useQRContentEditor = ({ qrCode }: { qrCode: TQrServerData }) => {
         qrCode={qrCode}
         showQRContentEditorModal={showQRContentEditorModal}
         setShowModal={setShowQRContentEditorModal}
+        user={user}
       />
     );
-  }, [showQRContentEditorModal, setShowQRContentEditorModal]);
+  }, [showQRContentEditorModal, setShowQRContentEditorModal, user]);
 
   return useMemo(
     () => ({

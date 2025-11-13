@@ -276,9 +276,8 @@ export function QrBuilderProvider({
 
   const handleFormSubmit = useCallback(
     (data: TQRFormData) => {
-      console.log("handleFormSubmit data", data);
       setFormData(data);
-      console.log("Form submitted:", data);
+
       handleNextStep();
     },
     [handleNextStep],

@@ -1,5 +1,6 @@
 "use client";
 
+import { Session } from "@/lib/auth/utils.ts";
 import { QRTabs } from "@/ui/landing/components/qr-tabs/qr-tabs.tsx";
 import { LandingSectionsServer } from "@/ui/landing/landing-sections-server.tsx";
 import { FC, useCallback, useState } from "react";
@@ -9,12 +10,13 @@ import { EQRType } from "../qr-builder-new/types/qr-type.ts";
 import { scrollToBuilder } from "./helpers/scrollToBuilder.tsx";
 
 interface ILandingSectionsClientProps {
+  user: Session["user"] | null;
   sessionId: string;
 }
 
 export const LandingSectionsClient: FC<
   Readonly<ILandingSectionsClientProps>
-> = ({ sessionId }) => {
+> = ({ user, sessionId }) => {
   const [typeToScrollTo, setTypeToScrollTo] = useState<EQRType | null>(null);
   const [featureToOpen, setFeatureToOpen] = useState<string | null>(null);
 
@@ -59,6 +61,7 @@ export const LandingSectionsClient: FC<
         className="bg-primary-100 flex min-h-[100svh] w-full items-center justify-center px-3 py-6 md:min-h-0 lg:py-14"
       >
         <QRTabs
+          user={user}
           sessionId={sessionId}
           typeToScrollTo={typeToScrollTo}
           handleResetTypeToScrollTo={handleResetTypeToScrollTo}

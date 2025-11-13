@@ -3,10 +3,14 @@
 import { verifyAndCreateUser } from "@/lib/actions/verify-and-create-user.ts";
 import { NewQrProps, WorkspaceProps } from "@/lib/types.ts";
 import { ratelimit, redis } from "@/lib/upstash";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { R2_URL } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
+import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
+import { trackMixpanelApiService } from "core/integration/analytic/services/track-mixpanel-api.service";
 import { getUserCookieService } from "core/services/cookie/user-session.service.ts";
 import { flattenValidationErrors } from "next-safe-action";
+import { qrActionsTrackingParams } from "../analytic/qr-actions-tracking-data.helper";
 import { createQrWithLinkUniversal } from "../api/qrs/create-qr-with-link-universal";
 import { createId, getIP } from "../api/utils";
 import { signUpSchema } from "../zod/schemas/auth";
@@ -121,24 +125,19 @@ export const createUserAccountAction = actionClient
                   userId: generatedUserId,
                 });
 
-                // const trackingParams = createQRTrackingParams(
-                //   convertQrStorageDataToBuilder(
-                //     qrCreateResponse.createdQr as QrStorageData,
-                //   ),
-                //   qrCreateResponse.createdQr.id,
-                // );
+                const trackingParams = qrActionsTrackingParams(
+                  qrCreateResponse.createdQr as unknown as TQrServerData,
+                );
 
-                // await trackMixpanelApiService({
-                //   event: EAnalyticEvents.QR_CREATED,
-                //   email,
-                //   userId: generatedUserId,
-                //   params: {
-                //     ...trackingParams,
-                //     link_url: qrCreateResponse.createdLink?.shortLink,
-                //     link_id: qrCreateResponse.createdLink?.id,
-                //     target_url: qrCreateResponse.createdLink?.url,
-                //   },
-                // });
+                await trackMixpanelApiService({
+                  event: EAnalyticEvents.QR_CREATED,
+                  email,
+                  userId: generatedUserId,
+                  params: {
+                    event_category: "Authorized",
+                    ...trackingParams,
+                  },
+                });
               })(),
             ]
           : []),

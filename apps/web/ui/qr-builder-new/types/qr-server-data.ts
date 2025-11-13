@@ -31,6 +31,7 @@ export type TQrServerData = {
   updatedAt?: string;
   file?: File;
   link: {
+    id?: string;
     url: string;
     key: string;
     domain: string;

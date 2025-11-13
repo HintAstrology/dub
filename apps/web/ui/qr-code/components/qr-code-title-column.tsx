@@ -117,6 +117,7 @@ export function QrCodeTitleColumn({
               QR Name
             </Text>
             <QRCardTitle
+              user={user}
               qrCode={qrCode}
               featuresAccess={featuresAccess}
               setShowTrialExpiredModal={setShowTrialExpiredModal}
@@ -133,6 +134,7 @@ export function QrCodeTitleColumn({
               {currentQrTypeInfo.yourContentColumnTitle}
             </Text>
             <QRCardDetails
+              user={user}
               qrCode={qrCode}
               featuresAccess={featuresAccess}
               setShowTrialExpiredModal={setShowTrialExpiredModal}

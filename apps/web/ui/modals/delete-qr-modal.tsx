@@ -1,3 +1,4 @@
+import { Session } from "@/lib/auth";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
@@ -16,16 +17,18 @@ type DeleteQRModalProps = {
   showDeleteQRModal: boolean;
   setShowDeleteQRModal: Dispatch<SetStateAction<boolean>>;
   qrCode: TQrServerData;
+  user: Session["user"];
 };
 
 function DeleteQRModal({
   showDeleteQRModal,
   setShowDeleteQRModal,
   qrCode,
+  user,
 }: DeleteQRModalProps) {
   const [deleting, setDeleting] = useState(false);
 
-  const { deleteQR } = useNewQrOperations({ initialQrData: qrCode });
+  const { deleteQR } = useNewQrOperations({ initialQrData: qrCode, user });
 
   const handleDelete = useCallback(async () => {
     setDeleting(true);
@@ -114,7 +117,13 @@ function DeleteQRModal({
   );
 }
 
-export function useDeleteQRModal({ qrCode }: { qrCode: TQrServerData }) {
+export function useDeleteQRModal({
+  qrCode,
+  user,
+}: {
+  qrCode: TQrServerData;
+  user: Session["user"];
+}) {
   const [showDeleteQRModal, setShowDeleteQRModal] = useState(false);
 
   const DeleteLinkModalCallback = useCallback(() => {
@@ -123,9 +132,10 @@ export function useDeleteQRModal({ qrCode }: { qrCode: TQrServerData }) {
         showDeleteQRModal={showDeleteQRModal}
         setShowDeleteQRModal={setShowDeleteQRModal}
         qrCode={qrCode}
+        user={user}
       />
     );
-  }, [showDeleteQRModal, setShowDeleteQRModal]);
+  }, [showDeleteQRModal, setShowDeleteQRModal, user]);
 
   return useMemo(
     () => ({

@@ -24,7 +24,6 @@ export const DownloadButton = () => {
     !customizationData.logo?.fileId;
 
   const handleSave = useCallback(async () => {
-    console.log("handleSave");
     // If on content step, validate and get form data without changing step
     if (isContentStep && contentStepRef.current) {
       const isValid = await contentStepRef.current.form.trigger();

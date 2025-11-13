@@ -1,3 +1,4 @@
+import { Session } from "@/lib/auth";
 import { QrFormResolver } from "@/ui/qr-builder-new/components/qr-form-resolver/qr-form-resolver";
 import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
@@ -21,11 +22,12 @@ import { getSaveButtonText } from "../helpers/get-save-button-text";
 
 interface IQrContentEditorInnerModalProps {
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  user: Session["user"];
 }
 
 export const QrContentEditorInnerModal: FC<
   Readonly<IQrContentEditorInnerModalProps>
-> = ({ setShowModal }) => {
+> = ({ setShowModal, user }) => {
   const {
     isFileUploading,
     isFileProcessing,
@@ -36,6 +38,7 @@ export const QrContentEditorInnerModal: FC<
 
   const { updateQRDestination } = useNewQrOperations({
     initialQrData: initialQrData!,
+    user,
   });
 
   const formRef = useRef<QRFormRef>(null);

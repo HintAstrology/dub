@@ -1,3 +1,4 @@
+import { Session } from "@/lib/auth";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
@@ -17,14 +18,16 @@ type ArchiveQRModalProps = {
   showArchiveQRModal: boolean;
   setShowArchiveQRModal: Dispatch<SetStateAction<boolean>>;
   qrCode: TQrServerData;
+  user: Session["user"];
 };
 
 function ArchiveQRModal({
   showArchiveQRModal,
   setShowArchiveQRModal,
   qrCode,
+  user,
 }: ArchiveQRModalProps) {
-  const { archiveQR } = useNewQrOperations({ initialQrData: qrCode });
+  const { archiveQR } = useNewQrOperations({ initialQrData: qrCode, user });
   const [archiving, setArchiving] = useState(false);
 
   const handleArchiveRequest = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -185,7 +188,13 @@ function ArchiveQRModal({
   );
 }
 
-export function useArchiveQRModal({ qrCode }: { qrCode: TQrServerData }) {
+export function useArchiveQRModal({
+  qrCode,
+  user,
+}: {
+  qrCode: TQrServerData;
+  user: Session["user"];
+}) {
   const [showArchiveQRModal, setShowArchiveQRModal] = useState(false);
 
   const ArchiveQRModalCallback = useCallback(() => {
@@ -194,9 +203,10 @@ export function useArchiveQRModal({ qrCode }: { qrCode: TQrServerData }) {
         showArchiveQRModal={showArchiveQRModal}
         setShowArchiveQRModal={setShowArchiveQRModal}
         qrCode={qrCode}
+        user={user}
       />
     );
-  }, [showArchiveQRModal, setShowArchiveQRModal]);
+  }, [showArchiveQRModal, setShowArchiveQRModal, user]);
 
   return useMemo(
     () => ({

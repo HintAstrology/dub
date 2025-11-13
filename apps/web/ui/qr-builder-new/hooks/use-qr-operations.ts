@@ -1,7 +1,14 @@
+import {
+  qrActionsTrackingParams,
+  qrActionsTrackingParamsError,
+} from "@/lib/analytic/qr-actions-tracking-data.helper";
+import { Session } from "@/lib/auth";
 import { mutatePrefix } from "@/lib/swr/mutate.ts";
 import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useToastWithUndo } from "@dub/ui";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
+import { trackClientEvents } from "core/integration/analytic";
+import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { FILE_QR_TYPES } from "../constants/get-qr-config";
@@ -15,11 +22,13 @@ import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 
 interface IUseNewQrOperationsProps {
+  user: Session["user"];
   initialQrData: TQrServerData | null;
 }
 
 export const useNewQrOperations = ({
   initialQrData,
+  user,
 }: IUseNewQrOperationsProps) => {
   const { id: workspaceId } = useWorkspace();
   const { setNewQrId } = useNewQrContext();
@@ -46,13 +55,29 @@ export const useNewQrOperations = ({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(serverData),
+            body: JSON.stringify({ ...serverData, link: false }),
           },
         );
 
         if (res.status === 200) {
-          await mutatePrefix(["/api/qrs", "/api/links"]);
+          await mutatePrefix(["/api/qrs"]);
+
           const responseData = await res.json();
+          const { createdQr } = responseData;
+
+          const trackingParams = qrActionsTrackingParams(createdQr);
+
+          trackClientEvents({
+            event: EAnalyticEvents.QR_CREATED,
+            params: {
+              event_category: "Authorized",
+              page_name: projectSlug ? "landing" : "dashboard",
+              email: user?.email,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
+
           toast.success("Successfully created QR!");
           return responseData;
         } else {
@@ -61,6 +86,22 @@ export const useNewQrOperations = ({
 
           const errorMessage =
             errorResponse?.error?.message || "Failed to create QR";
+
+          const trackingParams = qrActionsTrackingParamsError(
+            serverData as unknown as TQrServerData,
+            "create",
+            errorResponse,
+          );
+          trackClientEvents({
+            event: EAnalyticEvents.QR_CREATED_ERROR,
+            params: {
+              event_category: "Authorized",
+              page_name: projectSlug ? "landing" : "dashboard",
+              email: user?.email,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           console.error("Error creating QR:", errorMessage);
           toast.error(errorMessage);
@@ -110,6 +151,23 @@ export const useNewQrOperations = ({
           await mutatePrefix(["/api/qrs"]);
 
           const responseData = await res.json();
+          const { qr } = responseData;
+
+          const trackingParams = qrActionsTrackingParams(qr);
+
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              is_activated: false,
+              is_deactivated: false,
+              is_deleted: false,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toast.success("Successfully updated QR!");
           return responseData;
@@ -117,6 +175,22 @@ export const useNewQrOperations = ({
           const errorResponse = await res.json();
           const errorMessage =
             errorResponse?.error?.message || "Failed to update QR";
+
+          const trackingParams = qrActionsTrackingParamsError(
+            initialQrData!,
+            "update",
+            errorResponse,
+          );
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED_ERROR,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toast.error(errorMessage);
           return false;
@@ -160,6 +234,23 @@ export const useNewQrOperations = ({
           await mutatePrefix(["/api/qrs"]);
 
           const responseData = await res.json();
+          const { qr } = responseData;
+
+          const trackingParams = qrActionsTrackingParams(qr);
+
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              is_activated: false,
+              is_deactivated: false,
+              is_deleted: false,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toast.success("Successfully updated QR!");
 
@@ -168,6 +259,22 @@ export const useNewQrOperations = ({
           const errorResponse = await res.json();
           const errorMessage =
             errorResponse?.error?.message || "Failed to update QR";
+
+          const trackingParams = qrActionsTrackingParamsError(
+            initialQrData!,
+            "update",
+            errorResponse,
+          );
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED_ERROR,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toast.error(errorMessage);
           return false;
@@ -230,6 +337,23 @@ export const useNewQrOperations = ({
           await mutatePrefix(["/api/qrs"]);
 
           const responseData = await res.json();
+          const { qr } = responseData;
+
+          const trackingParams = qrActionsTrackingParams(qr);
+
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              is_activated: false,
+              is_deactivated: false,
+              is_deleted: false,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toast.success("Successfully updated QR!");
 
@@ -238,6 +362,22 @@ export const useNewQrOperations = ({
           const errorResponse = await res.json();
           const errorMessage =
             errorResponse?.error?.message || "Failed to update QR";
+
+          const trackingParams = qrActionsTrackingParamsError(
+            initialQrData!,
+            "update",
+            errorResponse,
+          );
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED_ERROR,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toast.error(errorMessage);
 
@@ -274,9 +414,26 @@ export const useNewQrOperations = ({
         );
 
         if (res.status === 200) {
-          await mutatePrefix(["/api/qrs", "/api/links"]);
+          await mutatePrefix(["/api/qrs"]);
 
           const responseData = await res.json();
+          const { qr } = responseData;
+
+          const trackingParams = qrActionsTrackingParams(qr);
+
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              is_activated: !archive,
+              is_deactivated: archive,
+              is_deleted: false,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
 
           toastWithUndo({
             id: "qr-archive-undo-toast",
@@ -295,8 +452,25 @@ export const useNewQrOperations = ({
 
           return true;
         } else {
-          const { error } = await res.json();
-          toast.error(error?.message || "Failed to archive QR");
+          const errorResponse = await res.json();
+          toast.error(errorResponse?.error?.message || "Failed to archive QR");
+
+          const trackingParams = qrActionsTrackingParamsError(
+            initialQrData!,
+            archive ? "deactivate" : "activate",
+            errorResponse,
+          );
+          trackClientEvents({
+            event: EAnalyticEvents.QR_UPDATED_ERROR,
+            params: {
+              event_category: "Authorized",
+              page_name: "dashboard",
+              email: user?.email,
+              ...trackingParams,
+            },
+            sessionId: user?.id,
+          });
+
           return false;
         }
       } catch (e) {
@@ -323,15 +497,49 @@ export const useNewQrOperations = ({
       );
 
       if (res.status === 200) {
-        await mutatePrefix(["/api/qrs", "/api/links"]);
+        await mutatePrefix(["/api/qrs"]);
 
         const responseData = await res.json();
+        const { qr } = responseData;
+
+        const trackingParams = qrActionsTrackingParams(qr);
+
+        trackClientEvents({
+          event: EAnalyticEvents.QR_UPDATED,
+          params: {
+            event_category: "Authorized",
+            page_name: "dashboard",
+            email: user?.email,
+            is_activated: false,
+            is_deactivated: false,
+            is_deleted: true,
+            ...trackingParams,
+          },
+          sessionId: user?.id,
+        });
 
         toast.success("Successfully deleted QR!");
         return true;
       } else {
-        const { error } = await res.json();
-        toast.error(error?.message || "Failed to delete QR");
+        const errorResponse = await res.json();
+        toast.error(errorResponse?.error?.message || "Failed to delete QR");
+
+        const trackingParams = qrActionsTrackingParamsError(
+          initialQrData!,
+          "delete",
+          errorResponse,
+        );
+        trackClientEvents({
+          event: EAnalyticEvents.QR_UPDATED_ERROR,
+          params: {
+            event_category: "Authorized",
+            page_name: "dashboard",
+            email: user?.email,
+            ...trackingParams,
+          },
+          sessionId: user?.id,
+        });
+
         return false;
       }
     } catch (e) {
@@ -364,7 +572,7 @@ export const useNewQrOperations = ({
 
         setNewQrId?.(createdQrId);
 
-        await mutatePrefix(["/api/qrs", "/api/links"]);
+        await mutatePrefix(["/api/qrs"]);
 
         toast.success("QR was duplicated");
         return true;
