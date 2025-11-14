@@ -2,7 +2,7 @@
 
 import { nFormatter } from "@dub/utils";
 import { Label, Pie, PieChart } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { useContext, useMemo } from "react";
 import { AnalyticsContext } from "./analytics-provider";
 import { ReactNode } from "react";
@@ -48,14 +48,18 @@ export default function AnalyticsPieChartWithLists({
     return nFormatter(value);
   };
 
-  const formatPercentage = (value: number) => {
-    return maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
-  };
-
   const displayData = useMemo(() => {
     const sorted = [...data].sort((a, b) => b.value - a.value);
     return sorted.slice(0, limit);
   }, [data, limit]);
+
+  const totalValue = useMemo(() => {
+    return displayData.reduce((sum, item) => sum + item.value, 0);
+  }, [displayData]);
+
+  const formatPercentage = (value: number) => {
+    return totalValue > 0 ? Math.round((value / totalValue) * 100) : 0;
+  };
 
   const pieChartData = useMemo(() => {
     return displayData.map((item, index) => ({
@@ -65,11 +69,7 @@ export default function AnalyticsPieChartWithLists({
       fullName: item.title,
       percentage: formatPercentage(item.value),
     }));
-  }, [displayData, maxValue]);
-
-  const totalValue = useMemo(() => {
-    return displayData.reduce((sum, item) => sum + item.value, 0);
-  }, [displayData]);
+  }, [displayData, totalValue]);
 
   const chartConfig = useMemo(() => {
     const config: Record<string, { label: string; color?: string }> = {
@@ -102,25 +102,37 @@ export default function AnalyticsPieChartWithLists({
   }, [displayData]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr] -mt-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr] -mt-2 overflow-hidden">
       {/* Pie Chart */}
-      <div className="relative w-full flex items-center justify-center order-first lg:order-first">
-        <ChartContainer config={chartConfig} className="h-[240px] w-full max-w-[240px]">
+      <div className="relative w-full flex items-center justify-center order-first lg:order-first min-w-0 overflow-hidden">
+        <ChartContainer config={chartConfig} className="h-[240px] w-[240px]">
           <PieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name, props) => {
-                    const data = props.payload;
-                    return [
-                      `${formatValue(data.value)} (${data.percentage}%)`,
-                      data.fullName,
-                    ];
-                  }}
-                />
-              }
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="rounded-lg border bg-white p-2 shadow-sm">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2.5 w-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: data.fill }}
+                          />
+                          <span className="text-sm font-medium truncate max-w-[200px]">
+                            {data.fullName}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground ml-4">
+                          {data.percentage}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
             />
             <Pie
               data={pieChartData}
@@ -165,35 +177,33 @@ export default function AnalyticsPieChartWithLists({
         </ChartContainer>
       </div>
 
-      {/* Combined List with Name/URL, Percentage, and Scans */}
-      <div>
-        <div className="mb-3 flex justify-end gap-8">
-          <h3 className="text-base font-semibold text-black">Percentage</h3>
+      {/* List with optional names and Scans */}
+      <div className="min-w-0">
+        <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
         <div className="space-y-3">
           {list1Data.map((item, index) => {
-            const percentage = formatPercentage(item.value);
             const formattedValue = formatValue(item.value);
             const displayTitle = item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title;
             return (
-              <div key={index} className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div
-                    className="h-3 w-3 flex-shrink-0 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  {showName && (
+              <div key={index} className="flex items-center gap-4">
+                {showName && (
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-foreground text-sm font-medium truncate">
+                      {item.icon}
+                    </span>
                     <span className="text-foreground text-sm font-medium truncate">
                       {displayTitle}
                     </span>
-                  )}
-                </div>
-                <div className="flex gap-8">
-                  <span className="text-foreground text-sm font-semibold whitespace-nowrap min-w-[60px] text-left">
-                    {percentage}%
-                  </span>
-                  <span className="text-foreground text-sm font-semibold whitespace-nowrap min-w-[60px] text-left">
+                  </div>
+                )}
+                <div className="flex items-center justify-end gap-2 ml-auto">
+                  <div
+                    className="h-2.5 w-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-foreground text-sm font-semibold whitespace-nowrap">
                     {formattedValue}
                   </span>
                 </div>

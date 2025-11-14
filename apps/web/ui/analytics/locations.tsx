@@ -7,15 +7,18 @@ import {
   OfficeBuilding,
 } from "@dub/ui/icons";
 import { X } from "@/ui/shared/icons";
-import { CONTINENTS, COUNTRIES, REGIONS } from "@dub/utils";
-import { useContext, useState } from "react";
+import { CONTINENTS, COUNTRIES, REGIONS, cn, nFormatter } from "@dub/utils";
+import { useContext, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { type ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
 import AnalyticsPieChartWithLists from "./analytics-pie-chart-with-lists";
 import ContinentIcon from "./continent-icon";
 import { useAnalyticsFilterOption } from "./utils";
+import { PieChartIcon, ChartBar } from "lucide-react";
 
 const tabs = [
   { name: "Countries", value: "countries" as const, icon: FlagWavy },
@@ -26,14 +29,185 @@ const tabs = [
 
 const EXPAND_LIMIT = 8;
 
-export default function Locations() {
+const chartColors = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--chart-6))",
+];
+
+interface LocationsBarChartProps {
+  data: Array<{
+    icon: React.ReactNode;
+    title: string;
+    href?: string;
+    value: number;
+  }>;
+  maxValue: number;
+  unit: string;
+  limit?: number;
+}
+
+function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChartProps) {
+  const { saleUnit } = useContext(AnalyticsContext);
+
+  const formatValue = (value: number) => {
+    if (unit === "sales" && saleUnit === "saleAmount") {
+      return `$${nFormatter(value / 100)}`;
+    }
+    return nFormatter(value);
+  };
+
+  const formatPercentage = (value: number) => {
+    return maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
+  };
+
+  const displayData = useMemo(() => {
+    const sorted = [...data].sort((a, b) => b.value - a.value);
+    return sorted.slice(0, limit);
+  }, [data, limit]);
+
+  const displayTotalValue = useMemo(() => {
+    return displayData.reduce((sum, item) => sum + item.value, 0);
+  }, [displayData]);
+
+  const chartData = useMemo(() => {
+    return displayData
+      .map((item, index) => ({
+        sr: displayData.length - index,
+        service: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
+        sales: displayTotalValue > 0 ? Math.round((item.value / displayTotalValue) * 100) : 0,
+        fill: chartColors[index % chartColors.length],
+        icon: item.icon,
+        title: item.title,
+        value: item.value,
+      }))
+      .reverse();
+  }, [displayData, displayTotalValue]);
+
+  const chartConfig = {
+    sales: {
+      label: "Sales",
+    },
+  } satisfies ChartConfig;
+
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[270px_1fr] -mt-2 overflow-hidden">
+      <div className="pl-2 pr-6 py-6 min-w-0 overflow-hidden flex items-center justify-center">
+        <ChartContainer config={chartConfig} className="h-[240px] w-[270px]">
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            layout="vertical"
+            barSize={24}
+            margin={{
+              top: 0,
+              bottom: 40,
+            }}
+          >
+            <CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis
+              type="number"
+              dataKey="sales"
+              domain={[0, 100]}
+              tickFormatter={(value) => `${value}%`}
+              axisLine={false}
+              tickLine={false}
+              tickMargin={8}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+            />
+            <YAxis 
+              dataKey="sr" 
+              type="category" 
+              tickLine={false} 
+              tickMargin={8} 
+              axisLine={false}
+              width={30}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="rounded-lg border bg-white p-2 shadow-sm">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2.5 w-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: data.fill }}
+                          />
+                          <span className="text-sm font-medium truncate max-w-[200px]">
+                            {data.title}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground ml-4">
+                          {data.sales}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Bar dataKey="sales" radius={[0, 10, 10, 0]}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+              <LabelList
+                dataKey="title"
+                position="bottom"
+                fill="hsl(var(--muted-foreground))"
+                className="text-xs"
+                offset={5}
+              />
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </div>
+      <div className="min-w-0">
+        <div className="mb-3 flex justify-end">
+          <h3 className="text-base font-semibold text-black">Scans</h3>
+        </div>
+        <div className="space-y-3">
+          {[...displayData].reverse().map((item, index) => {
+            const formattedValue = formatValue(item.value);
+            const color = chartData.find((d) => d.title === item.title)?.fill || chartColors[(displayData.length - 1 - index) % chartColors.length];
+            return (
+              <div key={index} className="flex items-center justify-end gap-2">
+                <div
+                  className="h-2.5 w-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="text-foreground text-sm font-semibold whitespace-nowrap">
+                  {formattedValue}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function Locations({ 
+  tab,
+  view,
+  onViewChange 
+}: { 
+  tab: "countries" | "cities" | "regions" | "continents";
+  view: "pie" | "list";
+  onViewChange: (view: "pie" | "list") => void;
+}) {
   const { queryParams, searchParams } = useRouterStuff();
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
-  const [tab, setTab] = useState<
-    "countries" | "cities" | "continents" | "regions"
-  >("countries");
   const [showModal, setShowModal] = useState(false);
 
   // Fetch data for each tab
@@ -123,56 +297,66 @@ export default function Locations() {
         )}
       </Modal>
 
-      <Card className="gap-4 pt-6">
-        <CardContent className="relative px-6">
-          <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)} className="w-full">
-            <div className="mb-6">
-              <TabsList className="bg-background gap-1 border p-1">
-                {tabs.map(({ icon: Icon, name, value }) => (
-                  <TabsTrigger
-                    key={value}
-                    value={value}
-                    className="flex items-center gap-1.5 data-[state=active]:bg-secondary dark:data-[state=active]:bg-secondary data-[state=active]:text-white dark:data-[state=active]:text-white dark:data-[state=active]:border-transparent"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+      <Card className="gap-4 pt-6 overflow-hidden">
+        <CardContent className="relative px-6 overflow-hidden">
+          {/* View Toggle */}
+          <div className="flex justify-start mb-4">
+            <div className="flex gap-1 border rounded-lg p-1">
+              <button
+                onClick={() => onViewChange("pie")}
+                className={cn(
+                  "p-2 rounded transition-colors",
+                  view === "pie" 
+                    ? "bg-secondary text-white" 
+                    : "hover:bg-gray-100"
+                )}
+              >
+                <PieChartIcon className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => onViewChange("list")}
+                className={cn(
+                  "p-2 rounded transition-colors",
+                  view === "list" 
+                    ? "bg-secondary text-white" 
+                    : "hover:bg-gray-100"
+                )}
+              >
+                <ChartBar className="h-4 w-4" />
+              </button>
             </div>
+          </div>
 
-            {tabs.map((tabItem) => {
-              const tabData = tabItem.value === "countries" ? countriesData 
-                : tabItem.value === "cities" ? citiesData
-                : tabItem.value === "regions" ? regionsData
-                : continentsData;
-              const tabMaxValue = Math.max(...(tabData?.map((d) => d[dataKey] ?? 0) ?? [0]));
-              
-              return (
-                <TabsContent key={tabItem.value} value={tabItem.value}>
-                  {tabData ? (
-                    tabData.length > 0 ? (
-                      <AnalyticsPieChartWithLists
-                        data={getBarListData(tabItem.value)}
-                        unit={selectedTab}
-                        maxValue={tabMaxValue}
-                        limit={EXPAND_LIMIT}
-                        showName={true}
-                      />
-                    ) : (
-                      <div className="flex h-[300px] items-center justify-center">
-                        <p className="text-sm text-neutral-600">No data available</p>
-                      </div>
-                    )
-                  ) : (
-                    <div className="flex h-[300px] items-center justify-center">
-                      <AnalyticsLoadingSpinner />
-                    </div>
-                  )}
-                </TabsContent>
-              );
-            })}
-          </Tabs>
+          {data ? (
+            data.length > 0 ? (
+              <>
+                {view === "list" ? (
+                  <LocationsBarChart
+                    data={getBarListData(tab)}
+                    unit={selectedTab}
+                    maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
+                    limit={EXPAND_LIMIT}
+                  />
+                ) : (
+                  <AnalyticsPieChartWithLists
+                    data={getBarListData(tab)}
+                    unit={selectedTab}
+                    maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
+                    limit={EXPAND_LIMIT}
+                    showName={false}
+                  />
+                )}
+              </>
+            ) : (
+              <div className="flex h-[300px] items-center justify-center">
+                <p className="text-sm text-neutral-600">No data available</p>
+              </div>
+            )
+          ) : (
+            <div className="flex h-[300px] items-center justify-center">
+              <AnalyticsLoadingSpinner />
+            </div>
+          )}
 
           <div className="px-6">
             {hasMore && (

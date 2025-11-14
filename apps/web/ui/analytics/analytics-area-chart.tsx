@@ -253,7 +253,7 @@ export default function AnalyticsAreaChart({
   }
 
   return (
-    <Card className={cn("grid gap-4 p-3 sm:p-4 md:p-6 lg:grid-cols-[2fr_2fr] border-none")}>
+    <Card className={cn("grid gap-4 p-3 sm:p-4 md:p-6 lg:grid-cols-[70%_30%] border-none")}>
       <div className="space-y-4 flex items-end overflow-x-auto">
         <div className="h-56 w-full min-w-[600px] sm:h-80 sm:min-w-0 md:h-96">
           <ChartContainer config={chartConfig} className="h-full w-full">

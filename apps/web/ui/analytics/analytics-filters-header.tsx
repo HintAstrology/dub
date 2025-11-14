@@ -448,121 +448,124 @@ export function AnalyticsFiltersHeader() {
   };
 
   return (
-    <div className="flex w-full flex-col gap-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap lg:gap-2">
-      <AnalyticsExport />
+    <div className="flex flex-col-reverse gap-3 md:flex-row w-full justify-between">
+      <div className="flex w-max flex-col gap-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap lg:gap-2">
+        <DateRangePicker
+          className={cn(
+            "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[200px]",
+            (start || end || interval) && "border-secondary",
+          )}
+          align="end"
+          value={
+            start && end
+              ? {
+                  from: start,
+                  to: end,
+                }
+              : undefined
+          }
+          presetId={start && end ? undefined : interval ?? "30d"}
+          onChange={(range, preset) => {
+            if (preset) {
+              queryParams({
+                del: ["start", "end"],
+                set: {
+                  interval: preset.id,
+                },
+                scroll: false,
+              });
+              return;
+            }
 
-      <Filter.Select
-        className={cn(
-          "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[140px]",
-          hasActiveFilters && "border-secondary",
-        )}
-        filters={filters}
-        activeFilters={activeFilters}
-        onSelect={onFilterSelect}
-        onRemove={(key) =>
-          queryParams({
-            del: key === "link" ? ["domain", "key"] : key,
-            scroll: false,
-          })
-        }
-      />
-      <DateRangePicker
-        className={cn(
-          "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[200px]",
-          (start || end || interval) && "border-secondary",
-        )}
-        align="end"
-        value={
-          start && end
-            ? {
-                from: start,
-                to: end,
-              }
-            : undefined
-        }
-        presetId={start && end ? undefined : interval ?? "30d"}
-        onChange={(range, preset) => {
-          if (preset) {
+            if (!range || !range.from || !range.to) return;
+
             queryParams({
-              del: ["start", "end"],
+              del: "preset",
               set: {
-                interval: preset.id,
+                start: range.from.toISOString(),
+                end: range.to.toISOString(),
               },
               scroll: false,
             });
-            return;
-          }
-
-          if (!range || !range.from || !range.to) return;
-
-          queryParams({
-            del: "preset",
-            set: {
-              start: range.from.toISOString(),
-              end: range.to.toISOString(),
-            },
-            scroll: false,
-          });
-        }}
-        presets={INTERVAL_DISPLAYS.map(({ display, value, shortcut }) => {
-          const requiresUpgrade = false;
-          const { startDate, endDate } = getStartEndDates({
-            interval: value,
-            dataAvailableFrom: createdAt,
-          });
-
-          return {
-            id: value,
-            label: display,
-            dateRange: {
-              from: startDate,
-              to: endDate,
-            },
-            requiresUpgrade,
-            tooltipContent: requiresUpgrade ? (
-              <UpgradeTooltip rangeLabel={display} plan={plan} />
-            ) : undefined,
-            shortcut,
-          };
-        })}
-      />
-
-      <div className="flex items-center gap-2 md:ml-auto">
-        <Switch
-          id="unique"
-          size="1"
-          checked={!!searchParamsObj.unique}
-          onCheckedChange={(checked: boolean) => {
-            if (checked) {
-              queryParams({
-                set: { unique: "true" },
-                scroll: false,
-              });
-            } else {
-              queryParams({
-                del: "unique",
-                scroll: false,
-              });
-            }
           }}
-        />
-        <label
-          htmlFor="unique"
-          className="cursor-pointer whitespace-nowrap text-sm font-medium text-neutral-700"
-        >
-          Unique Scans
-        </label>
-      </div>
+          presets={INTERVAL_DISPLAYS.map(({ display, value, shortcut }) => {
+            const requiresUpgrade = false;
+            const { startDate, endDate } = getStartEndDates({
+              interval: value,
+              dataAvailableFrom: createdAt,
+            });
 
-      {hasActiveFilters && (
-        <Button
-          variant="outline"
-          className="h-10 w-full gap-2 md:w-auto"
-          icon={<Xmark className="h-4 w-4" />}
-          onClick={clearAllFilters}
-          text="Clear"
+            return {
+              id: value,
+              label: display,
+              dateRange: {
+                from: startDate,
+                to: endDate,
+              },
+              requiresUpgrade,
+              tooltipContent: requiresUpgrade ? (
+                <UpgradeTooltip rangeLabel={display} plan={plan} />
+              ) : undefined,
+              shortcut,
+            };
+          })}
         />
-      )}
+        <Filter.Select
+          className={cn(
+            "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[140px]",
+            hasActiveFilters && "border-secondary",
+          )}
+          filters={filters}
+          activeFilters={activeFilters}
+          onSelect={onFilterSelect}
+          onRemove={(key) =>
+            queryParams({
+              del: key === "link" ? ["domain", "key"] : key,
+              scroll: false,
+            })
+          }
+        />
+
+        <div className="flex items-center gap-2 md:ml-auto">
+          <Switch
+            id="unique"
+            size="1"
+            checked={!!searchParamsObj.unique}
+            onCheckedChange={(checked: boolean) => {
+              if (checked) {
+                queryParams({
+                  set: { unique: "true" },
+                  scroll: false,
+                });
+              } else {
+                queryParams({
+                  del: "unique",
+                  scroll: false,
+                });
+              }
+            }}
+          />
+          <label
+            htmlFor="unique"
+            className="cursor-pointer whitespace-nowrap text-sm font-medium text-neutral-700"
+          >
+            Unique Scans
+          </label>
+        </div>
+
+        {hasActiveFilters && (
+          <Button
+            variant="outline"
+            className="h-10 w-full gap-2 md:w-auto"
+            icon={<Xmark className="h-4 w-4" />}
+            onClick={clearAllFilters}
+            text="Clear"
+          />
+        )}
+      </div>
+      <div className="w-max flex justify-end">
+        <AnalyticsExport />
+      </div>
     </div>
   );
 }
