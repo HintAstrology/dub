@@ -396,7 +396,7 @@ export function QrBuilderProvider({
         sessionId: sessionId || user?.id,
       });
 
-      const formValues = contentStepRef.current.getValues();
+      const formValues = contentStepRef.current?.getValues();
       setFormData(formValues as any);
       console.log(
         "Saving form data before moving to customization step:",
@@ -497,6 +497,7 @@ export function QrBuilderProvider({
       return () => clearTimeout(timeoutId);
     }
   }, [builderStep, isGoingBack]);
+
   // Reset form data when QR type changes (but not on initial load)
   useEffect(() => {
     const previousType = previousQrTypeRef.current;
