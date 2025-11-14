@@ -18,7 +18,12 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { DEFAULT_QR_CUSTOMIZATION } from "../constants/default-qr-customization.constants";
+import { FILE_QR_TYPES } from "../constants/get-qr-config";
 import { convertServerQRToNewBuilder } from "../helpers/data-converters";
+import {
+  fetchExistingFileData,
+  fetchExistingLogoFileData,
+} from "../helpers/prepare-file-data";
 import {
   IQrBuilderContextType,
   TDestinationData,
@@ -62,6 +67,10 @@ export function QrBuilderProvider({
   const user = useUser();
   const { isMobile } = useMediaQuery();
   const isEdit = !!initialQrData;
+
+  // State to track if initialization is complete
+  const [isInitializing, setIsInitializing] = useState<boolean>(false);
+  const hasInitializedRef = useRef<string | null>(null);
 
   const getInitializedProps = useCallback(() => {
     if (initialQrData) {
@@ -437,6 +446,98 @@ export function QrBuilderProvider({
     setCustomizationData(data);
   }, []);
 
+  // Unified initialization method for edit mode
+  const initializeFromQrData = useCallback(async () => {
+    if (!initialQrData) {
+      return;
+    }
+
+    // Check if we've already initialized for this QR data
+    const qrId = initialQrData.id;
+    if (hasInitializedRef.current === qrId) {
+      return;
+    }
+
+    hasInitializedRef.current = qrId;
+    setIsInitializing(true);
+
+    try {
+      // Convert server data to builder format
+      const builderData = convertServerQRToNewBuilder(initialQrData);
+      const isFileBasedQR = FILE_QR_TYPES.includes(builderData.qrType);
+
+      // Load files in parallel
+      const [fileDataResult, logoFileResult] = await Promise.allSettled([
+        // Load file for file-based QR codes
+        isFileBasedQR && initialQrData.fileId
+          ? fetchExistingFileData(initialQrData)
+          : Promise.resolve(undefined),
+        // Load logo file if exists
+        builderData.customizationData.logo.type === "uploaded" &&
+        builderData.customizationData.logo.fileId
+          ? fetchExistingLogoFileData(builderData.customizationData.logo)
+          : Promise.resolve(undefined),
+      ]);
+
+      // Update formData with loaded files
+      let updatedFormData = builderData.formData;
+      if (fileDataResult.status === "fulfilled" && fileDataResult.value) {
+        updatedFormData = {
+          ...updatedFormData,
+          ...fileDataResult.value,
+        } as TQRFormData;
+      }
+
+      // Update customizationData with loaded logo file
+      let updatedCustomizationData = builderData.customizationData;
+      if (logoFileResult.status === "fulfilled" && logoFileResult.value) {
+        updatedCustomizationData = {
+          ...updatedCustomizationData,
+          logo: {
+            ...updatedCustomizationData.logo,
+            file: logoFileResult.value,
+          },
+        };
+      }
+
+      // Update all state at once
+      setSelectedQrType(builderData.qrType);
+      setFormData(updatedFormData);
+      setCustomizationData(updatedCustomizationData);
+
+      // Update currentFormValues
+      const initialValues: Record<string, any> = {};
+      if (builderData.title) {
+        initialValues.qrName = builderData.title;
+      }
+      if (updatedFormData) {
+        Object.assign(initialValues, updatedFormData);
+      }
+      setCurrentFormValues(initialValues);
+    } catch (error) {
+      console.error(
+        "Failed to initialize QR builder from initialQrData:",
+        error,
+      );
+    } finally {
+      setIsInitializing(false);
+    }
+  }, [initialQrData]);
+
+  // Initialize from initialQrData on mount or when it changes (edit mode)
+  useEffect(() => {
+    if (initialQrData) {
+      const qrId = initialQrData.id;
+      // Only initialize if we haven't initialized for this QR ID yet
+      if (hasInitializedRef.current !== qrId) {
+        initializeFromQrData();
+      }
+    } else {
+      // Reset initialization ref when not in edit mode
+      hasInitializedRef.current = null;
+    }
+  }, [initialQrData, initializeFromQrData]);
+
   // Handle typeToScrollTo from landing page buttons
   useEffect(() => {
     if (typeToScrollTo && homepageDemo) {
@@ -493,6 +594,7 @@ export function QrBuilderProvider({
     isProcessing,
     isFileUploading,
     isFileProcessing,
+    isInitializing,
 
     // Form validation state
     isFormValid,

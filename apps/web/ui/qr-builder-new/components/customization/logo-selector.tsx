@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { fetchExistingLogoFileData } from "@/ui/qr-builder-new/helpers/prepare-file-data";
 import { cn } from "@dub/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoaderCircle, Upload, X } from "lucide-react";
@@ -50,7 +49,8 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
   disabled = false,
   isMobile = false,
 }) => {
-  const { setIsFileUploading, selectedQrType } = useQrBuilderContext();
+  const { setIsFileUploading, selectedQrType, isInitializing, isEditMode } =
+    useQrBuilderContext();
 
   const methods = useForm<LogoFormValues>({
     defaultValues: {
@@ -58,40 +58,51 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     },
   });
 
-  const { control, trigger } = methods;
+  const { control, trigger, reset } = methods;
   const uploadedLogoFiles = useWatch({ control, name: FILE_UPLOAD_FIELD_NAME });
   const previousFilesRef = useRef<File[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isLoadingExistingFile, setIsLoadingExistingFile] = useState(false);
-  const hasLoadedInitialFile = useRef(false);
+  const isSyncingFromContextRef = useRef(false);
+  const lastSyncedFileIdRef = useRef<string | undefined>(undefined);
 
-  // Load existing file when component mounts if fileId exists
+  // Sync logo file from context to form (file is loaded by initializeFromQrData in context)
+  // This should only run when logoData.file changes from context, not from user interaction
   useEffect(() => {
-    if (hasLoadedInitialFile.current) return;
-    if (!logoData.fileId) return;
-    if (logoData.type !== "uploaded") return;
+    // Only sync from context if logo has fileId (meaning it's loaded from server)
+    // and the fileId has changed (to avoid re-syncing the same file)
+    if (
+      logoData.type === "uploaded" &&
+      logoData.fileId &&
+      logoData.fileId !== lastSyncedFileIdRef.current &&
+      logoData.file
+    ) {
+      isSyncingFromContextRef.current = true;
+      lastSyncedFileIdRef.current = logoData.fileId;
 
-    const loadExistingFile = async () => {
-      setIsLoadingExistingFile(true);
-      try {
-        const preparedFile = await fetchExistingLogoFileData(logoData);
+      // Use reset to properly update form with new default values
+      reset({
+        [FILE_UPLOAD_FIELD_NAME]: [logoData.file],
+      });
 
-        if (preparedFile) {
-          methods.setValue(FILE_UPLOAD_FIELD_NAME, [preparedFile]);
-          // Update previousFilesRef to prevent the second useEffect from triggering
-          previousFilesRef.current = [preparedFile];
-          hasLoadedInitialFile.current = true;
-          console.log("LogoSelector: File loaded and set in form");
-        }
-      } catch (error) {
-        console.error("Failed to load existing logo file:", error);
-      } finally {
-        setIsLoadingExistingFile(false);
-      }
-    };
+      previousFilesRef.current = [logoData.file];
 
-    loadExistingFile();
-  }, [logoData.fileId, logoData.type, methods]);
+      // Reset flag after state update
+      setTimeout(() => {
+        isSyncingFromContextRef.current = false;
+      }, 0);
+    } else if (logoData.type !== "uploaded" && uploadedLogoFiles.length > 0) {
+      // Clear form if logo type changed to non-uploaded
+      isSyncingFromContextRef.current = true;
+      reset({
+        [FILE_UPLOAD_FIELD_NAME]: [],
+      });
+      previousFilesRef.current = [];
+      lastSyncedFileIdRef.current = undefined;
+      setTimeout(() => {
+        isSyncingFromContextRef.current = false;
+      }, 0);
+    }
+  }, [logoData.file, logoData.fileId, logoData.type, reset]);
 
   // File upload hook
   const { uploadFile, isUploading, uploadProgress } = useFileUpload({
@@ -124,51 +135,64 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
   }, [isUploading, setIsFileUploading]);
 
   useEffect(() => {
+    // Skip if we're currently syncing from context to avoid infinite loop
+    if (isSyncingFromContextRef.current) {
+      return;
+    }
+
     const lastFile = uploadedLogoFiles?.[uploadedLogoFiles.length - 1] || null;
     const previousLastFile =
       previousFilesRef.current?.[previousFilesRef.current.length - 1] || null;
 
-    if (lastFile !== previousLastFile) {
-      if (lastFile) {
-        // Check if this file is already uploaded (has fileId in metadata)
-        const isAlreadyUploaded = (lastFile as any).fileId;
+    // Skip if file hasn't changed
+    if (lastFile === previousLastFile) {
+      return;
+    }
 
-        if (isAlreadyUploaded) {
-          console.log("LogoSelector: File already uploaded, skipping upload", {
-            fileId: (lastFile as any).fileId,
-          });
-          previousFilesRef.current = uploadedLogoFiles || [];
-          return;
-        }
+    if (lastFile) {
+      // Check if this file is already uploaded (has fileId in metadata or in logoData)
+      const fileIdFromMetadata = (lastFile as any).fileId;
+      const isAlreadyUploaded = fileIdFromMetadata || logoData.fileId;
 
-        // Validate file size
-        if (lastFile.size > MAX_LOGO_FILE_SIZE) {
-          toast.error("Logo file size must be less than 5MB");
-          methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
-          return;
-        }
+      // If file is already uploaded (from context initialization), don't upload again
+      if (isAlreadyUploaded && logoData.fileId) {
+        // File is already loaded from server, just update ref and skip
+        previousFilesRef.current = uploadedLogoFiles || [];
+        return;
+      }
 
-        // Validate file type
-        if (!lastFile.type.startsWith("image/")) {
-          toast.error("Please select an image file");
-          methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
-          return;
-        }
+      // Validate file size
+      if (lastFile.size > MAX_LOGO_FILE_SIZE) {
+        toast.error("Logo file size must be less than 5MB");
+        methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
+        previousFilesRef.current = [];
+        return;
+      }
 
-        console.log("LogoSelector: New file selected, uploading...");
+      // Validate file type
+      if (!lastFile.type.startsWith("image/")) {
+        toast.error("Please select an image file");
+        methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
+        previousFilesRef.current = [];
+        return;
+      }
 
-        // Set file temporarily (for preview) and reset suggested logo selection
-        onLogoChange({
-          type: "uploaded",
-          file: lastFile,
-          id: undefined, // Clear suggested logo id
-        });
+      console.log("LogoSelector: New file selected, uploading...");
 
-        // Upload file to get fileId
-        uploadFile(lastFile).catch((error) => {
-          console.error("Logo upload error:", error);
-        });
-      } else {
+      // Set file temporarily (for preview) and reset suggested logo selection
+      onLogoChange({
+        type: "uploaded",
+        file: lastFile,
+        id: undefined, // Clear suggested logo id
+      });
+
+      // Upload file to get fileId
+      uploadFile(lastFile).catch((error) => {
+        console.error("Logo upload error:", error);
+      });
+    } else {
+      // File was removed - only clear logo if it's not already cleared
+      if (logoData.type !== "none") {
         onLogoChange({
           type: "none",
           id: undefined,
@@ -179,7 +203,7 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     }
 
     previousFilesRef.current = uploadedLogoFiles || [];
-  }, [uploadedLogoFiles, onLogoChange, uploadFile, methods]);
+  }, [uploadedLogoFiles, onLogoChange, uploadFile, methods, logoData]);
 
   const handleSuggestedLogoSelect = useCallback(
     (logoId: string, icon?: any) => {
@@ -218,14 +242,15 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     return getSortedLogos(selectedQrType);
   }, [selectedQrType]);
 
-  // const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const files = Array.from(e.target.files || []);
-  //   methods.setValue(FILE_UPLOAD_FIELD_NAME, files);
-  //   methods.trigger(FILE_UPLOAD_FIELD_NAME);
-  // }, [methods]);
+  // Show loading state while initializing logo file in edit mode
+  const isLoadingLogo =
+    isInitializing &&
+    isEditMode &&
+    logoData.type === "uploaded" &&
+    logoData.fileId &&
+    !logoData.file;
 
-  // Show loading indicator while existing file is being loaded
-  if (isLoadingExistingFile) {
+  if (isLoadingLogo) {
     return (
       <motion.div
         layout
