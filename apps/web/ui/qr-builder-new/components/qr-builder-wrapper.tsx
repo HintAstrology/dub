@@ -41,14 +41,15 @@ export const QRBuilderWrapper = () => {
     <motion.div
       ref={qrBuilderContentWrapperRef}
       key={`builder-step-${builderStep}`}
-      initial={isGoingBack ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.98 }}
+      initial={isGoingBack ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 0, scale: 1 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={
         isGoingBack
           ? { duration: 0 }
           : {
-              duration: 0.4,
+              duration: 0.3,
               ease: [0.4, 0, 0.2, 1],
+              opacity: { duration: 0.2 },
             }
       }
       className={cn(
