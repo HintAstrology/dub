@@ -1,19 +1,10 @@
 import { Button } from "@/components/ui/button";
-import QRCodeStyling from "qr-code-styling";
+import { Loader2 } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { useQrBuilderContext } from "../context";
 
-interface DownloadButtonProps {
-  qrCode: QRCodeStyling | null;
-  disabled?: boolean;
-}
-
-export const DownloadButton = ({
-  qrCode,
-  disabled = false,
-}: DownloadButtonProps) => {
+export const DownloadButton = () => {
   const {
     homepageDemo,
     isEditMode,
@@ -50,12 +41,7 @@ export const DownloadButton = ({
 
     // Directly save/create the QR code without navigating steps
     await onSave();
-  }, [
-    isContentStep,
-    contentStepRef,
-    setFormData,
-    onSave,
-  ]);
+  }, [isContentStep, contentStepRef, setFormData, onSave]);
 
   const getButtonText = useCallback(() => {
     if (isFileUploading) return "Uploading...";

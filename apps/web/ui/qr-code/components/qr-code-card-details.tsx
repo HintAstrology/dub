@@ -1,3 +1,4 @@
+import { Session } from "@/lib/auth";
 import { useQRContentEditor } from "@/ui/modals/qr-content-editor";
 import { LINKED_QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { getDisplayContent } from "@/ui/qr-builder-new/helpers/qr-data-handlers";
@@ -13,16 +14,18 @@ export const QRCardDetails = memo(
     qrCode,
     featuresAccess,
     setShowTrialExpiredModal,
+    user,
   }: {
     qrCode: TQrServerData;
     featuresAccess?: boolean;
     setShowTrialExpiredModal?: (show: boolean) => void;
+    user: Session["user"];
   }) => {
     const displayContent = getDisplayContent(qrCode);
     const qrType = qrCode.qrType as EQRType;
 
     const { setShowQRContentEditorModal, QRContentEditorModal } =
-      useQRContentEditor({ qrCode });
+      useQRContentEditor({ qrCode, user });
 
     const onEditClick = (e: React.MouseEvent<SVGSVGElement>) => {
       e.stopPropagation();

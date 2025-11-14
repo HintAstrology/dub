@@ -62,12 +62,15 @@ export function QrCodeControls({
   const { handleToggleModal: setShowDuplicateQRModal, DuplicateQRModal } =
     useDuplicateQRModal({
       qrCode,
+      user,
     });
   const { setShowArchiveQRModal, ArchiveQRModal } = useArchiveQRModal({
     qrCode,
+    user,
   });
   const { setShowDeleteQRModal, DeleteLinkModal } = useDeleteQRModal({
     qrCode,
+    user,
   });
   const { QRPreviewModal, setShowQRPreviewModal } = useQRPreviewModal({
     qrCodeStylingInstance,

@@ -35,6 +35,7 @@ export function QRBuilderNewModal({
 }: QRBuilderModalProps) {
   const { createQr, updateQR } = useNewQrOperations({
     initialQrData: qrCode!,
+    user,
   });
   const { isMobile } = useMediaQuery();
 

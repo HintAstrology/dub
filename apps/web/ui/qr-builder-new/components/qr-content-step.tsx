@@ -64,6 +64,7 @@ export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
 
   return (
     <QrFormResolver
+      key={selectedQrType}
       ref={formRef}
       qrType={selectedQrType}
       onSubmit={handleFormSubmit}

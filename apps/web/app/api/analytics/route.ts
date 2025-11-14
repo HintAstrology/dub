@@ -31,6 +31,7 @@ type Endpoint =
   | "referer_urls"
   | "top_links"
   | "top_urls"
+  | "top_types"
   | "utm_sources"
   | "utm_mediums"
   | "utm_campaigns"

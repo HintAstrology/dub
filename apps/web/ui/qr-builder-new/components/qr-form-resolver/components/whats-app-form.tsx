@@ -56,14 +56,16 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
         const result = await form.trigger();
         if (result) {
           const formData = form.getValues();
-          const encodedData = encodeQRData(EQRType.WEBSITE, formData);
+          const encodedData = encodeQRData(EQRType.WHATSAPP, formData);
+          console.log("validate encodedData", encodedData);
           onSubmit({ ...formData, encodedData });
         }
         return result;
       },
       getValues: () => {
         const formData = form.getValues();
-        const encodedData = encodeQRData(EQRType.WEBSITE, formData);
+        const encodedData = encodeQRData(EQRType.WHATSAPP, formData);
+        console.log("getValues encodedData", encodedData);
         return { ...formData, encodedData };
       },
       form,

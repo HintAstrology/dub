@@ -66,10 +66,7 @@ const handleUploadedLogo = (
     return true; // Async update in progress
   } else if (customizationData.logo.fileId) {
     // Construct full R2 URL for uploaded logo using fileId
-    const storageBaseUrl =
-      process.env.NEXT_PUBLIC_STORAGE_BASE_URL ||
-      "https://dev-assets.getqr.com";
-    options.image = `${storageBaseUrl}/qrs-content/${customizationData.logo.fileId}`;
+    options.image = `${process.env.NEXT_PUBLIC_STORAGE_BASE_URL}/qrs-content/${customizationData.logo.fileId}`;
   } else {
     options.image = "";
   }

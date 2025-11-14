@@ -1,3 +1,4 @@
+import { Session } from "@/lib/auth";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { Tooltip } from "@dub/ui";
 import { Icon } from "@iconify/react";
@@ -7,6 +8,7 @@ import { useQRRenameModal } from "../../modals/qr-rename-modal";
 
 interface IQRCardTitle {
   qrCode: TQrServerData;
+  user: Session["user"];
   featuresAccess?: boolean;
   setShowTrialExpiredModal?: (show: boolean) => void;
 }
@@ -15,8 +17,12 @@ export const QRCardTitle: FC<IQRCardTitle> = ({
   qrCode,
   featuresAccess,
   setShowTrialExpiredModal,
+  user,
 }) => {
-  const { QRRenameModal, setShowQRRenameModal } = useQRRenameModal({ qrCode });
+  const { QRRenameModal, setShowQRRenameModal } = useQRRenameModal({
+    qrCode,
+    user,
+  });
 
   const onEditClick = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
