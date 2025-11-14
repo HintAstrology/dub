@@ -102,7 +102,7 @@ export const WebsiteForm = forwardRef<WebsiteFormRef, WebsiteFormProps>(
               {openAccordion === "details" && !contentOnly && (
                 <Separator className="mb-3" />
               )}
-              <AccordionContent className="pt-2">
+              <AccordionContent className="space-y-4 pt-2">
                 <BaseFormField
                   name="websiteLink"
                   label="Enter your website"

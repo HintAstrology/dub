@@ -25,13 +25,21 @@ export const QrTypeIcon: FC<QrTypeIconProps> = ({
   className,
 }) => {
   return (
-    <Icon
-      icon={icon}
-      className={cn(
-        "transition-colors",
-        isActive ? "text-secondary" : ICON_COLORS[idx % ICON_COLORS.length],
-        className,
-      )}
-    />
+    <span
+      className={cn("inline-block", className)}
+      style={{
+        display: "inline-block",
+        verticalAlign: "middle",
+      }}
+    >
+      <Icon
+        icon={icon}
+        className={cn(
+          "transition-colors w-full h-full",
+          isActive ? "text-secondary" : ICON_COLORS[idx % ICON_COLORS.length],
+          className,
+        )}
+      />
+    </span>
   );
 };

@@ -22,11 +22,11 @@ export const PricingSection: FC<IPricingSectionProps> = ({
   handleScrollButtonClick,
 }) => {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-14">
+    <section className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 lg:py-14">
       <div className="mb-12 flex flex-col items-center justify-center gap-3">
         <SectionTitle
-          titleFirstPart={"Start 7-Day Trial Today, Upgrade when"}
-          highlightedTitlePart={"You Need"}
+          titleFirstPart={"Start 7-Day Trial Today, Upgrade when You Need"}
+          // highlightedTitlePart={"You Need"}
           className="lg:!leading-[52px]"
         />
         <p className="text-muted-foreground text-center max-w-4xl text-base md:text-lg">
@@ -34,15 +34,15 @@ export const PricingSection: FC<IPricingSectionProps> = ({
         </p>
       </div>
 
-      <div className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:items-end lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-auto lg:grid lg:grid-cols-3 lg:items-end lg:justify-center lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:max-w-4xl [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
         {PRICING_PLANS.map((plan, index) => (
-          <div key={index} className="h-full min-w-[85vw] flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-2 lg:min-w-0">
+          <div key={index} className="h-full min-w-[85vw] flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-2 lg:min-w-0 w-full lg:max-w-[320px] lg:mx-auto">
             <Card
               className={cn(
                 "relative h-full w-full overflow-hidden pt-3",
-                {
-                  "border-primary border-2 shadow": plan.withButton,
-                },
+                plan.withButton
+                  ? "border-primary border-2 shadow"
+                  : "border-none"
               )}
             >
               <CardContent className="flex h-full flex-col gap-6">
@@ -62,7 +62,13 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                       /{plan.plan.split("/")[1]}
                     </span>
                   </div>
-                  <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/20 pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold">
+                  <Badge 
+                  className={cn(
+                    "pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold",
+                    plan.withButton 
+                      ? "bg-primary hover:bg-primary/20" 
+                      : "bg-white text-primary border-primary hover:bg-white"
+                  )}>
                     {plan.badge}
                   </Badge>
                 </div>

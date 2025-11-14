@@ -16,8 +16,8 @@ export const ReviewsSection = () => {
     <section id="reviews" className="pb-10 lg:pb-14">
       <div className="mb-12 flex flex-col items-center justify-center gap-6 sm:mb-16 lg:gap-10">
         <SectionTitle
-          titleFirstPart={"Why Our Customers"}
-          highlightedTitlePart={"Choose GetQR"}
+          titleFirstPart={"Why Our Customers Choose GetQR"}
+          // highlightedTitlePart={"Choose GetQR"}
         />
 
         {stats.totalReviews > 0 && (

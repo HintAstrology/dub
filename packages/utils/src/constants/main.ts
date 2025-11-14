@@ -60,12 +60,12 @@ export const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN
 //   "admin.localhost:8888",
 // ]);
 
-// export const PARTNERS_DOMAIN =
-//   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-//     ? `https://partners.${APP_URL}`
-//     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-//       ? `https://partners-staging.${APP_URL}`
-//       : "http://partners.localhost:8888";
+export const PARTNERS_DOMAIN =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+    ? `https://partners.${APP_URL}`
+    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
+      ? `https://partners-staging.${APP_URL}`
+      : "http://partners.localhost:8888";
 
 // export const PARTNERS_HOSTNAMES = new Set([
 //   `partners.${APP_URL}`,

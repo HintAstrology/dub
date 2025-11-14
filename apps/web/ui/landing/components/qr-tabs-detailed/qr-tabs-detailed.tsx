@@ -63,13 +63,13 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
                   <TabsTrigger
                     key={type.id}
                     value={type.id}
-                    className="bg-card hover:border-primary/30 data-[state=active]:border-primary data-[state=active]:bg-primary/5 group relative flex h-24 w-24 flex-shrink-0 flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-transparent px-3 py-4 shadow-sm transition-all duration-300 data-[state=active]:shadow-md sm:h-28 sm:w-28"
+                    className="bg-card hover:border-primary/30 data-[state=active]:border-primary data-[state=active]:bg-primary/5 group relative flex h-24 w-24 flex-shrink-0 flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-transparent px-3 py-4 shadow-sm transition-all duration-300 data-[state=active]:shadow-md sm:h-28 sm:w-28 sm:whitespace-nowrap"
                   >
                     <Icon
                       icon={type.icon}
                       className="text-primary group-data-[state=active]:text-primary relative z-10 h-7 w-7 transition-colors duration-300 sm:h-8 sm:w-8"
                     />
-                    <span className="text-foreground group-data-[state=active]:text-primary relative z-10 text-center text-xs font-medium transition-colors duration-300">
+                    <span className="text-foreground group-data-[state=active]:text-primary relative z-10 text-center text-xs font-medium transition-colors duration-300 break-words whitespace-normal">
                       {type.label}
                     </span>
                   </TabsTrigger>

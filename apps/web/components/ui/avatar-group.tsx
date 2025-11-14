@@ -1,20 +1,35 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { default as man } from "../assets/avatars/man.png";
+import { default as woman } from "../assets/avatars/woman.png";
+
+const usersWithAvatar = [
+  {
+    name: "S",
+  },
+  {
+    name: "John",
+    avatar: man,
+  },
+  {
+    name: "Anna",
+    avatar: woman,
+  },
+];
 
 export const AvatarGroup = () => {
   return (
-    <div className="flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background *:data-[slot=avatar]:grayscale">
-      <Avatar>
-        <AvatarImage src="https://github.com/shadcn.png" alt="User 1" />
-        <AvatarFallback>U1</AvatarFallback>
-      </Avatar>
-      <Avatar>
-        <AvatarImage src="https://github.com/maxleiter.png" alt="User 2" />
-        <AvatarFallback>U2</AvatarFallback>
-      </Avatar>
-      <Avatar>
-        <AvatarImage src="https://github.com/evilrabbit.png" alt="User 3" />
-        <AvatarFallback>U3</AvatarFallback>
-      </Avatar>
+    <div className="flex -space-x-3">
+      {usersWithAvatar?.map((user, index) => (
+        <Avatar
+          key={index}
+          className="ring-offset-background h-8 w-8 ring-2 ring-gray-300 ring-offset-2"
+        >
+          <AvatarImage src={user?.avatar?.src ?? ""} alt={user.name} />
+          <AvatarFallback className="bg-gray-200 text-sm">
+            {user.name.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+      ))}
     </div>
   );
 };
