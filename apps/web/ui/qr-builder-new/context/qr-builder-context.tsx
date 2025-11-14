@@ -17,8 +17,8 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { DEFAULT_QR_CUSTOMIZATION } from "../constants/default-qr-customization.constants";
-import { convertServerQRToNewBuilder } from "../helpers/data-converters";
+import { getInitializedProps } from "../helpers/get-initialized-props";
+import { useInitializeQrData } from "../hooks/use-initialize-qr-data";
 import {
   IQrBuilderContextType,
   TDestinationData,
@@ -63,29 +63,7 @@ export function QrBuilderProvider({
   const { isMobile } = useMediaQuery();
   const isEdit = !!initialQrData;
 
-  const getInitializedProps = useCallback(() => {
-    if (initialQrData) {
-      const builderData = convertServerQRToNewBuilder(initialQrData);
-
-      return {
-        qrTitle: builderData.title || "",
-        selectedQrType: builderData.qrType,
-        formData: builderData.formData,
-        customizationData: builderData.customizationData,
-        fileId: builderData.fileId,
-      };
-    }
-
-    return {
-      qrTitle: "",
-      selectedQrType: null,
-      formData: null,
-      customizationData: DEFAULT_QR_CUSTOMIZATION,
-      fileId: undefined,
-    };
-  }, [initialQrData]);
-
-  const initialState = getInitializedProps();
+  const initialState = getInitializedProps(initialQrData);
 
   const [builderStep, setBuilderStep] = useState<TStepState>(initialStep || 1);
   const [destinationData, setDestinationData] =
@@ -136,6 +114,29 @@ export function QrBuilderProvider({
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
   const previousQrTypeRef = useRef<TQrType>(selectedQrType);
+
+  // Unified initialization method for edit mode using hook
+  const handleInitialized = useCallback(
+    (params: {
+      qrType: EQRType;
+      formData: TQRFormData;
+      customizationData: IQRCustomizationData;
+      currentFormValues: Record<string, any>;
+    }) => {
+      setSelectedQrType(params.qrType);
+      setFormData(params.formData);
+      setCustomizationData(params.customizationData);
+      setCurrentFormValues(params.currentFormValues);
+    },
+    [],
+  );
+
+  const { isInitializing, initialize, hasInitializedRef } = useInitializeQrData(
+    {
+      initialQrData,
+      onInitialized: handleInitialized,
+    },
+  );
 
   const isTypeStep = builderStep === 1;
   const isContentStep = builderStep === 2;
@@ -437,6 +438,21 @@ export function QrBuilderProvider({
     setCustomizationData(data);
   }, []);
 
+  // Initialize from initialQrData on mount or when it changes (edit mode)
+  useEffect(() => {
+    if (initialQrData) {
+      const qrId = initialQrData.id;
+      // Only initialize if we haven't initialized for this QR ID yet
+      if (hasInitializedRef.current !== qrId) {
+        initialize();
+      }
+    } else {
+      // Reset initialization ref when not in edit mode
+      hasInitializedRef.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQrData, initialize]);
+
   // Handle typeToScrollTo from landing page buttons
   useEffect(() => {
     if (typeToScrollTo && homepageDemo) {
@@ -468,14 +484,19 @@ export function QrBuilderProvider({
       selectedQrType !== null
     ) {
       // Clear form data when switching between different QR types
+      // But preserve qrName if it exists
+      const qrNameToPreserve = currentFormValues.qrName;
+
       setFormData(null);
-      setCurrentFormValues({});
+      setCurrentFormValues(
+        qrNameToPreserve ? { qrName: qrNameToPreserve } : {},
+      );
       setIsFormValid(false);
     }
 
     // Update ref for next comparison
     previousQrTypeRef.current = selectedQrType;
-  }, [selectedQrType]);
+  }, [selectedQrType, currentFormValues.qrName]);
 
   const contextValue: IQrBuilderContextType = {
     // States
@@ -493,6 +514,7 @@ export function QrBuilderProvider({
     isProcessing,
     isFileUploading,
     isFileProcessing,
+    isInitializing,
 
     // Form validation state
     isFormValid,

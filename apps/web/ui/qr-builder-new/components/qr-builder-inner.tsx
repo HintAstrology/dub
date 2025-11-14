@@ -1,10 +1,12 @@
 import { QRBuilderSteps } from "@/ui/qr-builder-new/components/qr-builder-steps.tsx";
 import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
+import { getDemoProps } from "@/ui/qr-builder-new/helpers/get-demo-props";
 import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Flex } from "@radix-ui/themes";
 import { motion } from "framer-motion";
+import { LoaderCircle } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useQRCodeStyling } from "../hooks/use-qr-code-styling";
 import { QRCustomization } from "./customization";
@@ -45,6 +47,9 @@ export const QRBuilderInner = () => {
     setBuilderStep,
     isDialogOpen,
     setIsDialogOpen,
+    initialQrData,
+    formData,
+    isInitializing,
   } = useQrBuilderContext();
 
   const qrCodeDemo = currentQRType ? QRCodeDemoMap[currentQRType] : null;
@@ -68,17 +73,25 @@ export const QRBuilderInner = () => {
     defaultData: "https://getqr.com/qr-complete-setup",
   });
 
-  const demoProps = useMemo(() => {
-    if (!qrCodeDemo || !currentQRType) return {};
-
-    return qrCodeDemo.propsKeys.reduce(
-      (acc: Record<string, any>, key: string) => {
-        acc[key] = currentFormValues[key];
-        return acc;
-      },
-      {},
-    );
-  }, [qrCodeDemo, currentQRType, currentFormValues]);
+  const demoProps = useMemo(
+    () =>
+      getDemoProps({
+        qrCodeDemo,
+        currentQRType,
+        currentFormValues,
+        isEditMode,
+        initialQrData,
+        formData,
+      }),
+    [
+      qrCodeDemo,
+      currentQRType,
+      currentFormValues,
+      isEditMode,
+      initialQrData,
+      formData,
+    ],
+  );
 
   const stepContent = (
     <>
@@ -102,6 +115,21 @@ export const QRBuilderInner = () => {
       )}
     </>
   );
+
+  // Hide constructor content while initializing files in edit mode
+  // This prevents form handlers from firing incorrectly during initialization
+  if (isInitializing && isEditMode && !isTypeStep) {
+    return (
+      <div className="flex w-full items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-4">
+          <LoaderCircle className="text-secondary h-12 w-12 animate-spin" />
+          <p className="text-muted-foreground text-sm">
+            Loading QR code data...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
