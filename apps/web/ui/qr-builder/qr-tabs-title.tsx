@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { SectionTitle } from "../../section-title";
+import { SectionTitle } from "../landing/components/section-title";
 
 export const QrTabsTitle: FC = () => {
   return (
@@ -9,7 +9,7 @@ export const QrTabsTitle: FC = () => {
         highlightedTitlePart="QR Code"
       />
       <p className="text-muted-foreground hidden max-w-4xl text-center text-base sm:block md:text-lg">
-        Generate branded QR codes and track engagement in real time{" "}
+      Generate branded QR codes and track engagement in real time{" "}
       </p>
     </div>
   );

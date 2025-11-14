@@ -11,9 +11,9 @@ export const GetQRInfoCardsSection: FC = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle
-            titleFirstPart={"Create QR"}
-            highlightedTitlePart={"In 3"}
-            titleSecondPart={"Simple Steps"}
+            titleFirstPart={"Create QR In 3 Simple Steps"}
+            // highlightedTitlePart={"In 3"}
+            // titleSecondPart={"Simple Steps"}
           />
           <p className="text-muted-foreground text-center max-w-4xl text-base md:text-lg">
             From selection to personalization — transparency at every step.

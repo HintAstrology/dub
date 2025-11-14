@@ -76,7 +76,6 @@ export function QrBuilderProvider({
   const [formData, setFormData] = useState<TQRFormData | null>(
     initialState.formData,
   );
-
   const [currentFormValues, setCurrentFormValues] = useState<
     Record<string, any>
   >(() => {
@@ -113,6 +112,7 @@ export function QrBuilderProvider({
   const contentStepRef = useRef<QRContentStepRef>(null);
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
+
   const previousQrTypeRef = useRef<TQrType>(selectedQrType);
 
   // Unified initialization method for edit mode using hook
@@ -181,15 +181,27 @@ export function QrBuilderProvider({
   }, [initialQrData]);
 
   const handleNextStep = useCallback(() => {
-    // Prevent scroll on step change
+    // Store scroll position and QR builder position relative to viewport before step change
     const scrollPosition = window.scrollY;
+    const qrBuilderElement = qrBuilderContentWrapperRef.current;
+    const qrBuilderViewportTop = qrBuilderElement
+      ? qrBuilderElement.getBoundingClientRect().top
+      : null;
 
     // @ts-ignore
     setBuilderStep((prev) => Math.min(prev + 1, 3));
 
-    // Restore scroll position after state update
+    // Restore QR builder position after DOM updates and animations
     requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
+      requestAnimationFrame(() => {
+        if (qrBuilderViewportTop !== null && qrBuilderElement) {
+          const newViewportTop = qrBuilderElement.getBoundingClientRect().top;
+          const offset = newViewportTop - qrBuilderViewportTop;
+          window.scrollTo(0, scrollPosition + offset);
+        } else {
+          window.scrollTo(0, scrollPosition);
+        }
+      });
     });
   }, []);
 
@@ -212,15 +224,27 @@ export function QrBuilderProvider({
         }
       }
 
-      // Prevent scroll on step change
+      // Store scroll position and QR builder position relative to viewport before step change
       const scrollPosition = window.scrollY;
+      const qrBuilderElement = qrBuilderContentWrapperRef.current;
+      const qrBuilderViewportTop = qrBuilderElement
+        ? qrBuilderElement.getBoundingClientRect().top
+        : null;
 
       setTypeSelectionError("");
       setBuilderStep(newStep as TStepState);
 
-      // Restore scroll position after state update
+      // Restore QR builder position after DOM updates and animations
       requestAnimationFrame(() => {
-        window.scrollTo(0, scrollPosition);
+        requestAnimationFrame(() => {
+          if (qrBuilderViewportTop !== null && qrBuilderElement) {
+            const newViewportTop = qrBuilderElement.getBoundingClientRect().top;
+            const offset = newViewportTop - qrBuilderViewportTop;
+            window.scrollTo(0, scrollPosition + offset);
+          } else {
+            window.scrollTo(0, scrollPosition);
+          }
+        });
       });
 
       // Reset form validity appropriately
@@ -397,15 +421,6 @@ export function QrBuilderProvider({
         "Saving form data before moving to customization step:",
         formValues,
       );
-
-      // Save the current form values to formData state before moving to next step
-      // if (currentFormValues && Object.keys(currentFormValues).length > 0) {
-      //   setFormData(currentFormValues as TQRFormData);
-      //   console.log(
-      //     "Saving form data before moving to customization step:",
-      //     currentFormValues,
-      //   );
-      // }
     }
 
     handleNextStep();
@@ -563,6 +578,9 @@ export function QrBuilderProvider({
     contentStepRef,
     qrBuilderButtonsWrapperRef,
     qrBuilderContentWrapperRef,
+
+    // Navigation state
+    isGoingBack: false,
   };
 
   return (

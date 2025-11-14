@@ -117,7 +117,7 @@ export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
               {openAccordion === "details" && !contentOnly && (
                 <Separator className="mb-3" />
               )}
-              <AccordionContent className="pt-2">
+              <AccordionContent className="space-y-4 pt-2">
                 <BaseFormField
                   name="networkName"
                   label="WiFi Network Name"
@@ -125,7 +125,7 @@ export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
                   tooltip="This is the name of the Wi-Fi network you want to share. You can usually find it on the back of your router."
                 />
 
-                <div className="flex w-full flex-col gap-2 p-3">
+                <div className="flex w-full flex-col gap-2">
                   <Flex gap="1" align="center">
                     <label className="text-neutral text-sm font-medium">
                       Network Security Type
@@ -162,7 +162,7 @@ export const WifiForm = forwardRef<WiFiFormRef, WiFiFormProps>(
                 )}
 
                 {/* Hidden Network Checkbox - using old component */}
-                <div className="flex w-full flex-col gap-2 p-3">
+                <div className="flex w-full flex-col gap-2">
                   <Controller
                     name="isHiddenNetwork"
                     control={form.control}

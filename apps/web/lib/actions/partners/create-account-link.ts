@@ -1,8 +1,8 @@
 "use server";
 
 import { stripe } from "@/lib/stripe";
-import { PARTNERS_DOMAIN } from "@dub/utils";
 import { authPartnerActionClient } from "../safe-action";
+import { PARTNERS_DOMAIN } from "@dub/utils";
 
 export const createAccountLinkAction = authPartnerActionClient.action(
   async ({ ctx }) => {

@@ -55,7 +55,7 @@ export const LandingSectionsServer = ({
       </div>
 
       {/* 8. CTA */}
-      <CTASection handleScrollButtonClick={handleScrollButtonClick} />
+      {/* <CTASection handleScrollButtonClick={handleScrollButtonClick} /> */}
 
       {/* 9. FAQ */}
       <FAQSection faqItems={FAQ_ITEMS_HOMEPAGE} />

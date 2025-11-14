@@ -39,7 +39,7 @@ export const SocialMedia: FC<SocialMediaProps> = ({ sessionId }) => {
   };
 
   return (
-    <ul className="flex gap-4">
+    <ul className="text-muted-foreground flex gap-2">
       {socialMediaLinks.map(({ href, icon: Icon, label }) => (
         <li key={label}>
           <Link
@@ -47,10 +47,10 @@ export const SocialMedia: FC<SocialMediaProps> = ({ sessionId }) => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => handleSocialClick(label.toLowerCase())}
-            className="text-neutral-600 transition-colors hover:text-secondary"
+            className="text-grey"
             aria-label={`Follow us on ${label}`}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className="h-5 w-5 text-grey" />
           </Link>
         </li>
       ))}

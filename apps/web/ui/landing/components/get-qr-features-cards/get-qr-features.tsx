@@ -66,9 +66,9 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
       <div className="mx-auto max-w-7xl overflow-hidden px-4 sm:px-6 lg:px-8">
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle
-            titleFirstPart="More Than Just a "
-            highlightedTitlePart="QR Code"
-            titleSecondPart=" Generator"
+            titleFirstPart="More Than Just a QR Code Generator"
+            // highlightedTitlePart="QR Code"
+            // titleSecondPart=" Generator"
           />
           <p className="text-muted-foreground max-w-4xl text-center text-base md:text-lg">
             Own the full lifecycle: creation, refinement, data insights.
@@ -80,7 +80,7 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
+          <div className="flex flex-col gap-8 lg:flex-row lg:gap-12 p-1">
             {/* Simple tabs on the left - hidden on mobile */}
             <div className="hidden w-full lg:block lg:w-auto">
               <TabsList className="flex h-auto w-full flex-col items-start gap-2 bg-transparent p-0 lg:sticky lg:top-24">
@@ -119,11 +119,11 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
                   return (
                     <div
                       key={feature.title}
-                      className="border-border/50 from-background via-background to-muted/20 relative h-full overflow-hidden rounded-3xl border bg-gradient-to-br p-8 shadow backdrop-blur-sm transition-all duration-500"
+                      className="border-border/50 !bg-white relative h-full overflow-hidden rounded-3xl border p-8 shadow"
                     >
                       {/* Decorative corner accents */}
-                      <div className="from-primary/10 absolute right-0 top-0 h-32 w-32 bg-gradient-to-bl to-transparent" />
-                      <div className="from-secondary/10 absolute bottom-0 left-0 h-32 w-32 bg-gradient-to-tr to-transparent" />
+                      {/* <div className="from-primary/15 absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl to-transparent" /> */}
+                      {/* <div className="from-secondary/15 absolute bottom-0 left-0 h-28 w-28 bg-gradient-to-tr to-transparent" /> */}
 
                       <div className="relative flex flex-col gap-6">
                         <div className="flex items-start gap-6">
@@ -188,10 +188,10 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = ({
                     value={feature.title.toLowerCase().replace(/\s+/g, "-")}
                     className="mt-0"
                   >
-                    <div className="border-border/50 from-background via-background to-muted/20 relative h-full overflow-hidden rounded-3xl border bg-gradient-to-br p-8 shadow backdrop-blur-sm sm:p-10 lg:p-12">
-                      {/* Decorative corner accents */}
-                      <div className="from-primary/10 absolute right-0 top-0 h-32 w-32 bg-gradient-to-bl to-transparent" />
-                      <div className="from-secondary/10 absolute bottom-0 left-0 h-32 w-32 bg-gradient-to-tr to-transparent" />
+                    <div className="border-border/50 bg-white relative h-full overflow-hidden rounded-3xl border p-8 shadow sm:p-10 lg:p-12">
+                      {/* Decorative corner accents
+                      <div className="from-primary/15 absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl to-transparent" />
+                      <div className="from-secondary/15 absolute bottom-0 left-0 h-28 w-28 bg-gradient-to-tr to-transparent" /> */}
 
                       <div className="relative flex flex-col gap-6 sm:gap-8">
                         <div className="flex items-start gap-6">
