@@ -118,7 +118,7 @@ export const QRBuilderInner = () => {
 
   // Hide constructor content while initializing files in edit mode
   // This prevents form handlers from firing incorrectly during initialization
-  if (isInitializing && isEditMode && !isTypeStep) {
+  if (isInitializing && isEditMode) {
     return (
       <div className="flex w-full items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">

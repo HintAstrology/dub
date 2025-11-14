@@ -37,6 +37,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
         </div>
       );
     }
+
     const formComponents = {
       [EQRType.WEBSITE]: (
         <WebsiteForm

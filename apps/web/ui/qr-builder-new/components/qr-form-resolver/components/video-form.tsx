@@ -44,7 +44,10 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
     const { setIsFileUploading, setIsFileProcessing, initialQrData } =
       useQrBuilderContext();
 
-    const [fileId, setFileId] = useState<string>(initialQrData?.fileId!);
+    // Initialize fileId from defaultValues (saved formData) or initialQrData
+    const [fileId, setFileId] = useState<string>(
+      (defaultValues as any)?.fileId || initialQrData?.fileId || undefined,
+    );
     const openAccordion = "details";
 
     const formDefaults = {
@@ -58,12 +61,19 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
       defaultValues: formDefaults,
     });
 
+    // Restore fileId from defaultValues when form is re-initialized (e.g., when returning to step 2)
+    useEffect(() => {
+      if (defaultValues && (defaultValues as any)?.fileId) {
+        setFileId((defaultValues as any).fileId);
+      }
+    }, [defaultValues]);
+
     // Update hidden fileId field when fileId state changes
     useEffect(() => {
       if (fileId) {
         form.setValue("fileId" as any, fileId);
       }
-    }, [fileId]);
+    }, [fileId, form]);
 
     useImperativeHandle(ref, () => ({
       validate: async () => {
