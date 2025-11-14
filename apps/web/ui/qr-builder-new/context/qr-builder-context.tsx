@@ -278,8 +278,6 @@ export function QrBuilderProvider({
   const handleFormSubmit = useCallback(
     (data: TQRFormData) => {
       setFormData(data);
-
-      handleNextStep();
     },
     [handleNextStep],
   );
@@ -375,6 +373,7 @@ export function QrBuilderProvider({
 
     if (isContentStep && contentStepRef.current) {
       const isValid = await contentStepRef.current.validateForm();
+
       if (!isValid) {
         // toast.error("Please fill in all required fields correctly");
         return;
