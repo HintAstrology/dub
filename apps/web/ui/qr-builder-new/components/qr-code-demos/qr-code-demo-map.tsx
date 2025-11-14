@@ -6,7 +6,7 @@ import { QRCodeDemoWebsite } from "./demos/website";
 import { QRCodeDemoWhatsapp } from "./demos/whatsapp";
 import { QRCodeDemoWifi } from "./demos/wifi";
 
-interface QRCodeDemoConfig {
+export interface QRCodeDemoConfig {
   Component: React.ComponentType<any>;
   propsKeys: string[];
 }

@@ -51,6 +51,7 @@ export interface IQrBuilderContextType {
   isProcessing: boolean;
   isFileUploading: boolean;
   isFileProcessing: boolean;
+  isInitializing: boolean;
 
   // Form validation state
   isFormValid: boolean;
