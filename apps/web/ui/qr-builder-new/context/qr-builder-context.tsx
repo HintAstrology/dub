@@ -17,13 +17,8 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { DEFAULT_QR_CUSTOMIZATION } from "../constants/default-qr-customization.constants";
-import { FILE_QR_TYPES } from "../constants/get-qr-config";
-import { convertServerQRToNewBuilder } from "../helpers/data-converters";
-import {
-  fetchExistingFileData,
-  fetchExistingLogoFileData,
-} from "../helpers/prepare-file-data";
+import { getInitializedProps } from "../helpers/get-initialized-props";
+import { useInitializeQrData } from "../hooks/use-initialize-qr-data";
 import {
   IQrBuilderContextType,
   TDestinationData,
@@ -68,33 +63,7 @@ export function QrBuilderProvider({
   const { isMobile } = useMediaQuery();
   const isEdit = !!initialQrData;
 
-  // State to track if initialization is complete
-  const [isInitializing, setIsInitializing] = useState<boolean>(false);
-  const hasInitializedRef = useRef<string | null>(null);
-
-  const getInitializedProps = useCallback(() => {
-    if (initialQrData) {
-      const builderData = convertServerQRToNewBuilder(initialQrData);
-
-      return {
-        qrTitle: builderData.title || "",
-        selectedQrType: builderData.qrType,
-        formData: builderData.formData,
-        customizationData: builderData.customizationData,
-        fileId: builderData.fileId,
-      };
-    }
-
-    return {
-      qrTitle: "",
-      selectedQrType: null,
-      formData: null,
-      customizationData: DEFAULT_QR_CUSTOMIZATION,
-      fileId: undefined,
-    };
-  }, [initialQrData]);
-
-  const initialState = getInitializedProps();
+  const initialState = getInitializedProps(initialQrData);
 
   const [builderStep, setBuilderStep] = useState<TStepState>(initialStep || 1);
   const [destinationData, setDestinationData] =
@@ -145,6 +114,29 @@ export function QrBuilderProvider({
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
   const previousQrTypeRef = useRef<TQrType>(selectedQrType);
+
+  // Unified initialization method for edit mode using hook
+  const handleInitialized = useCallback(
+    (params: {
+      qrType: EQRType;
+      formData: TQRFormData;
+      customizationData: IQRCustomizationData;
+      currentFormValues: Record<string, any>;
+    }) => {
+      setSelectedQrType(params.qrType);
+      setFormData(params.formData);
+      setCustomizationData(params.customizationData);
+      setCurrentFormValues(params.currentFormValues);
+    },
+    [],
+  );
+
+  const { isInitializing, initialize, hasInitializedRef } = useInitializeQrData(
+    {
+      initialQrData,
+      onInitialized: handleInitialized,
+    },
+  );
 
   const isTypeStep = builderStep === 1;
   const isContentStep = builderStep === 2;
@@ -446,97 +438,20 @@ export function QrBuilderProvider({
     setCustomizationData(data);
   }, []);
 
-  // Unified initialization method for edit mode
-  const initializeFromQrData = useCallback(async () => {
-    if (!initialQrData) {
-      return;
-    }
-
-    // Check if we've already initialized for this QR data
-    const qrId = initialQrData.id;
-    if (hasInitializedRef.current === qrId) {
-      return;
-    }
-
-    hasInitializedRef.current = qrId;
-    setIsInitializing(true);
-
-    try {
-      // Convert server data to builder format
-      const builderData = convertServerQRToNewBuilder(initialQrData);
-      const isFileBasedQR = FILE_QR_TYPES.includes(builderData.qrType);
-
-      // Load files in parallel
-      const [fileDataResult, logoFileResult] = await Promise.allSettled([
-        // Load file for file-based QR codes
-        isFileBasedQR && initialQrData.fileId
-          ? fetchExistingFileData(initialQrData)
-          : Promise.resolve(undefined),
-        // Load logo file if exists
-        builderData.customizationData.logo.type === "uploaded" &&
-        builderData.customizationData.logo.fileId
-          ? fetchExistingLogoFileData(builderData.customizationData.logo)
-          : Promise.resolve(undefined),
-      ]);
-
-      // Update formData with loaded files
-      let updatedFormData = builderData.formData;
-      if (fileDataResult.status === "fulfilled" && fileDataResult.value) {
-        updatedFormData = {
-          ...updatedFormData,
-          ...fileDataResult.value,
-        } as TQRFormData;
-      }
-
-      // Update customizationData with loaded logo file
-      let updatedCustomizationData = builderData.customizationData;
-      if (logoFileResult.status === "fulfilled" && logoFileResult.value) {
-        updatedCustomizationData = {
-          ...updatedCustomizationData,
-          logo: {
-            ...updatedCustomizationData.logo,
-            file: logoFileResult.value,
-          },
-        };
-      }
-
-      // Update all state at once
-      setSelectedQrType(builderData.qrType);
-      setFormData(updatedFormData);
-      setCustomizationData(updatedCustomizationData);
-
-      // Update currentFormValues
-      const initialValues: Record<string, any> = {};
-      if (builderData.title) {
-        initialValues.qrName = builderData.title;
-      }
-      if (updatedFormData) {
-        Object.assign(initialValues, updatedFormData);
-      }
-      setCurrentFormValues(initialValues);
-    } catch (error) {
-      console.error(
-        "Failed to initialize QR builder from initialQrData:",
-        error,
-      );
-    } finally {
-      setIsInitializing(false);
-    }
-  }, [initialQrData]);
-
   // Initialize from initialQrData on mount or when it changes (edit mode)
   useEffect(() => {
     if (initialQrData) {
       const qrId = initialQrData.id;
       // Only initialize if we haven't initialized for this QR ID yet
       if (hasInitializedRef.current !== qrId) {
-        initializeFromQrData();
+        initialize();
       }
     } else {
       // Reset initialization ref when not in edit mode
       hasInitializedRef.current = null;
     }
-  }, [initialQrData, initializeFromQrData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQrData, initialize]);
 
   // Handle typeToScrollTo from landing page buttons
   useEffect(() => {
@@ -569,14 +484,19 @@ export function QrBuilderProvider({
       selectedQrType !== null
     ) {
       // Clear form data when switching between different QR types
+      // But preserve qrName if it exists
+      const qrNameToPreserve = currentFormValues.qrName;
+
       setFormData(null);
-      setCurrentFormValues({});
+      setCurrentFormValues(
+        qrNameToPreserve ? { qrName: qrNameToPreserve } : {},
+      );
       setIsFormValid(false);
     }
 
     // Update ref for next comparison
     previousQrTypeRef.current = selectedQrType;
-  }, [selectedQrType]);
+  }, [selectedQrType, currentFormValues.qrName]);
 
   const contextValue: IQrBuilderContextType = {
     // States
