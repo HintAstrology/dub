@@ -3,7 +3,6 @@
 import { useUser } from "@/ui/contexts/user";
 import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step.tsx";
 import { useMediaQuery } from "@dub/ui";
-import { linkConstructor } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface.ts";
 import {
@@ -160,25 +159,6 @@ export function QrBuilderProvider({
         : selectedQrType
       : selectedQrType;
   }, [isTypeStep, hoveredQRType, selectedQrType]);
-
-  const shortLink = useMemo(() => {
-    // Use shortLink from initialQrData if available (edit mode)
-    if (initialQrData?.link?.shortLink) {
-      return initialQrData.link.shortLink;
-    }
-
-    // Compute shortLink if we have key and domain (edit mode without precomputed shortLink)
-    const key = initialQrData?.link?.key;
-    const domain = initialQrData?.link?.domain;
-
-    if (!key || !domain) return undefined;
-
-    return linkConstructor({
-      key,
-      domain,
-      pretty: true,
-    });
-  }, [initialQrData]);
 
   const handleNextStep = useCallback(() => {
     // Store scroll position and QR builder position relative to viewport before step change
@@ -519,7 +499,6 @@ export function QrBuilderProvider({
     selectedQrType,
     hoveredQRType,
     currentQRType,
-    shortLink,
     typeSelectionError,
     formData,
     currentFormValues,
