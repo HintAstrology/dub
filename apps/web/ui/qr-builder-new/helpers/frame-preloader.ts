@@ -1,12 +1,22 @@
+import CardFirstPreview from "@/ui/qr-builder-new/assets/icons/frames/card-1-preview.svg";
 import CardFirst from "@/ui/qr-builder-new/assets/icons/frames/card-1.svg";
+import CardSecondPreview from "@/ui/qr-builder-new/assets/icons/frames/card-2-preview.svg";
 import CardSecond from "@/ui/qr-builder-new/assets/icons/frames/card-2.svg";
+import CardThirdPreview from "@/ui/qr-builder-new/assets/icons/frames/card-3-preview.svg";
 import CardThird from "@/ui/qr-builder-new/assets/icons/frames/card-3.svg";
+import CardPreview from "@/ui/qr-builder-new/assets/icons/frames/card-preview.svg";
 import Card from "@/ui/qr-builder-new/assets/icons/frames/card.svg";
+import ClipboardFramePreview from "@/ui/qr-builder-new/assets/icons/frames/clipboard-preview.svg";
 import ClipboardFrame from "@/ui/qr-builder-new/assets/icons/frames/clipboard.svg";
+import CoffeeCupPreview from "@/ui/qr-builder-new/assets/icons/frames/coffee-cup-preview.svg";
 import CoffeeCup from "@/ui/qr-builder-new/assets/icons/frames/coffee-cup.svg";
+import EnvelopePreview from "@/ui/qr-builder-new/assets/icons/frames/envelope-preview.svg";
 import Envelope from "@/ui/qr-builder-new/assets/icons/frames/envelope.svg";
+import ScooterPreview from "@/ui/qr-builder-new/assets/icons/frames/scooter-preview.svg";
 import Scooter from "@/ui/qr-builder-new/assets/icons/frames/scooter.svg";
+import WaitressPreview from "@/ui/qr-builder-new/assets/icons/frames/waitress-preview.svg";
 import Waitress from "@/ui/qr-builder-new/assets/icons/frames/waitress.svg";
+import WreathPreview from "@/ui/qr-builder-new/assets/icons/frames/wreath-preview.svg";
 import Wreath from "@/ui/qr-builder-new/assets/icons/frames/wreath.svg";
 import { createCachedLoader } from "@/ui/qr-builder-new/helpers/resource-cache";
 import { StaticImageData } from "next/image";
@@ -31,15 +41,25 @@ export const loadAndCacheFrame = frameLoader.load;
 export const preloadAllFrames = async () => {
   const framesToLoad = [
     Card,
+    CardPreview,
     CardFirst,
+    CardFirstPreview,
     CardSecond,
+    CardSecondPreview,
     CardThird,
+    CardThirdPreview,
     Wreath,
+    WreathPreview,
     Envelope,
+    EnvelopePreview,
     Waitress,
+    WaitressPreview,
     CoffeeCup,
+    CoffeeCupPreview,
     Scooter,
+    ScooterPreview,
     ClipboardFrame,
+    ClipboardFramePreview,
   ];
 
   const BATCH_SIZE = 3;
