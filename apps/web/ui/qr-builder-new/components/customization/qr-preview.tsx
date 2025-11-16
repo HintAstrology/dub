@@ -7,28 +7,7 @@ interface QRPreviewProps {
   customizationData: IQRCustomizationData;
 }
 
-export const QRPreview = ({
-  homepageDemo,
-  customizationData,
-}: QRPreviewProps) => {
-  // const activeFormData =
-  //   Object.keys(currentFormValues || {}).length > 0
-  //     ? currentFormValues
-  //     : formData;
-
-  // const qrData = useMemo(() => {
-  //   if (selectedQrType && activeFormData) {
-  //     try {
-  //       const data = encodeQRData(selectedQrType, activeFormData as any);
-  //       return data || "https://getqr.com/qr-complete-setup";
-  //     } catch (error) {
-  //       console.error("Error generating QR data:", error);
-  //       return "https://getqr.com/qr-complete-setup";
-  //     }
-  //   }
-  //   return "https://getqr.com/qr-complete-setup";
-  // }, [selectedQrType, activeFormData]);
-
+export const QRPreview = ({ customizationData }: QRPreviewProps) => {
   const { svgString } = useQRCodeStyling({
     customizationData,
     defaultData: "https://getqr.com/qr-complete-setup",

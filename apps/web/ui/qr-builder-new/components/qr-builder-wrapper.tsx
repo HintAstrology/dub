@@ -92,7 +92,6 @@ export const QRBuilderWrapper = () => {
             isFileUploading={isFileUploading}
             isFileProcessing={isFileProcessing}
             homepageDemo={homepageDemo}
-            currentFormValues={currentFormValues}
             logoData={customizationData.logo}
             isFormValid={isFormValid}
             qrCode={qrCode}
