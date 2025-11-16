@@ -3,6 +3,8 @@ import { getSession } from "@/lib/auth";
 import { CancellationFlowModule } from "@/ui/cancellation-flow/cancellation-flow.module";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { redirect } from "next/navigation";
+import { prisma } from "@dub/prisma";
+import { User } from "@dub/prisma/client";
 
 const pageName = "cancel_flow_or_return";
 
@@ -12,6 +14,12 @@ const CancellationPage = async () => {
   if (!authSession?.user) {
     redirect("/cancellation/auth");
   }
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: authSession.user.id,
+    },
+  }) as User;
 
   const { isSubscribed, isScheduledForCancellation, isCancelled, isDunning } =
     await checkSubscriptionStatusAuthLess(authSession.user.email);
@@ -29,6 +37,7 @@ const CancellationPage = async () => {
       <CancellationFlowModule
         pageName={pageName}
         sessionId={authSession?.user.id!}
+        user={user}
       />
 
       <PageViewedTrackerComponent

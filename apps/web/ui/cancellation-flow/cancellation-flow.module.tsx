@@ -7,18 +7,22 @@ import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.i
 import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
 import { toast } from "sonner";
+import { User } from "@dub/prisma/client";
+import { DiscountModal } from "./components/discount-modal";
 
 interface ICancellationFlowModuleProps {
   pageName: string;
   sessionId: string;
+  user: User;
 }
 
 export const CancellationFlowModule: FC<
   Readonly<ICancellationFlowModuleProps>
-> = ({ pageName, sessionId }) => {
+> = ({ pageName, sessionId, user }) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showDiscountModal, setShowDiscountModal] = useState<boolean>(false);
 
   const {
     trigger: cancelSubscriptionSchedule,
@@ -26,6 +30,11 @@ export const CancellationFlowModule: FC<
   } = useCancelSubscriptionScheduleMutation();
 
   const handleCancelSubscription = async () => {
+    if (!user.discountOffered) {
+      setShowDiscountModal(true);
+      return;
+    }
+
     setIsLoading(true);
 
     trackClientEvents({
@@ -70,6 +79,7 @@ export const CancellationFlowModule: FC<
 
   return (
     <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
+      <DiscountModal showModal={showDiscountModal} setShowModal={setShowDiscountModal} />
       <h1 className="text-center text-2xl font-semibold lg:text-2xl">
         Are you sure you want to cancel your subscription?
       </h1>

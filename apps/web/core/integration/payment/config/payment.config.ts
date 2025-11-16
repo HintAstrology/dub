@@ -21,6 +21,7 @@ export const priceConfig = {
       PRICE_QUARTER_PLAN_PREV: 3999 * 3,
       PRICE_YEAR_PLAN: 1999 * 12,
       PRICE_YEAR_PLAN_PREV: 3999 * 12,
+      PRICE_SPECIAL_MONTH_PLAN: 1999,
     },
   },
 };
