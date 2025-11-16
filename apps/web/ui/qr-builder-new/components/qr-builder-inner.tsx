@@ -188,7 +188,6 @@ export const QRBuilderInner = () => {
                 isFileUploading={isFileUploading}
                 isFileProcessing={isFileProcessing}
                 homepageDemo={homepageDemo}
-                currentFormValues={currentFormValues}
                 logoData={customizationData.logo}
                 isFormValid={isFormValid}
               />
@@ -357,7 +356,6 @@ export const QRBuilderInner = () => {
                     isFileUploading={isFileUploading}
                     isFileProcessing={isFileProcessing}
                     homepageDemo={homepageDemo}
-                    currentFormValues={currentFormValues}
                     logoData={customizationData.logo}
                     isFormValid={isFormValid}
                     qrCode={qrCode}

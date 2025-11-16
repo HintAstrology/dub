@@ -19,7 +19,6 @@ interface IQrBuilderButtonsProps {
   isFileUploading?: boolean;
   isFileProcessing?: boolean;
   homepageDemo?: boolean;
-  currentFormValues?: Record<string, any>;
   logoData?: { type: string; fileId?: string; file?: File };
   isFormValid?: boolean;
   qrCode?: QRCodeStyling | null;
@@ -39,9 +38,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
   isFileUploading = false,
   isFileProcessing = false,
   homepageDemo = false,
-  currentFormValues = {},
   logoData,
-  isFormValid = true,
   qrCode = null,
   isMobile = false,
 }) => {
@@ -87,7 +84,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
         variant="outline"
         size="lg"
         className={cn(
-          "bg-white border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 md:gap-2",
+          "border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 bg-white md:gap-2",
           {
             "border-neutral-400 text-neutral-400": isProcessing,
             "w-full": isLastStep && !showDownloadOnCustomizationStep,
@@ -117,7 +114,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
           variant="outline"
           size="lg"
           className={cn(
-            "bg-white border-secondary text-secondary hover:bg-secondary/10 w-full shrink",
+            "border-secondary text-secondary hover:bg-secondary/10 w-full shrink bg-white",
             {
               "border-neutral-400 text-neutral-400": isProcessing,
               "bg-secondary hover:bg-secondary/90 border-secondary text-white":
