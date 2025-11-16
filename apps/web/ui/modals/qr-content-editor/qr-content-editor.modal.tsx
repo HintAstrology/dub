@@ -1,7 +1,7 @@
 "use client";
 
 import { Session } from "@/lib/auth";
-import { QrBuilderProvider } from "@/ui/qr-builder-new/context";
+import { QrBuilderProvider } from "@/ui/qr-builder-new/providers/qr-builder-provider";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { Modal } from "@dub/ui";
 import { Theme } from "@radix-ui/themes";

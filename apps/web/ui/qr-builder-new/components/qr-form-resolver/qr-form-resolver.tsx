@@ -4,7 +4,7 @@ import { LoaderCircle } from "lucide-react";
 import { forwardRef } from "react";
 
 import { FILE_QR_TYPES } from "../../constants/get-qr-config";
-import { useQrBuilderContext } from "../../context";
+import { useQrBuilderContext } from "../../contexts";
 import { TQRFormData } from "../../types/context";
 import { QRFormRef } from "../../types/qr-form-ref";
 import { EQRType } from "../../types/qr-type";

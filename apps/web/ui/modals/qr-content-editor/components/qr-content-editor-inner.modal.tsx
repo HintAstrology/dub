@@ -1,6 +1,6 @@
 import { Session } from "@/lib/auth";
 import { QrFormResolver } from "@/ui/qr-builder-new/components/qr-form-resolver/qr-form-resolver";
-import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/contexts";
 import { useNewQrOperations } from "@/ui/qr-builder-new/hooks/use-qr-operations";
 import { TQRFormData } from "@/ui/qr-builder-new/types/context";
 import { QRFormRef } from "@/ui/qr-builder-new/types/qr-form-ref";

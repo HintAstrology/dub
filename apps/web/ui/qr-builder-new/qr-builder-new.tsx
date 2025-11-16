@@ -1,5 +1,6 @@
 import { QRBuilderWrapper } from "./components/qr-builder-wrapper.tsx";
-import { QrBuilderProvider } from "./context/index.ts";
+import { FramePreloadProvider } from "./providers/frame-preload-provider.tsx";
+import { QrBuilderProvider } from "./providers/qr-builder-provider.tsx";
 import { TStepState } from "./types/context.ts";
 import { TNewQRBuilderData } from "./types/qr-builder-data.ts";
 import { TQrServerData } from "./types/qr-server-data.ts";
@@ -35,7 +36,9 @@ export const QRBuilderNew = ({
       handleResetTypeToScrollTo={handleResetTypeToScrollTo}
       initialStep={initialStep}
     >
-      <QRBuilderWrapper />
+      <FramePreloadProvider>
+        <QRBuilderWrapper />
+      </FramePreloadProvider>
     </QrBuilderProvider>
   );
 };

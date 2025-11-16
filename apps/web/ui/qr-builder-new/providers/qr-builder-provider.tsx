@@ -1,22 +1,18 @@
-"use client";
-
 import { useUser } from "@/ui/contexts/user";
 import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step.tsx";
 import { useMediaQuery } from "@dub/ui";
-import { linkConstructor } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface.ts";
 import {
-  createContext,
   ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { toast } from "sonner";
+import { QrBuilderContext } from "../contexts";
 import { getInitializedProps } from "../helpers/get-initialized-props";
 import { useInitializeQrData } from "../hooks/use-initialize-qr-data";
 import {
@@ -31,11 +27,6 @@ import { TNewQRBuilderData } from "../types/qr-builder-data";
 import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 
-// Create context
-const QrBuilderContext = createContext<IQrBuilderContextType | undefined>(
-  undefined,
-);
-
 // Provider props
 interface QrBuilderProviderProps {
   children: ReactNode;
@@ -49,7 +40,7 @@ interface QrBuilderProviderProps {
 }
 
 // Provider component
-export function QrBuilderProvider({
+export const QrBuilderProvider = ({
   children,
   initialQrData,
   homepageDemo = false,
@@ -58,7 +49,7 @@ export function QrBuilderProvider({
   typeToScrollTo,
   handleResetTypeToScrollTo,
   initialStep,
-}: QrBuilderProviderProps) {
+}: QrBuilderProviderProps) => {
   const user = useUser();
   const { isMobile } = useMediaQuery();
   const isEdit = !!initialQrData;
@@ -160,25 +151,6 @@ export function QrBuilderProvider({
         : selectedQrType
       : selectedQrType;
   }, [isTypeStep, hoveredQRType, selectedQrType]);
-
-  const shortLink = useMemo(() => {
-    // Use shortLink from initialQrData if available (edit mode)
-    if (initialQrData?.link?.shortLink) {
-      return initialQrData.link.shortLink;
-    }
-
-    // Compute shortLink if we have key and domain (edit mode without precomputed shortLink)
-    const key = initialQrData?.link?.key;
-    const domain = initialQrData?.link?.domain;
-
-    if (!key || !domain) return undefined;
-
-    return linkConstructor({
-      key,
-      domain,
-      pretty: true,
-    });
-  }, [initialQrData]);
 
   const handleNextStep = useCallback(() => {
     // Store scroll position and QR builder position relative to viewport before step change
@@ -519,7 +491,6 @@ export function QrBuilderProvider({
     selectedQrType,
     hoveredQRType,
     currentQRType,
-    shortLink,
     typeSelectionError,
     formData,
     currentFormValues,
@@ -588,15 +559,4 @@ export function QrBuilderProvider({
       {children}
     </QrBuilderContext.Provider>
   );
-}
-
-// Custom hook to use the context
-export function useQrBuilderContext(): IQrBuilderContextType {
-  const context = useContext(QrBuilderContext);
-
-  if (context === undefined) {
-    throw new Error("useQrBuilder must be used within a QrBuilderProvider");
-  }
-
-  return context;
-}
+};
