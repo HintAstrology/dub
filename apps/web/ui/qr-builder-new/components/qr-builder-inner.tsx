@@ -1,5 +1,5 @@
 import { QRBuilderSteps } from "@/ui/qr-builder-new/components/qr-builder-steps.tsx";
-import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/contexts/index.ts";
 import { getDemoProps } from "@/ui/qr-builder-new/helpers/get-demo-props";
 import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";

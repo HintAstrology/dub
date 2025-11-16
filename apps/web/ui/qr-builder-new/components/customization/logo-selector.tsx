@@ -16,7 +16,7 @@ import {
   FileUploadList,
 } from "../../components/file-upload";
 import { getSortedLogos } from "../../constants/customization/logos";
-import { useQrBuilderContext } from "../../context";
+import { useQrBuilderContext } from "../../contexts";
 import { useFileUpload } from "../../hooks/use-file-upload";
 import { ILogoData } from "../../types/customization";
 import { StylePicker } from "./style-picker";

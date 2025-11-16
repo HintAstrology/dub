@@ -1,34 +1,5 @@
 import { StaticImageData } from "next/image";
-
-// Frame cache functionality
-export const frameMemoryCache = new Map<string, SVGElement>();
-
-export const loadAndCacheFrame = async (
-  frame: StaticImageData,
-): Promise<SVGElement | null> => {
-  const { src } = frame;
-
-  if (frameMemoryCache.has(src)) {
-    return frameMemoryCache.get(src)!;
-  }
-
-  try {
-    const response = await fetch(src);
-    const svgText = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgText, "image/svg+xml");
-    const svgElement = doc.querySelector("svg") as SVGElement;
-
-    if (svgElement) {
-      frameMemoryCache.set(src, svgElement);
-      return svgElement;
-    }
-    return null;
-  } catch (error) {
-    console.error(`Failed to load frame: ${src}`, error);
-    return null;
-  }
-};
+import { frameMemoryCache, loadAndCacheFrame } from "./frame-preloader";
 
 // Helper functions
 export const lightenHexColor = (hex: string, percent: number): string => {
@@ -53,12 +24,15 @@ export const lightenHexColor = (hex: string, percent: number): string => {
 export const measureTextWidth = (text: string, font: string): number => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
+
   if (!context) return 0;
+
   context.font = font;
+
   return context.measureText(text).width;
 };
 
-export async function embedQRIntoFrame(
+export const embedQRIntoFrame = async (
   svg: SVGSVGElement,
   options: {
     width: number;
@@ -72,7 +46,7 @@ export async function embedQRIntoFrame(
   qrScale: number,
   qrTranslateX: number,
   qrTranslateY: number,
-) {
+) => {
   const { src } = frame;
 
   try {
@@ -150,4 +124,4 @@ export async function embedQRIntoFrame(
   } catch (err) {
     console.error("Failed to embed QR into frame:", err);
   }
-}
+};

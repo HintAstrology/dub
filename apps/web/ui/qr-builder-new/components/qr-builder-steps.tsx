@@ -1,6 +1,6 @@
-import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
-import { LayoutGridIcon, Edit3Icon, PaletteIcon } from "lucide-react";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/contexts";
 import { useMediaQuery } from "@dub/ui";
+import { Edit3Icon, LayoutGridIcon, PaletteIcon } from "lucide-react";
 import Stepper from "./stepper";
 
 export const QRBuilderSteps = () => {

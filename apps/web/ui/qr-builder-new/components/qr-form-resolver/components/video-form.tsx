@@ -11,7 +11,7 @@ import {
   QR_FILE_TITLES,
   QR_NAME_PLACEHOLDERS,
 } from "@/ui/qr-builder-new/constants/qr-type-inputs-placeholders.ts";
-import { useQrBuilderContext } from "@/ui/qr-builder-new/context/qr-builder-context.tsx";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/contexts/qr-builder-context.tsx";
 import { encodeQRData } from "@/ui/qr-builder-new/helpers/qr-data-handlers.ts";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type.ts";
 import {

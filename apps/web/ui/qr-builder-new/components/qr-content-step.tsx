@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { useQrBuilderContext } from "../context/qr-builder-context";
+import { useQrBuilderContext } from "../contexts/qr-builder-context";
 import { QRFormRef } from "../types/qr-form-ref";
 import { QrFormResolver } from "./qr-form-resolver/qr-form-resolver";
 

@@ -1,5 +1,5 @@
 import { QRBuilderInner } from "@/ui/qr-builder-new/components/qr-builder-inner.tsx";
-import { useQrBuilderContext } from "@/ui/qr-builder-new/context";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/contexts";
 import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils/src";
 import { motion } from "framer-motion";
@@ -41,7 +41,11 @@ export const QRBuilderWrapper = () => {
     <motion.div
       ref={qrBuilderContentWrapperRef}
       key={`builder-step-${builderStep}`}
-      initial={isGoingBack ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 0, scale: 1 }}
+      initial={
+        isGoingBack
+          ? { opacity: 1, y: 0, scale: 1 }
+          : { opacity: 0, y: 0, scale: 1 }
+      }
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={
         isGoingBack

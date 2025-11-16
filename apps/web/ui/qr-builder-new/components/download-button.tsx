@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { useQrBuilderContext } from "../context";
+import { useQrBuilderContext } from "../contexts";
 
 export const DownloadButton = () => {
   const {
