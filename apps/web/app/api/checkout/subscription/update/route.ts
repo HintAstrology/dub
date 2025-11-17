@@ -31,12 +31,14 @@ const allowedPaymentPlans: Partial<TPaymentPlan>[] = [
   "PRICE_MONTH_PLAN",
   "PRICE_QUARTER_PLAN",
   "PRICE_YEAR_PLAN",
+  "PRICE_SPECIAL_MONTH_PLAN",
 ];
 
 const titlesByPlans = {
   PRICE_MONTH_PLAN: "Monthly Plan",
   PRICE_QUARTER_PLAN: "3-Month Plan",
   PRICE_YEAR_PLAN: "12-Month Plan",
+  PRICE_SPECIAL_MONTH_PLAN: "Discounted Monthly Plan",
 };
 
 const getPlanNameByChargePeriodDays = (chargePeriodDays: number) => {

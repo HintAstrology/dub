@@ -47,7 +47,8 @@ export type TPaymentPlan =
   | "PRICE_QUARTER_PLAN"
   | "PRICE_QUARTER_PLAN_PREV"
   | "PRICE_YEAR_PLAN"
-  | "PRICE_YEAR_PLAN_PREV";
+  | "PRICE_YEAR_PLAN_PREV"
+  | "PRICE_SPECIAL_MONTH_PLAN";
 
 export interface IPaymentPlanPrice {
   paymentPlan: TPaymentPlan;

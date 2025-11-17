@@ -7,13 +7,13 @@ import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.i
 import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
 import { toast } from "sonner";
-import { User } from "@dub/prisma/client";
 import { DiscountModal } from "./components/discount-modal";
+import { ICustomerBody } from 'core/integration/payment/config';
 
 interface ICancellationFlowModuleProps {
   pageName: string;
   sessionId: string;
-  user: User;
+  user: ICustomerBody;
 }
 
 export const CancellationFlowModule: FC<
@@ -79,7 +79,7 @@ export const CancellationFlowModule: FC<
 
   return (
     <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
-      <DiscountModal showModal={showDiscountModal} setShowModal={setShowDiscountModal} />
+      <DiscountModal showModal={showDiscountModal} setShowModal={setShowDiscountModal} user={user} />
       <h1 className="text-center text-2xl font-semibold lg:text-2xl">
         Are you sure you want to cancel your subscription?
       </h1>
