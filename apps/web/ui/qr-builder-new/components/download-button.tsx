@@ -86,6 +86,7 @@ export const DownloadButton = () => {
     if (isFileUploading) return "Uploading...";
     if (isFileProcessing) return "Processing...";
     if (isEditMode) return "Save changes";
+    if (isCreating) return "Creating QR Code...";
     if (homepageDemo) return "Download QR Code";
     return "Create QR Code";
   }, [isFileUploading, isFileProcessing, isEditMode, homepageDemo, isCreating]);
