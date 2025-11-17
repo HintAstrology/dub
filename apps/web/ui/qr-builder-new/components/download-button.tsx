@@ -40,12 +40,13 @@ export const DownloadButton = () => {
       console.log("existingSession", existingSession);
 
       if (existingSession?.user) {
+        const data = formValues || formData as any;
         const builderData: TNewQRBuilderData = {
           qrType: selectedQrType as EQRType,
-          formData: formValues || formData as TQRFormData,
+          formData: data,
           customizationData,
-          title: formData?.qrName || `${selectedQrType} QR Code`,
-          fileId: (formData as any)?.fileId,
+          title: data?.qrName || `${selectedQrType} QR Code`,
+          fileId: data?.fileId,
         };
         const { createdQr } = await createQr(builderData, user?.defaultWorkspace, user);
         console.log("createdQrId", createdQr);
