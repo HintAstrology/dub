@@ -16,6 +16,7 @@ import { waitUntil } from "@vercel/functions";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import { trackMixpanelApiService } from "core/integration/analytic/services/track-mixpanel-api.service";
 import { ECookieArg } from "core/interfaces/cookie.interface.ts";
+import { qrActionsTrackingParams } from "@/lib/analytic/qr-actions-tracking-data.helper";
 import { ERedisArg } from "core/interfaces/redis.interface";
 import {
   applyUserSession,
@@ -130,6 +131,7 @@ export const authOptions: NextAuthOptions = {
             emailVerified: true,
             source: true,
             paymentData: true,
+            discountOffered: true,
           },
         });
 
@@ -177,6 +179,7 @@ export const authOptions: NextAuthOptions = {
           image: user.image,
           source: user.source,
           paymentData: user.paymentData,
+          discountOffered: user.discountOffered,
         };
       },
     }),

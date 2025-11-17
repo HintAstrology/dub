@@ -20,6 +20,7 @@ const updateUserSchema = z.object({
   source: z.preprocess(trim, z.string().min(1).max(32)).optional(),
   defaultWorkspace: z.preprocess(trim, z.string().min(1)).optional(),
   hasRated: z.boolean().optional(),
+  discountOffered: z.boolean().optional(),
 });
 
 const paymentService = new PaymentService();
@@ -43,6 +44,7 @@ export const GET = withSession(async ({ session }) => {
         dubPartnerId: true,
         passwordHash: true,
         paymentData: true,
+        discountOffered: true,
         createdAt: true,
         hasRated: true,
       } as any,
@@ -103,7 +105,7 @@ export const GET = withSession(async ({ session }) => {
 
 // PATCH /api/user – edit a specific user
 export const PATCH = withSession(async ({ req, session }) => {
-  let { name, email, image, source, defaultWorkspace, hasRated } =
+  let { name, email, image, source, defaultWorkspace, hasRated, discountOffered } =
     await updateUserSchema.parseAsync(await req.json());
 
   if (image) {
@@ -204,6 +206,7 @@ export const PATCH = withSession(async ({ req, session }) => {
       ...(source && { source }),
       ...(hasRated && { hasRated }),
       ...(defaultWorkspace && { defaultWorkspace }),
+      ...(discountOffered && { discountOffered }),
     },
   });
 

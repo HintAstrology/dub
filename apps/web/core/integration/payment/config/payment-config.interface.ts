@@ -6,6 +6,7 @@ export interface ICustomerBody {
   toxic?: boolean;
   isPaidUser?: boolean;
   emailMarketing?: boolean;
+  discountOffered?: boolean;
   currency?: {
     countryCode?: string;
     currencyCode?: string;

@@ -1,6 +1,7 @@
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Flex, Text, Theme } from "@radix-ui/themes";
+import { generateTrackingUpsellEvent } from 'core/services/events/upsell-events.service';
 import { Heart, TriangleAlert } from "lucide-react";
 import Link from 'next/link';
 import {
@@ -18,6 +19,7 @@ type Props = {
 
 export const DiscountModal: FC<Props> = ({ showModal, setShowModal }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isSecondStep, setIsSecondStep] = useState(false);
   
   const handleClose = () => {
@@ -32,6 +34,208 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal }) => {
     setIsLoading(true);
     setIsLoading(false);
   }, []);
+
+  // const payAndUpdatePlan = async () => {
+  //   setIsProcessing(true);
+
+  //   generateTrackingUpsellEvent({
+  //     user,
+  //     paymentPlan: selectedPlan.paymentPlan,
+  //     stage: "attempt",
+  //     additionalParams: {
+  //       billing_action: getSubscriptionRenewalAction(
+  //         selectedPlan.paymentPlan,
+  //         currentSubscriptionPlan as TPaymentPlan,
+  //       ),
+  //     },
+  //   });
+
+  //   const createPaymentRes = await triggerCreateUserPayment({
+  //     paymentPlan: selectedPlan.paymentPlan,
+  //   });
+
+  //   if (!createPaymentRes?.success) {
+  //     setIsProcessing(false);
+  //     generateTrackingUpsellEvent({
+  //       user,
+  //       paymentPlan: selectedPlan.paymentPlan,
+  //       stage: "error",
+  //       additionalParams: {
+  //         error_code: "PAYMENT_CREATION_FAILED",
+  //         billing_action: getSubscriptionRenewalAction(
+  //           selectedPlan.paymentPlan,
+  //           currentSubscriptionPlan as TPaymentPlan,
+  //         ),
+  //       },
+  //     });
+  //     toast.error(`Payment creation failed.`);
+
+  //     return;
+  //   }
+
+  //   const onError = (info?: IGetPrimerClientPaymentInfoRes) => {
+  //     setIsProcessing(false);
+
+  //     generateTrackingUpsellEvent({
+  //       user,
+  //       paymentPlan: selectedPlan.paymentPlan,
+  //       stage: "error",
+  //       paymentId: info?.id ?? createPaymentRes?.data?.paymentId,
+  //       additionalParams: {
+  //         error_code: info?.statusReason?.code ?? info?.status ?? null,
+  //         billing_action: getSubscriptionRenewalAction(
+  //           selectedPlan.paymentPlan,
+  //           currentSubscriptionPlan as TPaymentPlan,
+  //         ),
+  //       },
+  //     });
+
+  //     toast.error(
+  //       `Payment failed: ${info?.statusReason?.code ?? info?.status ?? "unknown error"}`,
+  //     );
+  //   };
+
+  //   const onPurchased = async (info: IGetPrimerClientPaymentInfoRes) => {
+  //     await triggerUpdateSubscription({
+  //       paymentId: info.id,
+  //       paymentPlan: selectedPlan.paymentPlan,
+  //     })
+  //       .then(async () => {
+  //         generateTrackingUpsellEvent({
+  //           user,
+  //           paymentPlan: selectedPlan.paymentPlan,
+  //           stage: "success",
+  //           paymentId: info?.id,
+  //           additionalParams: {
+  //             billing_action: getSubscriptionRenewalAction(
+  //               selectedPlan.paymentPlan,
+  //               currentSubscriptionPlan as TPaymentPlan,
+  //             ),
+  //           },
+  //         });
+
+  //         if (
+  //           featuresAccess.isSubscribed &&
+  //           featuresAccess.status !== "scheduled_for_cancellation"
+  //         ) {
+  //           toast.success(
+  //             `You’ve successfully upgraded to ${selectedPlan.name} plan.`,
+  //           );
+  //         } else {
+  //           toast.success(
+  //             `You’ve successfully activated your subscription. Your current plan is ${selectedPlan.name} plan.`,
+  //           );
+  //         }
+
+  //         const chargePeriodDays = getChargePeriodDaysIdByPlan({
+  //           paymentPlan: selectedPlan.paymentPlan,
+  //           user,
+  //         });
+
+  //         setPeopleAnalytic({
+  //           plan_name: selectedPlan.paymentPlan,
+  //           charge_period_days: chargePeriodDays,
+  //         });
+
+  //         setIsTrialOver(false);
+  //         await updateSession();
+  //         await mutate("/api/user");
+
+  //         // Force refresh the page cache
+  //         router.refresh();
+  //         router.push("/");
+  //       })
+  //       .catch((error) =>
+  //         toast.error(
+  //           `The plan updating failed: ${error?.code ?? error?.message}`,
+  //         ),
+  //       );
+  //   };
+
+  //   await pollPaymentStatus({
+  //     paymentId: createPaymentRes!.data!.paymentId,
+  //     onPurchased,
+  //     onError,
+  //     initialStatus: createPaymentRes!.data!.status,
+  //   });
+  // };
+
+  // const justDowngradePlan = useCallback(async () => {
+  //   await triggerUpdateSubscription({
+  //     paymentPlan: selectedPlan.paymentPlan,
+  //   })
+  //     .then(async (res) => {
+  //       const chargePeriodDays = getChargePeriodDaysIdByPlan({
+  //         paymentPlan: selectedPlan.paymentPlan,
+  //         user,
+  //       });
+
+  //       if (
+  //         featuresAccess.isSubscribed &&
+  //         featuresAccess.status !== "scheduled_for_cancellation"
+  //       ) {
+  //         toast.success(
+  //           `You’ve downgraded to ${selectedPlan.name} plan. It will take effect on ${format(
+  //             new Date(res?.data?.nextBillingDate || ""),
+  //             "yyyy-MM-dd",
+  //           )}. No charge today!`,
+  //         );
+  //       } else {
+  //         toast.success(
+  //           `You’ve successfully activated your subscription. Your current plan is ${selectedPlan.name} plan.`,
+  //         );
+  //       }
+
+  //       setPeopleAnalytic({
+  //         plan_name: selectedPlan.paymentPlan,
+  //         charge_period_days: chargePeriodDays,
+  //       });
+  //       setIsTrialOver(false);
+
+  //       await updateSession();
+  //       await mutate("/api/user");
+
+  //       // Force refresh the page cache
+
+  //       router.refresh();
+  //       router.push("/");
+  //     })
+  //     .catch((error) => {
+  //       setIsProcessing(false);
+  //       toast.error(
+  //         `The plan updating failed: ${error?.code ?? error?.message}`,
+  //       );
+  //     });
+
+  //   return;
+  // }, [selectedPlan, currentSubscriptionPlan]);
+
+  // const handleUpdatePlan = useCallback(async () => {
+  //   setIsProcessing(true);
+
+  //   trackClientEvents({
+  //     event: EAnalyticEvents.PLAN_PICKER_CLICKED,
+  //     params: {
+  //       event_category: "Authorized",
+  //       email: user.email,
+  //       plan_name: selectedPlan.paymentPlan,
+  //       page_name: "profile",
+  //       content_group: "plans",
+  //     },
+  //     sessionId: user.id,
+  //   });
+
+  //   if (
+  //     subscriptionPlansWeight[selectedPlan.paymentPlan] <
+  //     subscriptionPlansWeight?.[currentSubscriptionPlan!]
+  //   ) {
+  //     await justDowngradePlan();
+
+  //     return;
+  //   }
+
+  //   await payAndUpdatePlan();
+  // }, [selectedPlan, currentSubscriptionPlan, featuresAccess, user]);
 
   return (
     <Modal
