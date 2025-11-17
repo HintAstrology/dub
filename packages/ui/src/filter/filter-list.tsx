@@ -149,7 +149,7 @@ export function FilterList({
             })}
           </AnimatePresence>
         </div>
-        {activeFilters?.length !== 0 && (
+        {/* {activeFilters?.length !== 0 && (
           <button
             type="button"
             className="group mt-px flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3 py-2 text-sm text-neutral-500 ring-inset ring-neutral-500 transition-colors hover:border-neutral-200 hover:bg-white hover:text-black focus:outline-none"
@@ -160,7 +160,7 @@ export function FilterList({
               ESC
             </kbd>
           </button>
-        )}
+        )} */}
       </div>
     </AnimatedSizeContainer>
   );

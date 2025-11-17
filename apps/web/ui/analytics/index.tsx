@@ -19,6 +19,28 @@ import Toggle from "./toggle";
 import TopLinks from "./top-links";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Globe, Hyperlink, FlagWavy, OfficeBuilding, LocationPin, MapPosition, MobilePhone, Window, Cube, CursorRays, Sliders } from "@dub/ui/icons";
+import { AnalyticsFiltersList } from "./analytics-filters-list";
+
+const topLinksTabs = [
+  { name: "QR Name", value: "links" as const, icon: Globe },
+  { name: "Destination URLs", value: "urls" as const, icon: Hyperlink },
+  { name: "QR Type", value: "qrType" as const, icon: Sliders },
+];
+
+const locationsTabs = [
+  { name: "Countries", value: "countries" as const, icon: FlagWavy },
+  { name: "Cities", value: "cities" as const, icon: OfficeBuilding },
+  { name: "Regions", value: "regions" as const, icon: LocationPin },
+  { name: "Continents", value: "continents" as const, icon: MapPosition },
+];
+
+const devicesTabs = [
+  { name: "Devices", value: "devices" as const, icon: MobilePhone },
+  { name: "Browsers", value: "browsers" as const, icon: Window },
+  { name: "OS", value: "os" as const, icon: Cube },
+  { name: "Triggers", value: "triggers" as const, icon: CursorRays },
+];
+
 
 export default function Analytics({
   adminPage,
@@ -38,6 +60,7 @@ export default function Analytics({
               className={cn("py-3 px-3 sm:px-6 lg:px-10", dashboardProps && "bg-neutral-50")}
             >
               <Toggle />
+              <AnalyticsFiltersList />
               <div className="mx-auto grid w-full max-w-screen-xl gap-5">
                 <Main />
                 <StatsGrid />
@@ -67,26 +90,7 @@ function StatsGrid() {
     (selectedTab === "leads" || selectedTab === "sales" || view === "funnel") &&
     (plan === "free" || plan === "pro");
 
-  const topLinksTabs = [
-    { name: "QR Name", value: "links" as const, icon: Globe },
-    { name: "Destination URLs", value: "urls" as const, icon: Hyperlink },
-    { name: "QR Type", value: "qrType" as const, icon: Sliders },
-  ];
-
-  const locationsTabs = [
-    { name: "Countries", value: "countries" as const, icon: FlagWavy },
-    { name: "Cities", value: "cities" as const, icon: OfficeBuilding },
-    { name: "Regions", value: "regions" as const, icon: LocationPin },
-    { name: "Continents", value: "continents" as const, icon: MapPosition },
-  ];
-
-  const devicesTabs = [
-    { name: "Devices", value: "devices" as const, icon: MobilePhone },
-    { name: "Browsers", value: "browsers" as const, icon: Window },
-    { name: "OS", value: "os" as const, icon: Cube },
-    { name: "Triggers", value: "triggers" as const, icon: CursorRays },
-  ];
-
+ 
   return hide ? null : (
     <div className="space-y-5">
       {/* Tabs Row */}
@@ -146,7 +150,7 @@ function StatsGrid() {
       </div>
 
       {/* Content Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 w-full items-start">
         {!dashboardProps && <TopLinks tab={topLinksTab} view={topLinksView} onViewChange={setTopLinksView} />}
         <Locations tab={locationsTab} view={locationsView} onViewChange={setLocationsView} />
         <Devices tab={devicesTab} view={devicesView} onViewChange={setDevicesView} />

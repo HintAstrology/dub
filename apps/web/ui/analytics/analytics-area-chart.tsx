@@ -2,7 +2,7 @@ import { formatDateTooltip } from "@/lib/analytics/format-date-tooltip";
 import { EventType } from "@/lib/analytics/types";
 import { editQueryString } from "@/lib/analytics/utils";
 import useWorkspace from "@/lib/swr/use-workspace";
-import { cn, currencyFormatter, fetcher, nFormatter, COUNTRIES } from "@dub/utils";
+import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
 import { useContext, useMemo } from "react";
 import useSWR from "swr";
@@ -16,6 +16,14 @@ import {
   getDataKey,
 } from "./chart-helpers";
 import {
+  DashboardStats,
+  formatPercentageChange,
+  getQrTypeLabel,
+  getCountryName,
+  formatStatValue,
+  formatStatChange,
+} from "./stats-helpers";
+import {
   QrCodeIcon,
   UsersIcon,
   TagIcon,
@@ -24,6 +32,8 @@ import {
   GlobeIcon,
   ChromeIcon,
   MonitorIcon,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -62,16 +72,6 @@ const chartConfig = {
     label: "Sales",
   },
 } satisfies ChartConfig;
-
-interface DashboardStats {
-  totalClicks: number;
-  uniqueClicks: number;
-  topDevice: { name: string; value: number; percentage: number } | null;
-  topBrowser: { name: string; value: number; percentage: number } | null;
-  topOS: { name: string; value: number; percentage: number } | null;
-  topCountry: { name: string; value: number; percentage: number } | null;
-  topLink: { name: string; value: number } | null;
-}
 
 export default function AnalyticsAreaChart({
   resource,
@@ -145,104 +145,69 @@ export default function AnalyticsAreaChart({
   const yAxisConfig = getYAxisConfig(rechartsData, dataKey);
 
   const statsData = useMemo(() => {
-    if (demo) {
-      return [
-        {
-          icon: <QrCodeIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Total Scans",
-          value: "12,543",
-          change: "+1.2K",
-        },
-        {
-          icon: <UsersIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Unique Scans",
-          value: "8,234",
-          change: "+856",
-        },
-        {
-          icon: <LayoutGridIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Top QR Type",
-          value: "URL",
-          change: "65%",
-        },
-        {
-          icon: <SmartphoneIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Top Device",
-          value: "iPhone",
-          change: "45%",
-        },
-        {
-          icon: <ChromeIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Top Browser",
-          value: "Chrome",
-          change: "52%",
-        },
-        {
-          icon: <MonitorIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Top OS",
-          value: "iOS",
-          change: "48%",
-        },
-        {
-          icon: <GlobeIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Top Country",
-          value: "United States",
-          change: "38%",
-        },
-        {
-          icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
-          title: "Top QR Name",
-          value: "Product-2024 Qr code",
-          change: "2.3K scans",
-        },
-      ];
-    }
+    const comparisonPeriod = stats?.comparisonPeriod || "vs 7 days";
 
     return [
       {
         icon: <QrCodeIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Total Scans",
-        value: stats ? nFormatter(stats.totalClicks, { full: true }) : "0",
-        change: stats ? nFormatter(stats.totalClicks) : "0",
+        value: formatStatValue(stats?.totalClicks, true),
+        change: formatPercentageChange(stats?.totalClicksChange ?? null),
+        comparisonPeriod,
+        isNumeric: true,
       },
       {
         icon: <UsersIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Unique Scans",
-        value: stats ? nFormatter(stats.uniqueClicks, { full: true }) : "0",
-        change: stats ? nFormatter(stats.uniqueClicks) : "0",
+        value: formatStatValue(stats?.uniqueClicks, true),
+        change: formatPercentageChange(stats?.uniqueClicksChange ?? null),
+        comparisonPeriod,
+        isNumeric: true,
+      },
+      {
+        icon: <LayoutGridIcon className="text-primary size-6 stroke-[1.5]" />,
+        title: "Top QR Type",
+        value: getQrTypeLabel(stats?.topQrType?.name),
+        change: formatStatChange(stats?.topQrType?.percentage),
+        isNumeric: false,
       },
       {
         icon: <SmartphoneIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Top Device",
         value: stats?.topDevice?.name || "-",
-        change: stats?.topDevice ? `${stats.topDevice.percentage}%` : "0%",
+        change: formatStatChange(stats?.topDevice?.percentage),
+        isNumeric: false,
       },
       {
         icon: <ChromeIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Top Browser",
         value: stats?.topBrowser?.name || "-",
-        change: stats?.topBrowser ? `${stats.topBrowser.percentage}%` : "0%",
+        change: formatStatChange(stats?.topBrowser?.percentage),
+        isNumeric: false,
       },
       {
         icon: <MonitorIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Top OS",
         value: stats?.topOS?.name || "-",
-        change: stats?.topOS ? `${stats.topOS.percentage}%` : "0%",
+        change: formatStatChange(stats?.topOS?.percentage),
+        isNumeric: false,
       },
       {
         icon: <GlobeIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Top Country",
-        value: stats?.topCountry ? (COUNTRIES[stats.topCountry.name] || stats.topCountry.name) : "-",
-        change: stats?.topCountry ? `${stats.topCountry.percentage}%` : "0%",
+        value: getCountryName(stats?.topCountry?.name),
+        change: formatStatChange(stats?.topCountry?.percentage),
+        isNumeric: false,
       },
       {
         icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Top QR Name",
         value: stats?.topLink?.name || "-",
-        change: stats?.topLink ? `${nFormatter(stats.topLink.value)} scans` : "0 scans",
+        change: formatStatChange(undefined, stats?.topLink?.value),
+        isNumeric: false,
       },
     ];
-  }, [stats, demo]);
+  }, [stats]);
 
   if (!chartData) {
     return (
@@ -254,8 +219,8 @@ export default function AnalyticsAreaChart({
 
   return (
     <Card className={cn("grid gap-4 p-3 sm:p-4 md:p-6 lg:grid-cols-[70%_30%] border-none")}>
-      <div className="space-y-4 flex items-end overflow-x-auto">
-        <div className="h-56 w-full min-w-[600px] sm:h-80 sm:min-w-0 md:h-96">
+        <div className="space-y-4 flex flex-col overflow-x-auto">
+          <div className="h-56 w-full min-w-[600px] sm:h-80 sm:min-w-0 md:h-96">
           <ChartContainer config={chartConfig} className="h-full w-full">
             <AreaChart
               data={rechartsData}
@@ -268,8 +233,8 @@ export default function AnalyticsAreaChart({
             >
               <defs>
                 <linearGradient id="fillArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
+                  <stop offset="5%" stopColor="#016766" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#016766" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -326,7 +291,7 @@ export default function AnalyticsAreaChart({
                 type="monotone"
                 fill="url(#fillArea)"
                 fillOpacity={1}
-                stroke="hsl(var(--primary))"
+                stroke="#016766"
                 strokeWidth={2}
               />
             </AreaChart>
@@ -336,27 +301,62 @@ export default function AnalyticsAreaChart({
       <div className="flex flex-col gap-4 px-2">
         <CardContent className="grow p-0">
           <div className="grid grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2">
-            {statsData.map((stat, index) => (
-              <div
-                key={index}
-                className="bg-muted flex flex-col gap-2 rounded-lg p-2"
-              >
-                <span className="text-muted-foreground text-xs font-medium">
-                  {stat.title}
-                </span>
-                <div className="flex items-center gap-3">
-                  <Avatar className="size-10 rounded-sm">
-                    <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
-                      {stat.icon}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold">{stat.value}</span>
-                    <span className="text-xs text-muted-foreground">{stat.change}</span>
+            {statsData.map((stat, index) => {
+              const isNumeric = stat.isNumeric && typeof stat.change === "object" && stat.change !== null;
+              const changeValue = typeof stat.change === "string" ? stat.change : stat.change?.text || "-";
+              const isPositive = typeof stat.change === "object" && stat.change?.isPositive;
+
+              return (
+                <div
+                  key={index}
+                  className="bg-muted flex flex-col gap-2 rounded-lg p-2"
+                >
+                  <span className="text-muted-foreground text-xs font-medium">
+                    {stat.title}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="size-10 rounded-sm">
+                      <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
+                        {stat.icon}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">{stat.value}</span>
+                      {!isNumeric && (
+                        <span className="text-xs text-muted-foreground">{changeValue}</span>
+                      )}
+                    </div>
                   </div>
+                  {isNumeric && (
+                    <div className="flex items-center gap-1.5 mt-auto">
+                      {isPositive !== undefined && (
+                        isPositive ? (
+                          <TrendingUp className="h-3 w-3 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 text-orange-600" />
+                        )
+                      )}
+                      <span
+                        className={`text-xs font-medium ${
+                          isPositive === true
+                            ? "text-green-600"
+                            : isPositive === false
+                              ? "text-orange-600"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        {changeValue}
+                      </span>
+                      {stat.comparisonPeriod && (
+                        <span className="text-xs text-muted-foreground">
+                          {stat.comparisonPeriod}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </div>

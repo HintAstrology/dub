@@ -1,4 +1,11 @@
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+} from "@/components/ui/chart";
 import { SINGULAR_ANALYTICS_ENDPOINTS } from "@/lib/analytics/constants";
+import { X } from "@/ui/shared/icons";
 import { Modal, useRouterStuff } from "@dub/ui";
 import {
   FlagWavy,
@@ -6,19 +13,24 @@ import {
   MapPosition,
   OfficeBuilding,
 } from "@dub/ui/icons";
-import { X } from "@/ui/shared/icons";
 import { CONTINENTS, COUNTRIES, REGIONS, cn, nFormatter } from "@dub/utils";
-import { useContext, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { type ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
+import { ChartBar, PieChartIcon, Search } from "lucide-react";
+import React, { useContext, useMemo, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  LabelList,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
-import { AnalyticsContext } from "./analytics-provider";
 import AnalyticsPieChartWithLists from "./analytics-pie-chart-with-lists";
+import { AnalyticsContext } from "./analytics-provider";
+import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
 import ContinentIcon from "./continent-icon";
 import { useAnalyticsFilterOption } from "./utils";
-import { PieChartIcon, ChartBar } from "lucide-react";
 
 const tabs = [
   { name: "Countries", value: "countries" as const, icon: FlagWavy },
@@ -48,9 +60,18 @@ interface LocationsBarChartProps {
   maxValue: number;
   unit: string;
   limit?: number;
+  onViewAll?: () => void;
+  tab?: string;
 }
 
-function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChartProps) {
+function LocationsBarChart({
+  data,
+  maxValue,
+  unit,
+  limit = 6,
+  onViewAll,
+  tab,
+}: LocationsBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
 
   const formatValue = (value: number) => {
@@ -69,23 +90,40 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
     return sorted.slice(0, limit);
   }, [data, limit]);
 
+  // Limit visible bars to maximum 5 (5th one will be transparent)
+  const MAX_VISIBLE_BARS = 4;
+  const SHOW_TRANSPARENT_BAR = displayData.length > MAX_VISIBLE_BARS;
+  const visibleBarsData = useMemo(() => {
+    // Show 5 items if there are more than 4, otherwise show all
+    return displayData.slice(
+      0,
+      SHOW_TRANSPARENT_BAR ? MAX_VISIBLE_BARS + 1 : displayData.length,
+    );
+  }, [displayData, SHOW_TRANSPARENT_BAR]);
+
   const displayTotalValue = useMemo(() => {
-    return displayData.reduce((sum, item) => sum + item.value, 0);
-  }, [displayData]);
+    return visibleBarsData.reduce((sum, item) => sum + item.value, 0);
+  }, [visibleBarsData]);
 
   const chartData = useMemo(() => {
-    return displayData
-      .map((item, index) => ({
-        sr: displayData.length - index,
-        service: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
-        sales: displayTotalValue > 0 ? Math.round((item.value / displayTotalValue) * 100) : 0,
+    return visibleBarsData.map((item, index) => {
+      const isTransparent = SHOW_TRANSPARENT_BAR && index === MAX_VISIBLE_BARS;
+      return {
+        sr: visibleBarsData.length - index,
+        service:
+          item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
+        sales:
+          displayTotalValue > 0
+            ? Math.round((item.value / displayTotalValue) * 100)
+            : 0,
         fill: chartColors[index % chartColors.length],
         icon: item.icon,
         title: item.title,
         value: item.value,
-      }))
-      .reverse();
-  }, [displayData, displayTotalValue]);
+        isTransparent,
+      };
+    });
+  }, [visibleBarsData, displayTotalValue, SHOW_TRANSPARENT_BAR]);
 
   const chartConfig = {
     sales: {
@@ -93,21 +131,36 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
     },
   } satisfies ChartConfig;
 
+  const needsFade = displayData.length > MAX_VISIBLE_BARS;
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[270px_1fr] -mt-2 overflow-hidden">
-      <div className="pl-2 pr-6 py-6 min-w-0 overflow-hidden flex items-center justify-center">
-        <ChartContainer config={chartConfig} className="h-[240px] w-[270px]">
+    <div className="-mt-2 grid grid-cols-1 items-start gap-6 overflow-hidden lg:grid-cols-[320px_1fr]">
+      <div className="relative flex h-fit min-w-0 items-center justify-center overflow-hidden py-6 pl-2 pr-6">
+        <ChartContainer
+          config={chartConfig}
+          className={
+            needsFade
+              ? "h-[300px] min-h-[300px] w-[320px]"
+              : "h-[240px] w-[320px]"
+          }
+        >
           <BarChart
             accessibilityLayer
             data={chartData}
             layout="vertical"
             barSize={24}
+            barCategoryGap={4}
             margin={{
               top: 0,
-              bottom: 40,
+              bottom: needsFade ? 10 : 0,
             }}
           >
-            <CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <CartesianGrid
+              horizontal={true}
+              vertical={false}
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
+            />
             <XAxis
               type="number"
               dataKey="sales"
@@ -118,11 +171,11 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
               tickMargin={8}
               tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
             />
-            <YAxis 
-              dataKey="sr" 
-              type="category" 
-              tickLine={false} 
-              tickMargin={8} 
+            <YAxis
+              dataKey="sr"
+              type="category"
+              tickLine={false}
+              tickMargin={8}
               axisLine={false}
               width={30}
               tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
@@ -133,22 +186,15 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="rounded-lg border bg-white p-2 shadow-sm">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2.5 w-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: data.fill }}
-                          />
-                          <span className="text-sm font-medium truncate max-w-[200px]">
-                            {data.title}
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground ml-4">
-                          {data.sales}%
-                        </span>
-                      </div>
-                    </div>
+                    <ChartTooltipWithCopy
+                      color={data.fill}
+                      name={data.title}
+                      value={formatValue(data.value)}
+                      percentage={data.sales}
+                      copyValue={data.title}
+                      showCopy={false}
+                      active={active}
+                    />
                   );
                 }
                 return null;
@@ -156,7 +202,11 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
             />
             <Bar dataKey="sales" radius={[0, 10, 10, 0]}>
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.fill}
+                  opacity={entry.isTransparent ? 0.25 : 1}
+                />
               ))}
               <LabelList
                 dataKey="title"
@@ -164,26 +214,93 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
                 fill="hsl(var(--muted-foreground))"
                 className="text-xs"
                 offset={5}
+                formatter={(value: string, entry: any) => {
+                  const dataEntry = chartData.find((d) => d.title === value);
+                  if (dataEntry?.isTransparent) {
+                    return value ? `${value}...` : "";
+                  }
+                  return value;
+                }}
+                content={(props: any) => {
+                  if (!props) return null;
+                  const { x, y, width, height, value, payload } = props;
+                  // Use payload.sr to find the correct entry (most reliable)
+                  const dataEntry = chartData.find((d) => d.sr === payload?.sr || d.title === (value || payload?.title));
+                  const isTransparent = dataEntry?.isTransparent;
+                  const displayTitle = value || payload?.title || dataEntry?.title || "";
+
+                  const barHeight = height || 24;
+                  const labelY = y + barHeight + 8; // offset below the bar
+
+                  const iconElement = dataEntry?.icon;
+                  let iconToRender: React.ReactNode = null;
+
+                  if (iconElement && typeof iconElement === 'object' && 'props' in iconElement) {
+                    const iconProps = (iconElement as any).props;
+                    if (iconProps?.display) {
+                      iconToRender = <ContinentIcon display={iconProps.display} className="size-2" />;
+                    } else if (iconProps?.src) {
+                      iconToRender = <img alt={iconProps.alt || displayTitle} src={iconProps.src} className="h-3" />;
+                    }
+                  }
+
+                  return (
+                    <foreignObject
+                      x={x}
+                      y={labelY}
+                      width={200}
+                      height={24}
+                      style={{ opacity: isTransparent ? 0.4 : 1 }}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {iconToRender && (
+                          <div className="shrink-0">{iconToRender}</div>
+                        )}
+                        <span className="text-muted-foreground truncate text-xs">
+                          {displayTitle}
+                        </span>
+                      </div>
+                    </foreignObject>
+                  );
+                }}
               />
             </Bar>
           </BarChart>
         </ChartContainer>
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-20 bg-gradient-to-t from-white via-white/80 to-transparent" />
+        {needsFade && onViewAll && (
+          <div className="pointer-events-auto absolute bottom-0 left-0 right-0 z-20 flex h-max items-end justify-center">
+            <button
+              onClick={onViewAll}
+              className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+            >
+              View All
+            </button>
+          </div>
+        )}
       </div>
       <div className="min-w-0">
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
         <div className="space-y-3">
-          {[...displayData].reverse().map((item, index) => {
+          {visibleBarsData.map((item, index) => {
             const formattedValue = formatValue(item.value);
-            const color = chartData.find((d) => d.title === item.title)?.fill || chartColors[(displayData.length - 1 - index) % chartColors.length];
+            const dataEntry = chartData.find((d) => d.title === item.title);
+            const color =
+              dataEntry?.fill || chartColors[index % chartColors.length];
+            const isTransparent = dataEntry?.isTransparent || false;
             return (
-              <div key={index} className="flex items-center justify-end gap-2">
+              <div
+                key={index}
+                className="flex items-center justify-end gap-2"
+                style={{ opacity: isTransparent ? 0.4 : 1 }}
+              >
                 <div
-                  className="h-2.5 w-2.5 rounded-full shrink-0"
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-foreground text-sm font-semibold whitespace-nowrap">
+                <span className="text-foreground whitespace-nowrap text-sm font-semibold">
                   {formattedValue}
                 </span>
               </div>
@@ -195,11 +312,11 @@ function LocationsBarChart({ data, maxValue, unit, limit = 6 }: LocationsBarChar
   );
 }
 
-export default function Locations({ 
+export default function Locations({
   tab,
   view,
-  onViewChange 
-}: { 
+  onViewChange,
+}: {
   tab: "countries" | "cities" | "regions" | "continents";
   view: "pie" | "list";
   onViewChange: (view: "pie" | "list") => void;
@@ -209,65 +326,74 @@ export default function Locations({
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
   const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   // Fetch data for each tab
   const { data: countriesData } = useAnalyticsFilterOption("countries");
   const { data: citiesData } = useAnalyticsFilterOption("cities");
   const { data: regionsData } = useAnalyticsFilterOption("regions");
   const { data: continentsData } = useAnalyticsFilterOption("continents");
-  
+
   // Get data for current tab
-  const data = tab === "countries" ? countriesData 
-    : tab === "cities" ? citiesData
-    : tab === "regions" ? regionsData
-    : continentsData;
-  
-  const selectedTabData = tabs.find(t => t.value === tab) || tabs[0];
-  const hasMore = (data?.length ?? 0) > EXPAND_LIMIT;
+  const data =
+    tab === "countries"
+      ? countriesData
+      : tab === "cities"
+        ? citiesData
+        : tab === "regions"
+          ? regionsData
+          : continentsData;
+
+  const selectedTabData = tabs.find((t) => t.value === tab) || tabs[0];
 
   const getBarListData = (tabValue: typeof tab) => {
-    const tabData = tabValue === "countries" ? countriesData 
-      : tabValue === "cities" ? citiesData
-      : tabValue === "regions" ? regionsData
-      : continentsData;
+    const tabData =
+      tabValue === "countries"
+        ? countriesData
+        : tabValue === "cities"
+          ? citiesData
+          : tabValue === "regions"
+            ? regionsData
+            : continentsData;
     const singularTabName = SINGULAR_ANALYTICS_ENDPOINTS[tabValue];
-    
-    return tabData
-      ?.map((d) => ({
-        icon:
-          tabValue === "continents" ? (
-            <ContinentIcon
-              display={d.continent}
-              className="size-3"
-            />
-          ) : (
-            <img
-              alt={d.country}
-              src={`https://flag.vercel.app/m/${d.country}.svg`}
-              className="h-3 w-5"
-            />
-          ),
-        title:
-          tabValue === "continents"
-            ? CONTINENTS[d.continent]
-            : tabValue === "countries"
-              ? COUNTRIES[d.country]
-              : tabValue === "regions"
-                ? REGIONS[d.region] || d.region.split("-")[1]
-                : d.city,
-        href: queryParams({
-          ...(searchParams.has(singularTabName)
-            ? { del: singularTabName }
-            : {
-                set: {
-                  [singularTabName]: d[singularTabName],
-                },
-              }),
-          getNewPath: true,
-        }) as string,
-        value: d[dataKey] || 0,
-      }))
-      ?.sort((a, b) => b.value - a.value) || [];
+
+    return (
+      tabData
+        ?.map((d) => {
+          return {
+            icon:
+              tabValue === "continents" ? (
+                <ContinentIcon display={d.continent} className="size-2" />
+              ) : (
+                <img
+                  alt={d.country}
+                  src={`https://flag.vercel.app/m/${d.country}.svg`}
+                  className="h-3"
+                />
+              ),
+            title:
+              tabValue === "continents"
+                ? CONTINENTS[d.continent]
+                : tabValue === "countries"
+                  ? COUNTRIES[d.country]
+                  : tabValue === "regions"
+                    ? REGIONS[d.region] || d.region.split("-")[1] || COUNTRIES[d.country] || d.region
+                    : d.city,
+            href: queryParams({
+              ...(searchParams.has(singularTabName)
+                ? { del: singularTabName }
+                : {
+                    set: {
+                      [singularTabName]: d[singularTabName],
+                    },
+                  }),
+              getNewPath: true,
+            }) as string,
+            value: d[dataKey] || 0,
+          };
+        })
+        ?.sort((a, b) => b.value - a.value) || []
+    );
   };
 
   return (
@@ -275,40 +401,76 @@ export default function Locations({
       <Modal
         showModal={showModal}
         setShowModal={setShowModal}
-        className="max-w-lg px-0"
+        className="max-w-[500px] px-0"
       >
-        <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
+        <div className="flex w-full items-center justify-between gap-2 border-b px-6 py-4">
           <h1 className="text-lg font-semibold">{selectedTabData.name}</h1>
           <button
             type="button"
-            onClick={() => setShowModal(false)}
+            onClick={() => {
+              setShowModal(false);
+              setSearch("");
+            }}
             className="active:bg-border-500 group relative -right-2 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        {data && data.length > 0 && (
-          <AnalyticsPieChartWithLists
-            data={getBarListData(tab)}
-            unit={selectedTab}
-            maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
-            showName={true}
+        <div className="relative border-b px-6 py-3">
+          <div className="pointer-events-none absolute inset-y-0 left-9 flex items-center">
+            <Search className="h-4 w-4 text-neutral-400" />
+          </div>
+          <input
+            type="text"
+            autoFocus
+            className="w-full rounded-md border border-neutral-300 py-2 pl-10 pr-4 text-black placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-4 focus:ring-neutral-200 sm:text-sm"
+            placeholder={`Search ${tab}...`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+        {data && data.length > 0 && (
+          <div className="h-[400px] overflow-auto p-4">
+            <div className="space-y-2">
+              {getBarListData(tab)
+                .filter((item) =>
+                  search
+                    ? item.title.toLowerCase().includes(search.toLowerCase())
+                    : true,
+                )
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-3 rounded-lg bg-neutral-100 px-4 py-3"
+                  >
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <div className="shrink-0">{item.icon}</div>
+                      <span className="truncate text-sm font-medium text-neutral-900">
+                        {item.title}
+                      </span>
+                    </div>
+                    <span className="shrink-0 text-sm font-semibold text-neutral-900">
+                      {nFormatter(item.value)}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          </div>
         )}
       </Modal>
 
-      <Card className="gap-4 pt-6 overflow-hidden">
-        <CardContent className="relative px-6 overflow-hidden">
+      <Card className="gap-4 overflow-hidden pt-6">
+        <CardContent className="relative overflow-hidden px-6">
           {/* View Toggle */}
-          <div className="flex justify-start mb-4">
-            <div className="flex gap-1 border rounded-lg p-1">
+          <div className="mb-4 flex justify-start">
+            <div className="flex gap-1 rounded-lg border p-1">
               <button
                 onClick={() => onViewChange("pie")}
                 className={cn(
-                  "p-2 rounded transition-colors",
-                  view === "pie" 
-                    ? "bg-secondary text-white" 
-                    : "hover:bg-gray-100"
+                  "rounded p-2 transition-colors",
+                  view === "pie"
+                    ? "bg-secondary text-white"
+                    : "hover:bg-gray-100",
                 )}
               >
                 <PieChartIcon className="h-4 w-4" />
@@ -316,10 +478,10 @@ export default function Locations({
               <button
                 onClick={() => onViewChange("list")}
                 className={cn(
-                  "p-2 rounded transition-colors",
-                  view === "list" 
-                    ? "bg-secondary text-white" 
-                    : "hover:bg-gray-100"
+                  "rounded p-2 transition-colors",
+                  view === "list"
+                    ? "bg-secondary text-white"
+                    : "hover:bg-gray-100",
                 )}
               >
                 <ChartBar className="h-4 w-4" />
@@ -334,16 +496,23 @@ export default function Locations({
                   <LocationsBarChart
                     data={getBarListData(tab)}
                     unit={selectedTab}
-                    maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
+                    maxValue={Math.max(
+                      ...(data?.map((d) => d[dataKey] ?? 0) ?? [0]),
+                    )}
                     limit={EXPAND_LIMIT}
+                    onViewAll={() => setShowModal(true)}
+                    tab={tab}
                   />
                 ) : (
                   <AnalyticsPieChartWithLists
                     data={getBarListData(tab)}
                     unit={selectedTab}
-                    maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
+                    maxValue={Math.max(
+                      ...(data?.map((d) => d[dataKey] ?? 0) ?? [0]),
+                    )}
                     limit={EXPAND_LIMIT}
                     showName={false}
+                    onViewAll={() => setShowModal(true)}
                   />
                 )}
               </>
@@ -357,21 +526,6 @@ export default function Locations({
               <AnalyticsLoadingSpinner />
             </div>
           )}
-
-          <div className="px-6">
-            {hasMore && (
-              <div className="relative z-10 flex w-full items-end pb-4 pt-2">
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="group relative flex w-full items-center justify-center"
-                >
-                  <div className="border-border-500 rounded-md border bg-white px-2.5 py-1 text-sm text-neutral-950 group-hover:bg-neutral-100 group-active:border-neutral-300">
-                    View All
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
         </CardContent>
       </Card>
     </>

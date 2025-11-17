@@ -5,6 +5,7 @@ import { nFormatter } from "@dub/utils";
 import { ReactNode, useContext, useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 import { AnalyticsContext } from "./analytics-provider";
+import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
 
 const chartColors = [
   "#22c55e", // green
@@ -28,6 +29,7 @@ interface AnalyticsBarChartWithListsProps {
   maxValue: number;
   unit: string;
   limit?: number;
+  showCopy?: boolean;
 }
 
 export default function AnalyticsBarChartWithLists({
@@ -35,6 +37,7 @@ export default function AnalyticsBarChartWithLists({
   maxValue,
   unit,
   limit = 6,
+  showCopy = false,
 }: AnalyticsBarChartWithListsProps) {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
@@ -95,7 +98,7 @@ export default function AnalyticsBarChartWithLists({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1fr_1fr] -mt-2">
       <div className="relative w-full lg:w-fit">
-        <ChartContainer config={chartConfig} className="h-[240px] w-full lg:w-[500px]">
+        <ChartContainer config={chartConfig} className="min-h-[240px] w-full lg:w-[320px]">
           <BarChart
             data={chartData}
             layout="vertical"
@@ -134,22 +137,15 @@ export default function AnalyticsBarChartWithLists({
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="rounded-lg border bg-white p-2 shadow-sm">
-                      <div className="grid gap-2">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2 w-2 rounded-full"
-                            style={{ backgroundColor: data.color }}
-                          />
-                          <span className="text-sm font-medium">
-                            {data.fullName}
-                          </span>
-                        </div>
-                        <div className="text-muted-foreground text-sm">
-                          {formatValue(data.value)} ({data.percentage}%)
-                        </div>
-                      </div>
-                    </div>
+                    <ChartTooltipWithCopy
+                      color={data.color}
+                      name={data.fullName}
+                      value={formatValue(data.value)}
+                      percentage={data.percentage}
+                      copyValue={data.fullName}
+                      showCopy={showCopy}
+                      active={active}
+                    />
                   );
                 }
                 return null;

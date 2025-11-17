@@ -55,7 +55,7 @@ export default function AnalyticsExport() {
           className="bg-secondary hover:bg-secondary/90"
           onClick={() => setOpenPopover(!openPopover)}
         >
-          Download data
+          Export data
         </Button>
       </Popover>
     </div>

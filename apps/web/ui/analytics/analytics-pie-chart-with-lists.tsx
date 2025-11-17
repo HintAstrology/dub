@@ -6,6 +6,7 @@ import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { useContext, useMemo } from "react";
 import { AnalyticsContext } from "./analytics-provider";
 import { ReactNode } from "react";
+import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
 
 const chartColors = [
   "hsl(var(--chart-1))",
@@ -30,6 +31,8 @@ interface AnalyticsPieChartWithListsProps {
   unit: string;
   limit?: number;
   showName?: boolean;
+  showCopy?: boolean;
+  onViewAll?: () => void;
 }
 
 export default function AnalyticsPieChartWithLists({
@@ -38,6 +41,8 @@ export default function AnalyticsPieChartWithLists({
   unit,
   limit = 6,
   showName = false,
+  showCopy = false,
+  onViewAll,
 }: AnalyticsPieChartWithListsProps) {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
 
@@ -48,10 +53,16 @@ export default function AnalyticsPieChartWithLists({
     return nFormatter(value);
   };
 
+  const MAX_VISIBLE_ITEMS = 5;
+  const sortedData = useMemo(() => {
+    return [...data].sort((a, b) => b.value - a.value);
+  }, [data]);
+
   const displayData = useMemo(() => {
-    const sorted = [...data].sort((a, b) => b.value - a.value);
-    return sorted.slice(0, limit);
-  }, [data, limit]);
+    return sortedData.slice(0, limit ? Math.min(limit, MAX_VISIBLE_ITEMS) : MAX_VISIBLE_ITEMS);
+  }, [sortedData, limit]);
+
+  const hasMore = sortedData.length > MAX_VISIBLE_ITEMS;
 
   const totalValue = useMemo(() => {
     return displayData.reduce((sum, item) => sum + item.value, 0);
@@ -102,10 +113,10 @@ export default function AnalyticsPieChartWithLists({
   }, [displayData]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr] -mt-2 overflow-hidden">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[160px_1fr] -mt-2 overflow-hidden relative items-start min-h-[230px]">
       {/* Pie Chart */}
-      <div className="relative w-full flex items-center justify-center order-first lg:order-first min-w-0 overflow-hidden">
-        <ChartContainer config={chartConfig} className="h-[240px] w-[240px]">
+      <div className="relative w-full flex items-center justify-center order-first lg:order-first min-w-0 overflow-hidden h-fit">
+        <ChartContainer config={chartConfig} className="h-[160px] w-[160px]">
           <PieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
             <ChartTooltip
               cursor={false}
@@ -113,22 +124,15 @@ export default function AnalyticsPieChartWithLists({
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="rounded-lg border bg-white p-2 shadow-sm">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2.5 w-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: data.fill }}
-                          />
-                          <span className="text-sm font-medium truncate max-w-[200px]">
-                            {data.fullName}
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground ml-4">
-                          {data.percentage}%
-                        </span>
-                      </div>
-                    </div>
+                    <ChartTooltipWithCopy
+                      color={data.fill}
+                      name={data.fullName}
+                      value={formatValue(data.value)}
+                      percentage={data.percentage}
+                      copyValue={data.fullName}
+                      showCopy={showCopy}
+                      active={active}
+                    />
                   );
                 }
                 return null;
@@ -138,9 +142,9 @@ export default function AnalyticsPieChartWithLists({
               data={pieChartData}
               dataKey="value"
               nameKey="name"
-              innerRadius={60}
-              strokeWidth={15}
-              outerRadius={90}
+              innerRadius={40}
+              strokeWidth={10}
+              outerRadius={60}
               paddingAngle={2}
             >
               <Label
@@ -177,41 +181,52 @@ export default function AnalyticsPieChartWithLists({
         </ChartContainer>
       </div>
 
-      {/* List with optional names and Scans */}
-      <div className="min-w-0">
+      {/* List with names and Scans */}
+      <div className="min-w-0 h-fit">
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
         <div className="space-y-3">
           {list1Data.map((item, index) => {
             const formattedValue = formatValue(item.value);
-            const displayTitle = item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title;
+            // Calculate max length based on available space (approximately 20-25 chars)
+            const maxLength = 25;
+            const displayTitle = item.title.length > maxLength 
+              ? `${item.title.slice(0, maxLength)}...` 
+              : item.title;
             return (
-              <div key={index} className="flex items-center gap-4">
-                {showName && (
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-foreground text-sm font-medium truncate">
-                      {item.icon}
-                    </span>
-                    <span className="text-foreground text-sm font-medium truncate">
-                      {displayTitle}
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-center justify-end gap-2 ml-auto">
+              <div key={index} className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
                   <div
                     className="h-2.5 w-2.5 rounded-full shrink-0"
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-foreground text-sm font-semibold whitespace-nowrap">
-                    {formattedValue}
+                  {item.icon && (
+                    <div className="shrink-0">{item.icon}</div>
+                  )}
+                  <span className="text-foreground text-sm font-medium truncate" title={item.title}>
+                    {displayTitle}
                   </span>
                 </div>
+                <span className="text-foreground text-sm font-semibold whitespace-nowrap shrink-0">
+                  {formattedValue}
+                </span>
               </div>
             );
           })}
         </div>
       </div>
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+      {hasMore && onViewAll && (
+        <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center h-max z-20 pointer-events-auto">
+          <button
+            onClick={onViewAll}
+            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 hover:bg-neutral-50 active:bg-neutral-100 shadow-sm"
+          >
+            View All
+          </button>
+        </div>
+      )}
     </div>
   );
 }

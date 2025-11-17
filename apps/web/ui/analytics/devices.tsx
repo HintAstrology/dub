@@ -17,7 +17,8 @@ import { AnalyticsContext } from "./analytics-provider";
 import AnalyticsPieChartWithLists from "./analytics-pie-chart-with-lists";
 import DeviceIcon from "./device-icon";
 import { useAnalyticsFilterOption } from "./utils";
-import { PieChartIcon, ChartBar } from "lucide-react";
+import { PieChartIcon, ChartBar, Search } from "lucide-react";
+import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
 
 const tabs = [
   { name: "Devices", value: "devices" as const, icon: MobilePhone },
@@ -47,9 +48,10 @@ interface DevicesBarChartProps {
   maxValue: number;
   unit: string;
   limit?: number;
+  onViewAll?: () => void;
 }
 
-function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartProps) {
+function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: DevicesBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
 
   const formatValue = (value: number) => {
@@ -68,23 +70,34 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
     return sorted.slice(0, limit);
   }, [data, limit]);
 
+  // Limit visible bars to maximum 5 (5th one will be transparent)
+  const MAX_VISIBLE_BARS = 4;
+  const SHOW_TRANSPARENT_BAR = displayData.length > MAX_VISIBLE_BARS;
+  const visibleBarsData = useMemo(() => {
+    // Show 5 items if there are more than 4, otherwise show all
+    return displayData.slice(0, SHOW_TRANSPARENT_BAR ? MAX_VISIBLE_BARS + 1 : displayData.length);
+  }, [displayData, SHOW_TRANSPARENT_BAR]);
+
   const displayTotalValue = useMemo(() => {
-    return displayData.reduce((sum, item) => sum + item.value, 0);
-  }, [displayData]);
+    return visibleBarsData.reduce((sum, item) => sum + item.value, 0);
+  }, [visibleBarsData]);
 
   const chartData = useMemo(() => {
-    return displayData
-      .map((item, index) => ({
-        sr: displayData.length - index,
-        service: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
-        sales: displayTotalValue > 0 ? Math.round((item.value / displayTotalValue) * 100) : 0,
-        fill: chartColors[index % chartColors.length],
-        icon: item.icon,
-        title: item.title,
-        value: item.value,
-      }))
-      .reverse();
-  }, [displayData, displayTotalValue]);
+    return visibleBarsData
+      .map((item, index) => {
+        const isTransparent = SHOW_TRANSPARENT_BAR && index === MAX_VISIBLE_BARS;
+        return {
+          sr: visibleBarsData.length - index,
+          service: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
+          sales: displayTotalValue > 0 ? Math.round((item.value / displayTotalValue) * 100) : 0,
+          fill: chartColors[index % chartColors.length],
+          icon: item.icon,
+          title: item.title,
+          value: item.value,
+          isTransparent,
+        };
+      });
+  }, [visibleBarsData, displayTotalValue, SHOW_TRANSPARENT_BAR]);
 
   const chartConfig = {
     sales: {
@@ -92,18 +105,21 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
     },
   } satisfies ChartConfig;
 
+  const needsFade = displayData.length > MAX_VISIBLE_BARS;
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[270px_1fr] -mt-2 overflow-hidden">
-      <div className="pl-2 pr-6 py-6 min-w-0 overflow-hidden flex items-center justify-center">
-        <ChartContainer config={chartConfig} className="h-[240px] w-[270px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr] -mt-2 overflow-hidden items-start">
+      <div className="pl-2 pr-6 py-6 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
+        <ChartContainer config={chartConfig} className={needsFade ? "min-h-[300px] h-[300px] w-[320px]" : "h-[240px] w-[320px]"}>
           <BarChart
             accessibilityLayer
             data={chartData}
             layout="vertical"
             barSize={24}
+            barCategoryGap={4}
             margin={{
               top: 0,
-              bottom: 40,
+              bottom: needsFade ? 10 : 0,
             }}
           >
             <CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -132,22 +148,15 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="rounded-lg border bg-white p-2 shadow-sm">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2.5 w-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: data.fill }}
-                          />
-                          <span className="text-sm font-medium truncate max-w-[200px]">
-                            {data.title}
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground ml-4">
-                          {data.sales}%
-                        </span>
-                      </div>
-                    </div>
+                    <ChartTooltipWithCopy
+                      color={data.fill}
+                      name={data.title}
+                      value={formatValue(data.value)}
+                      percentage={data.sales}
+                      copyValue={data.title}
+                      showCopy={false}
+                      active={active}
+                    />
                   );
                 }
                 return null;
@@ -155,7 +164,11 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
             />
             <Bar dataKey="sales" radius={[0, 10, 10, 0]}>
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.fill}
+                  opacity={entry.isTransparent ? 0.25 : 1}
+                />
               ))}
               <LabelList
                 dataKey="title"
@@ -163,21 +176,71 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
                 fill="hsl(var(--muted-foreground))"
                 className="text-xs"
                 offset={5}
+                formatter={(value: string, entry: any) => {
+                  const dataEntry = chartData.find((d) => d.title === value);
+                  if (dataEntry?.isTransparent) {
+                    return value ? `${value}...` : '';
+                  }
+                  return value;
+                }}
+                content={(props: any) => {
+                  if (!props) return null;
+                  const { x, y, width, height, value, payload } = props;
+                  const dataEntry = chartData.find((d) => d.title === value);
+                  const isTransparent = dataEntry?.isTransparent;
+                  
+                  // For vertical bar chart, position="bottom" means below the bar
+                  // y is the top of the bar, so we add bar height + offset to place text below
+                  // x is the left edge of the bar, so we use it for left alignment
+                  const barHeight = height || 24;
+                  const labelY = y + barHeight + 15; // 15px offset below the bar
+                  
+                  return (
+                    <text
+                      x={x}
+                      y={labelY}
+                      fill="hsl(var(--muted-foreground))"
+                      textAnchor="start"
+                      fontSize="12"
+                      opacity={isTransparent ? 0.4 : 1}
+                    >
+                      {value}
+                    </text>
+                  );
+                }}
               />
             </Bar>
           </BarChart>
         </ChartContainer>
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+        {needsFade && onViewAll && (
+          <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center h-max z-20 pointer-events-auto">
+            <button
+              onClick={onViewAll}
+              className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 hover:bg-neutral-50 active:bg-neutral-100 shadow-sm"
+            >
+              View All
+            </button>
+          </div>
+        )}
       </div>
       <div className="min-w-0">
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
+        
         <div className="space-y-3">
-          {[...displayData].reverse().map((item, index) => {
+          {visibleBarsData.map((item, index) => {
             const formattedValue = formatValue(item.value);
-            const color = chartData.find((d) => d.title === item.title)?.fill || chartColors[(displayData.length - 1 - index) % chartColors.length];
+            const dataEntry = chartData.find((d) => d.title === item.title);
+            const color = dataEntry?.fill || chartColors[index % chartColors.length];
+            const isTransparent = dataEntry?.isTransparent || false;
             return (
-              <div key={index} className="flex items-center justify-end gap-2">
+              <div 
+                key={index} 
+                className="flex items-center justify-end gap-2"
+                style={{ opacity: isTransparent ? 0.4 : 1 }}
+              >
                 <div
                   className="h-2.5 w-2.5 rounded-full shrink-0"
                   style={{ backgroundColor: color }}
@@ -208,6 +271,7 @@ export default function Devices({
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
   const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   // Fetch data for each tab
   const { data: devicesData, loading: devicesLoading } = useAnalyticsFilterOption("devices");
@@ -268,25 +332,61 @@ export default function Devices({
       <Modal
         showModal={showModal}
         setShowModal={setShowModal}
-        className="max-w-lg px-0"
+        className="max-w-[500px] px-0"
       >
-        <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
+        <div className="flex w-full items-center justify-between gap-2 px-6 py-4 border-b">
           <h1 className="text-lg font-semibold">{selectedTabData.name}</h1>
           <button
             type="button"
-            onClick={() => setShowModal(false)}
+            onClick={() => {
+              setShowModal(false);
+              setSearch("");
+            }}
             className="active:bg-border-500 group relative -right-2 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        {data && data.length > 0 && (
-          <AnalyticsPieChartWithLists
-            data={getBarListData(tab)}
-            unit={selectedTab}
-            maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
-            showName={true}
+        <div className="relative px-6 py-3 border-b">
+          <div className="pointer-events-none absolute inset-y-0 left-9 flex items-center">
+            <Search className="h-4 w-4 text-neutral-400" />
+          </div>
+          <input
+            type="text"
+            autoFocus
+            className="w-full rounded-md border border-neutral-300 py-2 pl-10 pr-4 text-black placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-4 focus:ring-neutral-200 sm:text-sm"
+            placeholder={`Search ${tab}...`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+        {data && data.length > 0 && (
+          <div className="h-[400px] overflow-auto p-4">
+            <div className="space-y-2">
+              {getBarListData(tab)
+                .filter((item) =>
+                  search
+                    ? item.title.toLowerCase().includes(search.toLowerCase())
+                    : true
+                )
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-3 bg-neutral-100 rounded-lg px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="shrink-0">{item.icon}</div>
+                      <span className="text-sm font-medium text-neutral-900 truncate">
+                        {item.title}
+                      </span>
+                    </div>
+                    <span className="text-sm font-semibold text-neutral-900 shrink-0">
+                      {nFormatter(item.value)}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          </div>
         )}
       </Modal>
 
@@ -329,16 +429,18 @@ export default function Devices({
                     unit={selectedTab}
                     maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
                     limit={EXPAND_LIMIT}
+                    onViewAll={() => setShowModal(true)}
                   />
-                ) : (
-                  <AnalyticsPieChartWithLists
-                    data={getBarListData(tab)}
-                    unit={selectedTab}
-                    maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
-                    limit={EXPAND_LIMIT}
-                    showName={false}
-                  />
-                )}
+                        ) : (
+                          <AnalyticsPieChartWithLists
+                            data={getBarListData(tab)}
+                            unit={selectedTab}
+                            maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
+                            limit={EXPAND_LIMIT}
+                            showName={false}
+                            onViewAll={() => setShowModal(true)}
+                          />
+                        )}
               </>
             ) : (
               <div className="flex h-[300px] items-center justify-center">
@@ -351,20 +453,6 @@ export default function Devices({
             </div>
           )}
 
-          <div className="px-6">
-            {hasMore && (
-              <div className="relative z-10 flex w-full items-end pb-4 pt-2">
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="group relative flex w-full items-center justify-center"
-                >
-                  <div className="border-border-500 rounded-md border bg-white px-2.5 py-1 text-sm text-neutral-950 group-hover:bg-neutral-100 group-active:border-neutral-300">
-                    View All
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
         </CardContent>
       </Card>
     </>

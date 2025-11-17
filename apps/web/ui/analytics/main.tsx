@@ -72,7 +72,6 @@ export default function Main() {
 
   return (
     <div className="w-full overflow-hidden rounded-[20px] border border-border bg-white shadow">
-   
       <div className="relative">
         <div
           className={cn(
