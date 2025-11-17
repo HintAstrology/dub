@@ -37,8 +37,6 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
   const [isSecondStep, setIsSecondStep] = useState(false);
   const router = useRouter();
 
-  const { update: updateSession } = useSession();
-
   const { trigger: triggerUpdateSubscription } =
     useUpdateSubscriptionMutation();
   
@@ -72,7 +70,6 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
           charge_period_days: chargePeriodDays,
         });
 
-        await updateSession();
         await mutate("/api/user");
 
         // Force refresh the page cache
