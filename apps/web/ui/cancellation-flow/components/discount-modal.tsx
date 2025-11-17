@@ -3,13 +3,11 @@
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
 import { Theme } from "@radix-ui/themes";
-import { useCreateUserPaymentMutation } from 'core/api/user/payment/payment.hook';
 import { useUpdateSubscriptionMutation } from 'core/api/user/subscription/subscription.hook';
 import { setPeopleAnalytic, trackClientEvents } from 'core/integration/analytic';
 import { EAnalyticEvents } from 'core/integration/analytic/interfaces/analytic.interface';
 import { getChargePeriodDaysIdByPlan, ICustomerBody, TPaymentPlan } from 'core/integration/payment/config';
 import { Heart, TriangleAlert } from "lucide-react";
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -22,7 +20,6 @@ import {
 import { toast } from 'sonner';
 import { mutate } from 'swr';
 import { format } from "date-fns";
-
 
 const SPECIAL_PLAN = "PRICE_SPECIAL_MONTH_PLAN";
 

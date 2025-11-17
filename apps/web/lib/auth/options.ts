@@ -30,7 +30,6 @@ import EmailProvider from "next-auth/providers/email";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
-import { qrActionsTrackingParams } from "../analytic/qr-actions-tracking-data.helper";
 import { completeProgramApplications } from "../partners/complete-program-applications";
 import { createAutoLoginURL } from "./jwt-signin";
 import {
