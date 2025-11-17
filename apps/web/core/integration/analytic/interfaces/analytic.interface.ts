@@ -40,6 +40,8 @@ export enum EAnalyticEvents {
   SUBSCRIPTION_CANCELLED_ERROR = "subscriptionCancelledError",
 
   TRIAL_ACTIVATED = "trial_activated",
+  SCHEDULED_FOR_CANCELLATION = "scheduled_for_cancellation",
+  CANCELLED = "cancelled",
 }
 
 // purchase related events
