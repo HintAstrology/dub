@@ -34,6 +34,25 @@ export const DownloadButton = () => {
     !customizationData.logo?.fileId;
 
   const handleSave = useCallback(async () => {
+    const checkSessionAndCreateQr = async () => {
+      const existingSession = await getSession();
+      const user = existingSession?.user as Session['user'] || undefined;
+      console.log("existingSession", existingSession);
+
+      if (existingSession?.user) {
+        const builderData: TNewQRBuilderData = {
+          qrType: selectedQrType as EQRType,
+          formData: formData as TQRFormData,
+          customizationData,
+          title: formData?.qrName || `${selectedQrType} QR Code`,
+          fileId: (formData as any)?.fileId,
+        };
+        const createdQrId = await createQr(builderData, user?.defaultWorkspace, user);
+        console.log("createdQrId", createdQrId);
+        router.push(`/?qrId=${createdQrId}`);
+        return true;
+      }
+    };
     // If on content step, validate and get form data without changing step
     if (isContentStep && contentStepRef.current) {
       const isValid = await contentStepRef.current.form.trigger();
@@ -44,25 +63,15 @@ export const DownloadButton = () => {
 
       const formValues = contentStepRef.current.getValues();
       setFormData(formValues as any);
-
+      
+      if (await checkSessionAndCreateQr()) {
+        return;
+      }
       await onSave(formValues as any);
       return;
     }
 
-    const existingSession = await getSession();
-    const user = existingSession?.user as Session['user'] || undefined;
-
-    if (existingSession?.user) {
-      const builderData: TNewQRBuilderData = {
-        qrType: selectedQrType as EQRType,
-        formData: formData as TQRFormData,
-        customizationData,
-        title: formData?.qrName || `${selectedQrType} QR Code`,
-        fileId: (formData as any)?.fileId,
-      };
-      const createdQrId = await createQr(builderData, user?.defaultWorkspace, user);
-      console.log("createdQrId", createdQrId);
-      router.push(`/?qrId=${createdQrId}`);
+    if (await checkSessionAndCreateQr()) {
       return;
     }
     // Directly save/create the QR code without navigating steps
