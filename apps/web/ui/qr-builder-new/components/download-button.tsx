@@ -87,8 +87,9 @@ export const DownloadButton = () => {
     if (isFileProcessing) return "Processing...";
     if (isEditMode) return "Save changes";
     if (homepageDemo) return "Download QR Code";
+    if (isCreating) return "Creating...";
     return "Create QR Code";
-  }, [isFileUploading, isFileProcessing, isEditMode, homepageDemo]);
+  }, [isFileUploading, isFileProcessing, isEditMode, homepageDemo, isCreating]);
 
   const buttonText = getButtonText();
   const isDisabled =
@@ -98,7 +99,7 @@ export const DownloadButton = () => {
     hasUploadedLogoWithoutFileId ||
     isCreating;
 
-  const isLoading = isProcessing || isFileUploading || isFileProcessing;
+  const isLoading = isProcessing || isFileUploading || isFileProcessing || isCreating;
 
   return (
     <Button
