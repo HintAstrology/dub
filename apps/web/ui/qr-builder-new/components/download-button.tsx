@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useQrBuilderContext } from "../contexts";
 import { getSession } from 'next-auth/react';
@@ -12,6 +12,7 @@ import { EQRType } from '../types/qr-type';
 import { useRouter } from 'next/navigation';
 
 export const DownloadButton = () => {
+  const [isCreating, setIsCreating] = useState(false);
   const {
     homepageDemo,
     isEditMode,
@@ -40,6 +41,7 @@ export const DownloadButton = () => {
       console.log("existingSession", existingSession);
 
       if (existingSession?.user) {
+        setIsCreating(true);
         const data = formValues || formData as any;
         const builderData: TNewQRBuilderData = {
           qrType: selectedQrType as EQRType,
@@ -53,6 +55,7 @@ export const DownloadButton = () => {
         router.push(`/?qrId=${createdQr.id}`);
         return true;
       }
+      setIsCreating(false);
     };
     // If on content step, validate and get form data without changing step
     if (isContentStep && contentStepRef.current) {
@@ -92,7 +95,8 @@ export const DownloadButton = () => {
     isProcessing ||
     isFileUploading ||
     isFileProcessing ||
-    hasUploadedLogoWithoutFileId;
+    hasUploadedLogoWithoutFileId ||
+    isCreating;
 
   const isLoading = isProcessing || isFileUploading || isFileProcessing;
 
