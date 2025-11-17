@@ -46,8 +46,9 @@ export const useNewQrOperations = ({
         }
 
         // Convert new builder data to server format
+        console.log("builderData", builderData);
         const serverData = await convertNewQRBuilderDataToServer(builderData);
-
+        console.log("serverData", serverData);
         const res = await fetch(
           `/api/qrs?workspaceId=${projectSlug ? projectSlug : workspaceId}`,
           {

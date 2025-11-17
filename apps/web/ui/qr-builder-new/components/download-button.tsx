@@ -34,7 +34,7 @@ export const DownloadButton = () => {
     !customizationData.logo?.fileId;
 
   const handleSave = useCallback(async () => {
-    const checkSessionAndCreateQr = async () => {
+    const checkSessionAndCreateQr = async (formValues?: TQRFormData) => {
       const existingSession = await getSession();
       const user = existingSession?.user as Session['user'] || undefined;
       console.log("existingSession", existingSession);
@@ -42,14 +42,14 @@ export const DownloadButton = () => {
       if (existingSession?.user) {
         const builderData: TNewQRBuilderData = {
           qrType: selectedQrType as EQRType,
-          formData: formData as TQRFormData,
+          formData: formValues || formData as TQRFormData,
           customizationData,
           title: formData?.qrName || `${selectedQrType} QR Code`,
           fileId: (formData as any)?.fileId,
         };
-        const createdQrId = await createQr(builderData, user?.defaultWorkspace, user);
-        console.log("createdQrId", createdQrId);
-        router.push(`/?qrId=${createdQrId}`);
+        const { createdQr } = await createQr(builderData, user?.defaultWorkspace, user);
+        console.log("createdQrId", createdQr);
+        router.push(`/?qrId=${createdQr.id}`);
         return true;
       }
     };
@@ -64,7 +64,7 @@ export const DownloadButton = () => {
       const formValues = contentStepRef.current.getValues();
       setFormData(formValues as any);
       
-      if (await checkSessionAndCreateQr()) {
+      if (await checkSessionAndCreateQr(formValues)) {
         return;
       }
       await onSave(formValues as any);
