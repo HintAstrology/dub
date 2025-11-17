@@ -1,11 +1,10 @@
 "use client";
 
-import { prepareFileDataForModal } from "@/ui/modals/qr-content-editor/helpers/prepare-file-data";
 import { LoaderCircle } from "lucide-react";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef } from "react";
 
 import { FILE_QR_TYPES } from "../../constants/get-qr-config";
-import { useQrBuilderContext } from "../../context";
+import { useQrBuilderContext } from "../../contexts";
 import { TQRFormData } from "../../types/context";
 import { QRFormRef } from "../../types/qr-form-ref";
 import { EQRType } from "../../types/qr-type";
@@ -27,51 +26,13 @@ interface QRFormResolverProps {
 
 export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
   ({ qrType, onSubmit, defaultValues, contentOnly }, ref) => {
-    const { initialQrData } = useQrBuilderContext();
-
-    const isEdit = !!initialQrData;
-
-    const [fileData, setFileData] = useState<
-      Record<string, File[]> | undefined
-    >();
-    const [isLoadingFileData, setIsLoadingFileData] = useState(false);
-
+    const { isInitializing, isEditMode } = useQrBuilderContext();
     const isFileBasedQR = FILE_QR_TYPES.includes(qrType);
 
-    // Load file data for file-based QR codes when in edit mode
-    useEffect(() => {
-      if (!isEdit || !isFileBasedQR) {
-        setFileData(undefined);
-        return;
-      }
-
-      const loadFileData = async () => {
-        setIsLoadingFileData(true);
-        try {
-          const data = await prepareFileDataForModal(initialQrData!);
-
-          setFileData(data);
-        } catch (error) {
-          console.error("QrFormResolver: Failed to load file data:", error);
-          setFileData(undefined);
-        } finally {
-          setIsLoadingFileData(false);
-        }
-      };
-
-      loadFileData();
-    }, [isEdit, isFileBasedQR, initialQrData]);
-
-    // Combine defaultValues with loaded fileData
-    const combinedDefaultValues = useMemo(() => {
-      const combined = { ...(defaultValues || {}), ...(fileData || {}) };
-      return Object.keys(combined).length > 0 ? combined : undefined;
-    }, [defaultValues, fileData]);
-
-    // Show loading state while file data is being loaded
-    if (isEdit && isFileBasedQR && isLoadingFileData) {
+    // Show loading state while initializing file-based QR codes in edit mode
+    if (isInitializing && isEditMode && isFileBasedQR) {
       return (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex w-full items-center justify-center py-12">
           <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
         </div>
       );
@@ -106,7 +67,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
         <PdfForm
           ref={ref as any}
           onSubmit={onSubmit}
-          defaultValues={combinedDefaultValues}
+          defaultValues={defaultValues}
           contentOnly={contentOnly}
         />
       ),
@@ -114,7 +75,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
         <ImageForm
           ref={ref as any}
           onSubmit={onSubmit}
-          defaultValues={combinedDefaultValues}
+          defaultValues={defaultValues}
           contentOnly={contentOnly}
         />
       ),
@@ -122,7 +83,7 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
         <VideoForm
           ref={ref as any}
           onSubmit={onSubmit}
-          defaultValues={combinedDefaultValues}
+          defaultValues={defaultValues}
           contentOnly={contentOnly}
         />
       ),

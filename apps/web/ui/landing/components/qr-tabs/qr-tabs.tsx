@@ -10,13 +10,12 @@ import { QRBuilderNew } from "@/ui/qr-builder-new/index.tsx";
 import { TNewQRBuilderData } from "@/ui/qr-builder-new/types/qr-builder-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { useMediaQuery } from "@dub/ui";
-import { SHORT_DOMAIN } from "@dub/utils";
-import { getSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { FC, forwardRef, Ref, useEffect, useState } from "react";
 
 interface IQRTabsProps {
+  user: Session["user"] | null;
   sessionId: string;
   typeToScrollTo: EQRType | null;
   handleResetTypeToScrollTo: () => void;
@@ -25,10 +24,13 @@ interface IQRTabsProps {
 export const QRTabs: FC<
   Readonly<IQRTabsProps> & { ref?: Ref<HTMLDivElement> }
 > = forwardRef(
-  ({ sessionId, typeToScrollTo, handleResetTypeToScrollTo }, ref) => {
+  ({ user, sessionId, typeToScrollTo, handleResetTypeToScrollTo }, ref) => {
     const { AuthModal, showModal } = useAuthModal({ sessionId });
     const router = useRouter();
-    const { createQr } = useNewQrOperations({ initialQrData: null });
+    const { createQr } = useNewQrOperations({
+      initialQrData: null,
+      user: user!,
+    });
 
     const { executeAsync: saveQrDataToRedis } = useAction(
       saveQrDataToRedisAction,
@@ -68,21 +70,16 @@ export const QRTabs: FC<
       if (isProcessingSignup) return;
       setIsProcessingSignup(true);
 
-      const existingSession = await getSession();
-
-      const user = (existingSession?.user as Session["user"]) || undefined;
-
-      if (existingSession?.user) {
+      if (user) {
         const createdQrId = await createQr(data, user?.defaultWorkspace);
-        console.log("createdQrId", createdQrId);
+
         router.push(`/?qrId=${createdQrId}`);
+
         return;
       }
 
       try {
-        const serverData = await convertNewQRBuilderDataToServer(data, {
-          domain: SHORT_DOMAIN!,
-        });
+        const serverData = await convertNewQRBuilderDataToServer(data);
 
         await saveQrDataToRedis({
           sessionId,

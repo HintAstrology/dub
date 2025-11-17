@@ -44,21 +44,28 @@ export default function Stepper({
                   className={cn(
                     "h-auto flex-shrink-0 gap-2 rounded !bg-transparent p-0 transition-all disabled:opacity-100",
                     "flex-col items-center md:flex-row md:items-center",
+                    "focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                     isActive && "cursor-pointer hover:scale-105",
                     !isClickable && "cursor-default",
                   )}
-                  onClick={() => isClickable && onStepClick(step.number)}
+                  onClick={(e) => {
+                    if (isClickable) {
+                      onStepClick(step.number);
+                    }
+                  }}
                   disabled={!isClickable}
                 >
                   <Avatar className="size-10">
                     <AvatarFallback
                       className={cn("transition-colors", {
+                        "bg-white border border-primary/10 text-primary":
+                          (isActive && step.number === 3) || (!isActive && step.number === 3 && isClickable),
                         "!bg-primary !text-primary-foreground shadow-sm":
-                          isActive,
+                          isActive && step.number !== 3,
                         "bg-muted text-muted-foreground opacity-50":
                           !isActive && step.number === 1,
                         "bg-white border border-secondary/20 text-muted-foreground opacity-50":
-                          !isActive && (step.number === 2 || step.number === 3),
+                          !isActive && (step.number === 2 || (step.number === 3 && !isClickable)),
                       })}
                     >
                       {isCompleted ? (
@@ -84,8 +91,8 @@ export default function Stepper({
                     <div className="hidden flex-col items-start md:flex">
                       <span
                         className={cn("text-sm font-medium", {
-                          "text-foreground": isActive,
-                          "text-muted-foreground opacity-50": !isActive,
+                          "text-foreground": isActive || step.number === 3,
+                          "text-muted-foreground opacity-50": !isActive && step.number !== 3,
                         })}
                       >
                         Step {step.number}

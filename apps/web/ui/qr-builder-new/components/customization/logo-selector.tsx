@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@dub/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Upload, X } from "lucide-react";
+import { LoaderCircle, Upload, X } from "lucide-react";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import {
   FileUploadList,
 } from "../../components/file-upload";
 import { getSortedLogos } from "../../constants/customization/logos";
-import { useQrBuilderContext } from "../../context";
+import { useQrBuilderContext } from "../../contexts";
 import { useFileUpload } from "../../hooks/use-file-upload";
 import { ILogoData } from "../../types/customization";
 import { StylePicker } from "./style-picker";
@@ -49,7 +49,8 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
   disabled = false,
   isMobile = false,
 }) => {
-  const { setIsFileUploading, selectedQrType } = useQrBuilderContext();
+  const { setIsFileUploading, selectedQrType, isInitializing, isEditMode } =
+    useQrBuilderContext();
 
   const methods = useForm<LogoFormValues>({
     defaultValues: {
@@ -57,10 +58,51 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     },
   });
 
-  const { control, trigger } = methods;
+  const { control, trigger, reset } = methods;
   const uploadedLogoFiles = useWatch({ control, name: FILE_UPLOAD_FIELD_NAME });
   const previousFilesRef = useRef<File[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const isSyncingFromContextRef = useRef(false);
+  const lastSyncedFileIdRef = useRef<string | undefined>(undefined);
+
+  // Sync logo file from context to form (file is loaded by initializeFromQrData in context)
+  // This should only run when logoData.file changes from context, not from user interaction
+  useEffect(() => {
+    // Only sync from context if logo has fileId (meaning it's loaded from server)
+    // and the fileId has changed (to avoid re-syncing the same file)
+    if (
+      logoData.type === "uploaded" &&
+      logoData.fileId &&
+      logoData.fileId !== lastSyncedFileIdRef.current &&
+      logoData.file
+    ) {
+      isSyncingFromContextRef.current = true;
+      lastSyncedFileIdRef.current = logoData.fileId;
+
+      // Use reset to properly update form with new default values
+      reset({
+        [FILE_UPLOAD_FIELD_NAME]: [logoData.file],
+      });
+
+      previousFilesRef.current = [logoData.file];
+
+      // Reset flag after state update
+      setTimeout(() => {
+        isSyncingFromContextRef.current = false;
+      }, 0);
+    } else if (logoData.type !== "uploaded" && uploadedLogoFiles.length > 0) {
+      // Clear form if logo type changed to non-uploaded
+      isSyncingFromContextRef.current = true;
+      reset({
+        [FILE_UPLOAD_FIELD_NAME]: [],
+      });
+      previousFilesRef.current = [];
+      lastSyncedFileIdRef.current = undefined;
+      setTimeout(() => {
+        isSyncingFromContextRef.current = false;
+      }, 0);
+    }
+  }, [logoData.file, logoData.fileId, logoData.type, reset]);
 
   // File upload hook
   const { uploadFile, isUploading, uploadProgress } = useFileUpload({
@@ -93,38 +135,64 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
   }, [isUploading, setIsFileUploading]);
 
   useEffect(() => {
+    // Skip if we're currently syncing from context to avoid infinite loop
+    if (isSyncingFromContextRef.current) {
+      return;
+    }
+
     const lastFile = uploadedLogoFiles?.[uploadedLogoFiles.length - 1] || null;
     const previousLastFile =
       previousFilesRef.current?.[previousFilesRef.current.length - 1] || null;
 
-    if (lastFile !== previousLastFile) {
-      if (lastFile) {
-        // Validate file size
-        if (lastFile.size > MAX_LOGO_FILE_SIZE) {
-          toast.error("Logo file size must be less than 5MB");
-          methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
-          return;
-        }
+    // Skip if file hasn't changed
+    if (lastFile === previousLastFile) {
+      return;
+    }
 
-        // Validate file type
-        if (!lastFile.type.startsWith("image/")) {
-          toast.error("Please select an image file");
-          methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
-          return;
-        }
+    if (lastFile) {
+      // Check if this file is already uploaded (has fileId in metadata or in logoData)
+      const fileIdFromMetadata = (lastFile as any).fileId;
+      const isAlreadyUploaded = fileIdFromMetadata || logoData.fileId;
 
-        // Set file temporarily (for preview) and reset suggested logo selection
-        onLogoChange({
-          type: "uploaded",
-          file: lastFile,
-          id: undefined, // Clear suggested logo id
-        });
+      // If file is already uploaded (from context initialization), don't upload again
+      if (isAlreadyUploaded && logoData.fileId) {
+        // File is already loaded from server, just update ref and skip
+        previousFilesRef.current = uploadedLogoFiles || [];
+        return;
+      }
 
-        // Upload file to get fileId
-        uploadFile(lastFile).catch((error) => {
-          console.error("Logo upload error:", error);
-        });
-      } else {
+      // Validate file size
+      if (lastFile.size > MAX_LOGO_FILE_SIZE) {
+        toast.error("Logo file size must be less than 5MB");
+        methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
+        previousFilesRef.current = [];
+        return;
+      }
+
+      // Validate file type
+      if (!lastFile.type.startsWith("image/")) {
+        toast.error("Please select an image file");
+        methods.setValue(FILE_UPLOAD_FIELD_NAME, []);
+        previousFilesRef.current = [];
+        return;
+      }
+
+      console.log("LogoSelector: New file selected, uploading...");
+
+      // Set file temporarily (for preview) and reset suggested logo selection
+      onLogoChange({
+        type: "uploaded",
+        file: lastFile,
+        id: undefined, // Clear suggested logo id
+      });
+
+      // Upload file to get fileId
+      uploadFile(lastFile).catch((error) => {
+        console.error("Logo upload error:", error);
+      });
+    } else {
+      // File was removed - only clear logo if it's not already cleared
+      if (logoData.type !== "none") {
         onLogoChange({
           type: "none",
           id: undefined,
@@ -135,7 +203,7 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     }
 
     previousFilesRef.current = uploadedLogoFiles || [];
-  }, [uploadedLogoFiles, onLogoChange, uploadFile, methods]);
+  }, [uploadedLogoFiles, onLogoChange, uploadFile, methods, logoData]);
 
   const handleSuggestedLogoSelect = useCallback(
     (logoId: string, icon?: any) => {
@@ -174,16 +242,31 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
     return getSortedLogos(selectedQrType);
   }, [selectedQrType]);
 
-  // const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const files = Array.from(e.target.files || []);
-  //   methods.setValue(FILE_UPLOAD_FIELD_NAME, files);
-  //   methods.trigger(FILE_UPLOAD_FIELD_NAME);
-  // }, [methods]);
+  // Show loading state while initializing logo file in edit mode
+  const isLoadingLogo =
+    isInitializing &&
+    isEditMode &&
+    logoData.type === "uploaded" &&
+    logoData.fileId &&
+    !logoData.file;
+
+  if (isLoadingLogo) {
+    return (
+      <motion.div
+        layout
+        className="flex w-full max-w-[788px] flex-col gap-4 pb-6"
+      >
+        <div className="flex w-full items-center justify-center py-12">
+          <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
       layout
-      className="flex max-w-[788px] w-full flex-col gap-4 pb-6"
+      className="flex w-full max-w-[788px] flex-col gap-4 pb-6"
     >
       <StylePicker
         label="Select a logo"
@@ -274,9 +357,10 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
                     >
                       <FileUploadDropzone
                         className={cn(
-                          "border-border hover:border-secondary hover:bg-muted/30 w-full h-[140px] cursor-pointer py-12 px-6 transition-all duration-200",
+                          "border-border hover:border-secondary hover:bg-muted/30 h-[140px] w-full cursor-pointer px-6 py-12 transition-all duration-200",
                           {
-                            "border-red-500 hover:border-red-500": fieldState.error || uploadError,
+                            "border-red-500 hover:border-red-500":
+                              fieldState.error || uploadError,
                           },
                         )}
                       >
@@ -286,10 +370,11 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
                           </div>
                           <div className="flex flex-col gap-1">
                             <p className="text-neutral text-base font-medium">
-                            Click to upload or drag & drop your logo
+                              Click to upload or drag & drop your logo
                             </p>
                             <p className="text-muted-foreground text-xs">
-                              Max size: {formatFileSize(MAX_LOGO_FILE_SIZE)} • .jpg, .png, .svg, etc.
+                              Max size: {formatFileSize(MAX_LOGO_FILE_SIZE)} •
+                              .jpg, .png, .svg, etc.
                             </p>
                           </div>
                         </div>

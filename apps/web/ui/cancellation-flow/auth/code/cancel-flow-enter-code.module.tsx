@@ -79,7 +79,7 @@ export const CancelFlowEnterCodeModule: FC<
       params: {
         page_name: pageName,
         event_category: response?.error ? "nonAuthorized" : "Authorized",
-        email: value,
+        email,
         flow_type: "cancel_subscription",
         status: !response?.error ? "success" : "failed",
         ...(response?.error

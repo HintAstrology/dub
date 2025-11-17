@@ -181,7 +181,7 @@ export function AuthModal({
               <p className="mt-1.5 text-base text-neutral-400">
                 {authType === "login"
                   ? "Please enter your details to sign in"
-                  : "Download your QR code instantly"}
+                  : "To download your QR code instantly"}
               </p>
             </motion.div>
               </div>

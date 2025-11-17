@@ -1,3 +1,4 @@
+import { Session } from "@/lib/auth";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import { Button, Modal } from "@dub/ui";
@@ -15,10 +16,11 @@ type Props = {
   isOpen: boolean;
   onToggleModal: Dispatch<SetStateAction<boolean>>;
   qrCode: TQrServerData;
+  user: Session["user"];
 };
 
-function DuplicateQRModal({ isOpen, onToggleModal, qrCode }: Props) {
-  const { duplicateQR } = useNewQrOperations({ initialQrData: qrCode });
+function DuplicateQRModal({ isOpen, onToggleModal, qrCode, user }: Props) {
+  const { duplicateQR } = useNewQrOperations({ initialQrData: qrCode, user });
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -95,7 +97,13 @@ function DuplicateQRModal({ isOpen, onToggleModal, qrCode }: Props) {
   );
 }
 
-export function useDuplicateQRModal({ qrCode }: { qrCode: TQrServerData }) {
+export function useDuplicateQRModal({
+  qrCode,
+  user,
+}: {
+  qrCode: TQrServerData;
+  user: Session["user"];
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const DuplicateQRModalCallback = useCallback(() => {
@@ -104,9 +112,10 @@ export function useDuplicateQRModal({ qrCode }: { qrCode: TQrServerData }) {
         isOpen={isOpen}
         onToggleModal={setIsOpen}
         qrCode={qrCode}
+        user={user}
       />
     );
-  }, [isOpen, setIsOpen]);
+  }, [isOpen, setIsOpen, user]);
 
   return {
     isOpen,

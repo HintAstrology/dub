@@ -7,11 +7,14 @@ import { getWorkspace } from "@/lib/fetchers";
 import { isStored, storage } from "@/lib/storage";
 import { NewQrProps, UserProps, WorkspaceProps } from "@/lib/types";
 import { ratelimit, redis } from "@/lib/upstash";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
 import { prisma } from "@dub/prisma";
 import { APP_URL, R2_URL } from "@dub/utils";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { waitUntil } from "@vercel/functions";
+import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
+import { trackMixpanelApiService } from "core/integration/analytic/services/track-mixpanel-api.service";
 import { ECookieArg } from "core/interfaces/cookie.interface.ts";
 import { ERedisArg } from "core/interfaces/redis.interface";
 import {
@@ -26,6 +29,7 @@ import EmailProvider from "next-auth/providers/email";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
+import { qrActionsTrackingParams } from "../analytic/qr-actions-tracking-data.helper";
 import { completeProgramApplications } from "../partners/complete-program-applications";
 import { createAutoLoginURL } from "./jwt-signin";
 import {
@@ -336,7 +340,19 @@ export const authOptions: NextAuthOptions = {
           userId: message.user.id,
         });
 
-        console.log("qrCreateResponse", qrCreateResponse);
+        const trackingParams = qrActionsTrackingParams(
+          qrCreateResponse.createdQr as unknown as TQrServerData,
+        );
+
+        await trackMixpanelApiService({
+          event: EAnalyticEvents.QR_CREATED,
+          email: message.user.email as string,
+          userId: message.user.id,
+          params: {
+            event_category: "Authorized",
+            ...trackingParams,
+          },
+        });
 
         removeQrDataFromRedis(message.user.id, "qr-from-landing");
 

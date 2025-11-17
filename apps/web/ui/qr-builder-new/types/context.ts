@@ -41,7 +41,6 @@ export interface IQrBuilderContextType {
   selectedQrType: TQrType;
   hoveredQRType: EQRType | null;
   currentQRType: EQRType | null;
-  shortLink?: string;
   typeSelectionError: string;
   formData: TQRFormData | null;
   currentFormValues: Record<string, any>;
@@ -51,6 +50,7 @@ export interface IQrBuilderContextType {
   isProcessing: boolean;
   isFileUploading: boolean;
   isFileProcessing: boolean;
+  isInitializing: boolean;
 
   // Form validation state
   isFormValid: boolean;
@@ -100,4 +100,7 @@ export interface IQrBuilderContextType {
   contentStepRef: RefObject<QRContentStepRef>;
   qrBuilderButtonsWrapperRef: RefObject<HTMLDivElement>;
   qrBuilderContentWrapperRef: RefObject<HTMLDivElement>;
+
+  // Navigation state
+  isGoingBack: boolean;
 }

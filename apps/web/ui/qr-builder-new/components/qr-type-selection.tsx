@@ -32,8 +32,9 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
           <div
             key={type.id}
             className={cn(
-              "qr-type-card group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ease-in-out",
-              "border-secondary/20 hover:border-secondary w-full border-2 shadow",
+              "qr-type-card group relative cursor-pointer bg-[#ffffff] overflow-hidden rounded-xl transition-all duration-300 ease-in-out",
+              "w-full border-2 border-transparent shadow",
+              "ring-1 ring-secondary hover:ring-2 hover:ring-secondary",
               // isSelected && "border-pr",
             )}
             onClick={() => onSelect(type.id)}
@@ -41,9 +42,9 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
             onMouseLeave={() => onHover(null)}
           >
             {/* Animated gradient background */}
-            <div className="from-background to-muted/30 absolute inset-0 z-0 bg-gradient-to-br" />
+            {/* <div className="from-background to-muted/30 absolute inset-0 z-0 bg-gradient-to-br" /> */}
             {/* Grid pattern overlay */}
-            <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
+            {/* <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" /> */}
 
             {/* Blob effect */}
             {/* <div className="blob bg-secondary absolute left-0 top-0 z-[1] h-[150px] w-[150px] rounded-full opacity-0 blur-2xl transition-all duration-300 ease-in-out" /> */}

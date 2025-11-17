@@ -1,24 +1,20 @@
-"use client";
-
 import { useUser } from "@/ui/contexts/user";
 import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step.tsx";
 import { useMediaQuery } from "@dub/ui";
-import { linkConstructor } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface.ts";
 import {
-  createContext,
   ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { toast } from "sonner";
-import { DEFAULT_QR_CUSTOMIZATION } from "../constants/default-qr-customization.constants";
-import { convertServerQRToNewBuilder } from "../helpers/data-converters";
+import { QrBuilderContext } from "../contexts";
+import { getInitializedProps } from "../helpers/get-initialized-props";
+import { useInitializeQrData } from "../hooks/use-initialize-qr-data";
 import {
   IQrBuilderContextType,
   TDestinationData,
@@ -30,11 +26,6 @@ import { IQRCustomizationData } from "../types/customization";
 import { TNewQRBuilderData } from "../types/qr-builder-data";
 import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
-
-// Create context
-const QrBuilderContext = createContext<IQrBuilderContextType | undefined>(
-  undefined,
-);
 
 // Provider props
 interface QrBuilderProviderProps {
@@ -49,7 +40,7 @@ interface QrBuilderProviderProps {
 }
 
 // Provider component
-export function QrBuilderProvider({
+export const QrBuilderProvider = ({
   children,
   initialQrData,
   homepageDemo = false,
@@ -58,34 +49,12 @@ export function QrBuilderProvider({
   typeToScrollTo,
   handleResetTypeToScrollTo,
   initialStep,
-}: QrBuilderProviderProps) {
+}: QrBuilderProviderProps) => {
   const user = useUser();
   const { isMobile } = useMediaQuery();
   const isEdit = !!initialQrData;
 
-  const getInitializedProps = useCallback(() => {
-    if (initialQrData) {
-      const builderData = convertServerQRToNewBuilder(initialQrData);
-
-      return {
-        qrTitle: builderData.title || "",
-        selectedQrType: builderData.qrType,
-        formData: builderData.formData,
-        customizationData: builderData.customizationData,
-        fileId: builderData.fileId,
-      };
-    }
-
-    return {
-      qrTitle: "",
-      selectedQrType: null,
-      formData: null,
-      customizationData: DEFAULT_QR_CUSTOMIZATION,
-      fileId: undefined,
-    };
-  }, [initialQrData]);
-
-  const initialState = getInitializedProps();
+  const initialState = getInitializedProps(initialQrData);
 
   const [builderStep, setBuilderStep] = useState<TStepState>(initialStep || 1);
   const [destinationData, setDestinationData] =
@@ -135,6 +104,31 @@ export function QrBuilderProvider({
   const qrBuilderButtonsWrapperRef = useRef<HTMLDivElement>(null);
   const qrBuilderContentWrapperRef = useRef<HTMLDivElement>(null);
 
+  const previousQrTypeRef = useRef<TQrType>(selectedQrType);
+
+  // Unified initialization method for edit mode using hook
+  const handleInitialized = useCallback(
+    (params: {
+      qrType: EQRType;
+      formData: TQRFormData;
+      customizationData: IQRCustomizationData;
+      currentFormValues: Record<string, any>;
+    }) => {
+      setSelectedQrType(params.qrType);
+      setFormData(params.formData);
+      setCustomizationData(params.customizationData);
+      setCurrentFormValues(params.currentFormValues);
+    },
+    [],
+  );
+
+  const { isInitializing, initialize, hasInitializedRef } = useInitializeQrData(
+    {
+      initialQrData,
+      onInitialized: handleInitialized,
+    },
+  );
+
   const isTypeStep = builderStep === 1;
   const isContentStep = builderStep === 2;
   const isCustomizationStep = builderStep === 3;
@@ -158,35 +152,28 @@ export function QrBuilderProvider({
       : selectedQrType;
   }, [isTypeStep, hoveredQRType, selectedQrType]);
 
-  const shortLink = useMemo(() => {
-    // Use shortLink from initialQrData if available (edit mode)
-    if (initialQrData?.link?.shortLink) {
-      return initialQrData.link.shortLink;
-    }
-
-    // Compute shortLink if we have key and domain (edit mode without precomputed shortLink)
-    const key = initialQrData?.link?.key;
-    const domain = initialQrData?.link?.domain;
-
-    if (!key || !domain) return undefined;
-
-    return linkConstructor({
-      key,
-      domain,
-      pretty: true,
-    });
-  }, [initialQrData]);
-
   const handleNextStep = useCallback(() => {
-    // Prevent scroll on step change
+    // Store scroll position and QR builder position relative to viewport before step change
     const scrollPosition = window.scrollY;
+    const qrBuilderElement = qrBuilderContentWrapperRef.current;
+    const qrBuilderViewportTop = qrBuilderElement
+      ? qrBuilderElement.getBoundingClientRect().top
+      : null;
 
     // @ts-ignore
     setBuilderStep((prev) => Math.min(prev + 1, 3));
 
-    // Restore scroll position after state update
+    // Restore QR builder position after DOM updates and animations
     requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
+      requestAnimationFrame(() => {
+        if (qrBuilderViewportTop !== null && qrBuilderElement) {
+          const newViewportTop = qrBuilderElement.getBoundingClientRect().top;
+          const offset = newViewportTop - qrBuilderViewportTop;
+          window.scrollTo(0, scrollPosition + offset);
+        } else {
+          window.scrollTo(0, scrollPosition);
+        }
+      });
     });
   }, []);
 
@@ -209,15 +196,27 @@ export function QrBuilderProvider({
         }
       }
 
-      // Prevent scroll on step change
+      // Store scroll position and QR builder position relative to viewport before step change
       const scrollPosition = window.scrollY;
+      const qrBuilderElement = qrBuilderContentWrapperRef.current;
+      const qrBuilderViewportTop = qrBuilderElement
+        ? qrBuilderElement.getBoundingClientRect().top
+        : null;
 
       setTypeSelectionError("");
       setBuilderStep(newStep as TStepState);
 
-      // Restore scroll position after state update
+      // Restore QR builder position after DOM updates and animations
       requestAnimationFrame(() => {
-        window.scrollTo(0, scrollPosition);
+        requestAnimationFrame(() => {
+          if (qrBuilderViewportTop !== null && qrBuilderElement) {
+            const newViewportTop = qrBuilderElement.getBoundingClientRect().top;
+            const offset = newViewportTop - qrBuilderViewportTop;
+            window.scrollTo(0, scrollPosition + offset);
+          } else {
+            window.scrollTo(0, scrollPosition);
+          }
+        });
       });
 
       // Reset form validity appropriately
@@ -275,8 +274,6 @@ export function QrBuilderProvider({
   const handleFormSubmit = useCallback(
     (data: TQRFormData) => {
       setFormData(data);
-      console.log("Form submitted:", data);
-      handleNextStep();
     },
     [handleNextStep],
   );
@@ -304,45 +301,48 @@ export function QrBuilderProvider({
   }, [builderStep, handleChangeStep, homepageDemo, user, sessionId]);
 
   // Methods
-  const onSave = useCallback(async () => {
-    const dataToSave = formData;
+  const onSave = useCallback(
+    async (providedFormData?: TQRFormData) => {
+      const dataToSave = providedFormData || formData;
 
-    if (!selectedQrType || !dataToSave) {
-      toast.error("Please complete all required fields");
-      return;
-    }
+      if (!selectedQrType || !dataToSave) {
+        toast.error("Please complete all required fields");
+        return;
+      }
 
-    if (!onSaveProp) {
-      console.error("onSave prop not provided to QrBuilderProvider");
-      toast.error("Save functionality not configured");
-      return;
-    }
+      if (!onSaveProp) {
+        console.error("onSave prop not provided to QrBuilderProvider");
+        toast.error("Save functionality not configured");
+        return;
+      }
 
-    setIsProcessing(true);
+      setIsProcessing(true);
 
-    try {
-      const builderData: TNewQRBuilderData = {
-        qrType: selectedQrType,
-        formData: dataToSave,
-        customizationData,
-        title: formData?.qrName || `${selectedQrType} QR Code`,
-        fileId: (dataToSave as any)?.fileId || initialState.fileId,
-      };
+      try {
+        const builderData: TNewQRBuilderData = {
+          qrType: selectedQrType,
+          formData: dataToSave,
+          customizationData,
+          title: dataToSave?.qrName || `${selectedQrType} QR Code`,
+          fileId: (dataToSave as any)?.fileId || initialState.fileId,
+        };
 
-      await onSaveProp(builderData);
-    } catch (error) {
-      console.error("Error saving QR:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [
-    selectedQrType,
-    formData,
-    customizationData,
-    initialState.qrTitle,
-    initialState.fileId,
-    onSaveProp,
-  ]);
+        await onSaveProp(builderData);
+      } catch (error) {
+        console.error("Error saving QR:", error);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [
+      selectedQrType,
+      formData,
+      customizationData,
+      initialState.qrTitle,
+      initialState.fileId,
+      onSaveProp,
+    ],
+  );
 
   const handleContinue = useCallback(async () => {
     if (isCustomizationStep) {
@@ -369,6 +369,7 @@ export function QrBuilderProvider({
 
     if (isContentStep && contentStepRef.current) {
       const isValid = await contentStepRef.current.validateForm();
+
       if (!isValid) {
         // toast.error("Please fill in all required fields correctly");
         return;
@@ -386,14 +387,12 @@ export function QrBuilderProvider({
         sessionId: sessionId || user?.id,
       });
 
-      // Save the current form values to formData state before moving to next step
-      if (currentFormValues && Object.keys(currentFormValues).length > 0) {
-        setFormData(currentFormValues as TQRFormData);
-        console.log(
-          "Saving form data before moving to customization step:",
-          currentFormValues,
-        );
-      }
+      const formValues = contentStepRef.current.getValues();
+      setFormData(formValues as any);
+      console.log(
+        "Saving form data before moving to customization step:",
+        formValues,
+      );
     }
 
     handleNextStep();
@@ -425,6 +424,21 @@ export function QrBuilderProvider({
     setCustomizationData(data);
   }, []);
 
+  // Initialize from initialQrData on mount or when it changes (edit mode)
+  useEffect(() => {
+    if (initialQrData) {
+      const qrId = initialQrData.id;
+      // Only initialize if we haven't initialized for this QR ID yet
+      if (hasInitializedRef.current !== qrId) {
+        initialize();
+      }
+    } else {
+      // Reset initialization ref when not in edit mode
+      hasInitializedRef.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQrData, initialize]);
+
   // Handle typeToScrollTo from landing page buttons
   useEffect(() => {
     if (typeToScrollTo && homepageDemo) {
@@ -445,6 +459,31 @@ export function QrBuilderProvider({
     }
   }, [isMobile, homepageDemo, isTypeStep]);
 
+  // Reset form data when QR type changes (but not on initial load)
+  useEffect(() => {
+    const previousType = previousQrTypeRef.current;
+
+    // If type actually changed (and it's not null to null)
+    if (
+      previousType !== selectedQrType &&
+      previousType !== null &&
+      selectedQrType !== null
+    ) {
+      // Clear form data when switching between different QR types
+      // But preserve qrName if it exists
+      const qrNameToPreserve = currentFormValues.qrName;
+
+      setFormData(null);
+      setCurrentFormValues(
+        qrNameToPreserve ? { qrName: qrNameToPreserve } : {},
+      );
+      setIsFormValid(false);
+    }
+
+    // Update ref for next comparison
+    previousQrTypeRef.current = selectedQrType;
+  }, [selectedQrType, currentFormValues.qrName]);
+
   const contextValue: IQrBuilderContextType = {
     // States
     builderStep,
@@ -452,7 +491,6 @@ export function QrBuilderProvider({
     selectedQrType,
     hoveredQRType,
     currentQRType,
-    shortLink,
     typeSelectionError,
     formData,
     currentFormValues,
@@ -461,6 +499,7 @@ export function QrBuilderProvider({
     isProcessing,
     isFileUploading,
     isFileProcessing,
+    isInitializing,
 
     // Form validation state
     isFormValid,
@@ -510,6 +549,9 @@ export function QrBuilderProvider({
     contentStepRef,
     qrBuilderButtonsWrapperRef,
     qrBuilderContentWrapperRef,
+
+    // Navigation state
+    isGoingBack: false,
   };
 
   return (
@@ -517,15 +559,4 @@ export function QrBuilderProvider({
       {children}
     </QrBuilderContext.Provider>
   );
-}
-
-// Custom hook to use the context
-export function useQrBuilderContext(): IQrBuilderContextType {
-  const context = useContext(QrBuilderContext);
-
-  if (context === undefined) {
-    throw new Error("useQrBuilder must be used within a QrBuilderProvider");
-  }
-
-  return context;
-}
+};

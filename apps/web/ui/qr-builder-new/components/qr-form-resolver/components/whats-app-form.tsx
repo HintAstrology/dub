@@ -56,14 +56,16 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
         const result = await form.trigger();
         if (result) {
           const formData = form.getValues();
-          const encodedData = encodeQRData(EQRType.WEBSITE, formData);
+          const encodedData = encodeQRData(EQRType.WHATSAPP, formData);
+          console.log("validate encodedData", encodedData);
           onSubmit({ ...formData, encodedData });
         }
         return result;
       },
       getValues: () => {
         const formData = form.getValues();
-        const encodedData = encodeQRData(EQRType.WEBSITE, formData);
+        const encodedData = encodeQRData(EQRType.WHATSAPP, formData);
+        console.log("getValues encodedData", encodedData);
         return { ...formData, encodedData };
       },
       form,
@@ -101,7 +103,7 @@ export const WhatsAppForm = forwardRef<WhatsAppFormRef, WhatsAppFormProps>(
               {openAccordion === "details" && !contentOnly && (
                 <Separator className="mb-3" />
               )}
-              <AccordionContent className="pt-2">
+              <AccordionContent className="space-y-4 pt-2">
                 <BaseFormField
                   name="number"
                   label="WhatsApp Number"

@@ -11,7 +11,7 @@ import {
   QR_FILE_TITLES,
   QR_NAME_PLACEHOLDERS,
 } from "@/ui/qr-builder-new/constants/qr-type-inputs-placeholders.ts";
-import { useQrBuilderContext } from "@/ui/qr-builder-new/context/qr-builder-context.tsx";
+import { useQrBuilderContext } from "@/ui/qr-builder-new/contexts/qr-builder-context.tsx";
 import { encodeQRData } from "@/ui/qr-builder-new/helpers/qr-data-handlers.ts";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type.ts";
 import {
@@ -44,7 +44,10 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
     const { setIsFileUploading, setIsFileProcessing, initialQrData } =
       useQrBuilderContext();
 
-    const [fileId, setFileId] = useState<string>(initialQrData?.fileId!);
+    // Initialize fileId from defaultValues (saved formData) or initialQrData
+    const [fileId, setFileId] = useState<string>(
+      (defaultValues as any)?.fileId || initialQrData?.fileId || undefined,
+    );
     const openAccordion = "details";
 
     const formDefaults = {
@@ -58,12 +61,19 @@ export const VideoForm = forwardRef<VideoFormRef, VideoFormProps>(
       defaultValues: formDefaults,
     });
 
+    // Restore fileId from defaultValues when form is re-initialized (e.g., when returning to step 2)
+    useEffect(() => {
+      if (defaultValues && (defaultValues as any)?.fileId) {
+        setFileId((defaultValues as any).fileId);
+      }
+    }, [defaultValues]);
+
     // Update hidden fileId field when fileId state changes
     useEffect(() => {
       if (fileId) {
         form.setValue("fileId" as any, fileId);
       }
-    }, [fileId]);
+    }, [fileId, form]);
 
     useImperativeHandle(ref, () => ({
       validate: async () => {

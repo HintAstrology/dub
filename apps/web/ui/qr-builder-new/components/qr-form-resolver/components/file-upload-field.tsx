@@ -12,7 +12,7 @@ import { FileUploadList } from "@/ui/qr-builder-new/components/file-upload/list"
 import { useFileUpload } from "@/ui/qr-builder-new/hooks/use-file-upload";
 import { cn } from "@dub/utils";
 import { Upload, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 interface FileUploadFieldProps {
@@ -43,11 +43,21 @@ export const FileUploadField = ({
 }: FileUploadFieldProps) => {
   const { control } = useFormContext();
   const [uploadError, setUploadError] = useState<string>("");
+  const progressCallbackRef = useRef<
+    Map<File, (file: File, progress: number) => void>
+  >(new Map());
 
   const { uploadFile, isUploading, uploadProgress } = useFileUpload({
     onFileIdReceived,
     onError: (_, error) => setUploadError(error),
     onSuccess: () => setUploadError(""),
+    onProgress: (file, progress) => {
+      // Forward progress updates to FileUpload component's onProgress callback
+      const callback = progressCallbackRef.current.get(file);
+      if (callback) {
+        callback(file, progress);
+      }
+    },
   });
 
   // Notify parent about upload state changes
@@ -117,14 +127,20 @@ export const FileUploadField = ({
         await Promise.all(
           files.map(async (file: File) => {
             try {
+              // Store the progress callback for this file
+              progressCallbackRef.current.set(file, onProgress);
               onProgress(file, 0);
               await uploadFile(file);
               onSuccess(file);
+              // Clean up the callback after upload completes
+              progressCallbackRef.current.delete(file);
             } catch (error) {
               const err =
                 error instanceof Error ? error : new Error("Upload failed");
               onError(file, err);
               setUploadError(err.message);
+              // Clean up the callback on error
+              progressCallbackRef.current.delete(file);
             }
           }),
         );
@@ -162,7 +178,7 @@ export const FileUploadField = ({
             >
               <FileUploadDropzone
                 className={cn(
-                  "border-border hover:border-secondary hover:bg-muted/30 min-h-[240px] w-full cursor-pointer px-6 py-12 transition-all duration-200",
+                  "border-border hover:border-secondary hover:bg-muted/30 min-h-[130px] w-full cursor-pointer px-6 py-8 transition-all duration-200",
                   {
                     "border-red-500 hover:border-red-500":
                       fieldState.error || uploadError,
