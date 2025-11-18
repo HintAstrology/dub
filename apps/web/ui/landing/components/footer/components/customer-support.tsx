@@ -27,7 +27,7 @@ export const CustomerSupport: FC<Readonly<ICustomerSupportProps>> = ({
 
   return (
     <Link
-      className="bg-white shadow border-none hover:border-primary hover:bg-primary/5 group inline-flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-all"
+      className="bg-white border border-gray-100 hover:border-primary hover:bg-primary/5 group inline-flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-all"
       href="/help"
       target="_blank"
       onClick={() => onClickHandler("customer_support")}
