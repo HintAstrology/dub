@@ -31,7 +31,7 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = () 
           {GET_QR_FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="border-border/50 bg-white group relative overflow-hidden rounded-xl border p-6 shadow-sm transition-all duration-300 hover:shadow-md"
+              className="bg-white group relative overflow-hidden rounded-xl p-6 shadow transition-all duration-300 hover:shadow-md"
             >
               <div className="flex flex-col gap-4">
                 {/* Icon */}

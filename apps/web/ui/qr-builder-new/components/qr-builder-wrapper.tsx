@@ -59,16 +59,9 @@ export const QRBuilderWrapper = () => {
       className={cn(
         "mx-auto flex h-full w-full flex-col justify-between",
         !isTypeStep &&
-          "border-secondary/20 rounded-[20px] border bg-white shadow",
+          " rounded-[20px] bg-white shadow",
       )}
     >
-      {/* Decorative blobs - only on steps 2 and 3, hidden on mobile */}
-      {showDecorations && !isMobile && (
-        <>
-          <div className="bg-primary/10 absolute -right-20 -top-20 h-72 w-72 animate-pulse rounded-full blur-3xl" />
-          <div className="bg-secondary/10 absolute -bottom-20 -left-20 h-72 w-72 animate-pulse rounded-full blur-3xl delay-700" />
-        </>
-      )}
 
       <div className="relative">
         <div
