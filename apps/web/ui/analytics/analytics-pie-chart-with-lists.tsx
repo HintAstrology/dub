@@ -118,7 +118,7 @@ export default function AnalyticsPieChartWithLists({
   }, [displayData]);
 
   return (
-    <div className="relative flex flex-col gap-6 overflow-hidden">
+    <div className="relative flex flex-col overflow-hidden">
       {/* Pie Chart and Controls */}
       <div className="flex items-start justify-between gap-8">
         {/* Pie Chart */}
