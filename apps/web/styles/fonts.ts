@@ -1,5 +1,5 @@
 import { GeistMono } from "geist/font/mono";
-import { Inter } from "next/font/google";
+import { Inter, Anton, Caveat } from "next/font/google";
 import localFont from "next/font/local";
 
 export const satoshi = localFont({
@@ -14,5 +14,15 @@ export const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
+
+export const anton = Anton({
+  variable: '--font-anton',
+  weight: '400',
+})
+
+export const caveat = Caveat({
+  variable: '--font-caveat',
+  weight: '400'
+})
 
 export const geistMono = GeistMono;
