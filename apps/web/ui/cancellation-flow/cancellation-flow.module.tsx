@@ -30,6 +30,7 @@ export const CancellationFlowModule: FC<
   } = useCancelSubscriptionScheduleMutation();
 
   const handleCancelSubscription = async () => {
+    console.log("user", user);
     if (!user.discountOffered) {
       setShowDiscountModal(true);
       return;

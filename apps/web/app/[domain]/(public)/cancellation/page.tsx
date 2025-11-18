@@ -11,11 +11,14 @@ const pageName = "cancel_flow_or_return";
 const CancellationPage = async () => {
   const authSession = await getSession();
 
+  console.log("authSession", authSession);
+
   if (!authSession?.user) {
     redirect("/cancellation/auth");
   }
 
   const user = convertSessionUserToCustomerBody(authSession.user);
+  console.log("converted user", user);
 
   const { isSubscribed, isScheduledForCancellation, isCancelled, isDunning } =
     await checkSubscriptionStatusAuthLess(authSession.user.email);
