@@ -17,11 +17,13 @@ export const inter = Inter({
 
 export const anton = Anton({
   variable: '--font-anton',
+  subsets: ["latin"],
   weight: '400',
 })
 
 export const caveat = Caveat({
   variable: '--font-caveat',
+  subsets: ["latin"],
   weight: '400'
 })
 
