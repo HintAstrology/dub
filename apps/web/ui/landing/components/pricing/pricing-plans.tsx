@@ -34,9 +34,9 @@ export const PricingSection: FC<IPricingSectionProps> = ({
         </p>
       </div>
 
-      <div className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-auto lg:grid lg:grid-cols-3 lg:items-end lg:justify-center lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:max-w-4xl [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="relative flex snap-x snap-mandatory gap-4 overflow-x-auto pl-6 pr-4 pb-4 lg:mx-auto lg:grid lg:grid-cols-3 lg:items-end lg:justify-center lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:max-w-4xl [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
         {PRICING_PLANS.map((plan, index) => (
-          <div key={index} className="h-full min-w-[85vw] flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-2 lg:min-w-0 w-full lg:max-w-[320px] lg:mx-auto">
+          <div key={index} className="h-full min-w-[calc(80vw-5rem)] sm:min-w-[70vw] flex-shrink-0 snap-start transition-transform duration-300 hover:-translate-y-2 lg:min-w-0 w-full lg:max-w-[320px] lg:mx-auto">
             <Card
               className={cn(
                 "relative h-full w-full overflow-hidden pt-3",

@@ -51,14 +51,14 @@ export const ReviewsSection = () => {
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[rgb(248,252,252)] to-transparent sm:w-32" />
           <div className="space-y-6">
             <div className="w-full overflow-hidden">
-              <Marquee pauseOnHover duration={80} gap={1.5}>
+              <Marquee pauseOnHover duration={160} gap={1.5}>
                 {firstRow.map((testimonial, index) => (
                   <TestimonialCard key={index} testimonial={testimonial} />
                 ))}
               </Marquee>
             </div>
             <div className="w-full overflow-hidden">
-              <Marquee pauseOnHover duration={80} gap={1.5} reverse>
+              <Marquee pauseOnHover duration={160} gap={1.5} reverse>
                 {secondRow.map((testimonial, index) => (
                   <TestimonialCard key={index} testimonial={testimonial} />
                 ))}

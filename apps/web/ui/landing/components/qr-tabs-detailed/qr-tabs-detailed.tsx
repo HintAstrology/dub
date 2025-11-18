@@ -57,8 +57,8 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
           className="w-full"
         >
           <ScrollArea.Root className="w-full">
-            <ScrollArea.Viewport className="w-full overflow-x-auto pt-3">
-              <TabsList className="mb-4 flex h-auto w-max min-w-full justify-start gap-3 bg-transparent p-0 sm:gap-4">
+            <ScrollArea.Viewport className="w-full overflow-x-auto pt-3 pl-4 sm:pl-6">
+              <TabsList className="mb-4 flex h-auto w-max justify-start gap-3 bg-transparent p-0 pr-4 sm:gap-4">
                 {QR_TYPES.map((type) => (
                   <TabsTrigger
                     key={type.id}

@@ -3,7 +3,7 @@ import { SectionTitle } from "../../section-title";
 
 export const QrTabsTitle: FC = () => {
   return (
-    <div className="mb-6 flex flex-col items-center justify-center gap-3 md:mb-12">
+    <div className="mb-6 flex flex-col items-center justify-center gap-2 md:gap-3 md:mb-12">
       <SectionTitle
         titleFirstPart="Create Your"
         highlightedTitlePart="QR Code"
