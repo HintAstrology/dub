@@ -57,11 +57,11 @@ export default function Analytics({
         {({ dashboardProps }) => {
           return (
             <div
-              className={cn("py-3 px-3 sm:px-6 lg:px-10", dashboardProps && "bg-neutral-50")}
+              className={cn( dashboardProps && "bg-neutral-50")}
             >
               <Toggle />
               <AnalyticsFiltersList />
-              <div className="mx-auto grid w-full max-w-screen-xl gap-5">
+              <div className="mx-auto grid w-full gap-5">
                 <Main />
                 <StatsGrid />
               </div>

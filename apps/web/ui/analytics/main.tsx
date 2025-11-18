@@ -24,11 +24,8 @@ type Tab = {
 
 export default function Main() {
   const {
-    totalEvents,
-    requiresUpgrade,
     showConversions,
     selectedTab,
-    saleUnit,
     view,
   } = useContext(AnalyticsContext);
   const { plan } = useWorkspace();

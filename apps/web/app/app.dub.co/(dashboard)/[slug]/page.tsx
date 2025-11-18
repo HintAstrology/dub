@@ -46,7 +46,7 @@ const WorkspaceQRsPage = async () => {
 
   return (
     <>
-      <PageContent title={<LinksTitle />}>
+      <PageContent>
         <WorkspaceQRsClient
           initialQrs={qrs as unknown as TQrServerData[]}
           featuresAccess={featuresAccess}

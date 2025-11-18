@@ -57,10 +57,9 @@ interface TopLinksBarChartProps {
   maxValue: number;
   unit: string;
   limit?: number;
-  onViewAll?: () => void;
 }
 
-function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLinksBarChartProps) {
+function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
 
   const formatValue = (value: number) => {
@@ -79,13 +78,11 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
     return sorted.slice(0, limit);
   }, [data, limit]);
 
-  // Limit visible bars to maximum 5 (5th one will be transparent)
-  const MAX_VISIBLE_BARS = 4;
-  const SHOW_TRANSPARENT_BAR = displayData.length > MAX_VISIBLE_BARS;
+  // Limit visible bars
+  const MAX_VISIBLE_BARS = 5;
   const visibleBarsData = useMemo(() => {
-    // Show 5 items if there are more than 4, otherwise show all
-    return displayData.slice(0, SHOW_TRANSPARENT_BAR ? MAX_VISIBLE_BARS + 1 : displayData.length);
-  }, [displayData, SHOW_TRANSPARENT_BAR]);
+    return displayData.slice(0, MAX_VISIBLE_BARS);
+  }, [displayData]);
 
   const displayTotalValue = useMemo(() => {
     return visibleBarsData.reduce((sum, item) => sum + item.value, 0);
@@ -94,7 +91,6 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
   const chartData = useMemo(() => {
     return visibleBarsData
       .map((item, index) => {
-        const isTransparent = SHOW_TRANSPARENT_BAR && index === MAX_VISIBLE_BARS;
         return {
           sr: visibleBarsData.length - index,
           service: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
@@ -103,10 +99,9 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
           icon: item.icon,
           title: item.title,
           value: item.value,
-          isTransparent,
         };
       });
-  }, [visibleBarsData, displayTotalValue, SHOW_TRANSPARENT_BAR]);
+  }, [visibleBarsData, displayTotalValue]);
 
   const chartConfig = {
     sales: {
@@ -114,12 +109,10 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
     },
   } satisfies ChartConfig;
 
-  const needsFade = displayData.length > MAX_VISIBLE_BARS;
-
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr] -mt-2 overflow-hidden items-start">
-      <div className="pl-2 pr-6 py-6 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
-        <ChartContainer config={chartConfig} className={needsFade ? "min-h-[300px] h-[300px] w-[320px]" : "h-[240px] w-[320px]"}>
+      <div className="pl-2 pr-6 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
+        <ChartContainer config={chartConfig} className="h-[240px] w-[320px]">
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -128,7 +121,7 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
             barCategoryGap={4}
             margin={{
               top: 0,
-              bottom: needsFade ? 10 : 0,
+              bottom: 0,
             }}
           >
             <CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -176,7 +169,6 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
                 <Cell 
                   key={`cell-${index}`} 
                   fill={entry.fill}
-                  opacity={entry.isTransparent ? 0.25 : 1}
                 />
               ))}
               <LabelList
@@ -185,18 +177,9 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
                 fill="hsl(var(--muted-foreground))"
                 className="text-xs"
                 offset={5}
-                formatter={(value: string, entry: any) => {
-                  const dataEntry = chartData.find((d) => d.title === value);
-                  if (dataEntry?.isTransparent) {
-                    return value ? `${value}...` : '';
-                  }
-                  return value;
-                }}
                 content={(props: any) => {
                   if (!props) return null;
                   const { x, y, width, height, value, payload } = props;
-                  const dataEntry = chartData.find((d) => d.title === value);
-                  const isTransparent = dataEntry?.isTransparent;
                   
                   // For vertical bar chart, position="bottom" means below the bar
                   // y is the top of the bar, so we add bar height + offset to place text below
@@ -211,7 +194,6 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
                       fill="hsl(var(--muted-foreground))"
                       textAnchor="start"
                       fontSize="12"
-                      opacity={isTransparent ? 0.4 : 1}
                     >
                       {value}
                     </text>
@@ -221,16 +203,6 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
             </Bar>
           </BarChart>
         </ChartContainer>
-        {needsFade && onViewAll && (
-          <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center h-max z-20 pointer-events-auto">
-            <button
-              onClick={onViewAll}
-              className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 hover:bg-neutral-50 active:bg-neutral-100 shadow-sm"
-            >
-              View All
-            </button>
-          </div>
-        )}
       </div>
       <div className="min-w-0">
         <div className="mb-3 flex justify-end">
@@ -241,12 +213,10 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLin
             const formattedValue = formatValue(item.value);
             const dataEntry = chartData.find((d) => d.title === item.title);
             const color = dataEntry?.fill || chartColors[index % chartColors.length];
-            const isTransparent = dataEntry?.isTransparent || false;
             return (
               <div 
                 key={index} 
                 className="flex items-center justify-end gap-2"
-                style={{ opacity: isTransparent ? 0.4 : 1 }}
               >
                 <div
                   className="h-2.5 w-2.5 rounded-full shrink-0"
@@ -439,58 +409,101 @@ export default function TopLinks({
         )}
       </Modal>
 
-      <Card className="gap-4 pt-6 overflow-hidden">
+      <Card className="gap-4 pt-6 overflow-hidden min-h-[392px]">
         <CardContent className="relative px-6 overflow-hidden">
-          {/* View Toggle */}
-          <div className="flex justify-start mb-4">
-            <div className="flex gap-1 border rounded-lg p-1">
-              <button
-                onClick={() => onViewChange("pie")}
-                className={cn(
-                  "p-2 rounded transition-colors",
-                  view === "pie" 
-                    ? "bg-secondary text-white" 
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <PieChartIcon className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => onViewChange("list")}
-                className={cn(
-                  "p-2 rounded transition-colors",
-                  view === "list" 
-                    ? "bg-secondary text-white" 
-                    : "hover:bg-gray-100"
-                )}
-              >
-                <ChartBar className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
           {data ? (
             data.length > 0 ? (
               <>
                 {view === "list" ? (
-                  <TopLinksBarChart
+                  <>
+                    {/* Controls for Bar Chart - Top */}
+                    <div className="flex gap-3 justify-end mb-4">
+                      <div className="flex gap-1 border rounded-lg p-1">
+                        <button
+                          onClick={() => onViewChange("pie")}
+                          className={cn(
+                            "p-2 rounded transition-colors",
+                            view === "pie" 
+                              ? "bg-secondary text-white" 
+                              : "hover:bg-gray-100"
+                          )}
+                        >
+                          <PieChartIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => onViewChange("list")}
+                          className={cn(
+                            "p-2 rounded transition-colors",
+                            view === "list" 
+                              ? "bg-secondary text-white" 
+                              : "hover:bg-gray-100"
+                          )}
+                        >
+                          <ChartBar className="h-4 w-4" />
+                        </button>
+                      </div>
+                      {data && data.length > EXPAND_LIMIT && (
+                        <button
+                          onClick={() => setShowModal(true)}
+                          className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+                        >
+                          View All
+                        </button>
+                      )}
+                    </div>
+                    <TopLinksBarChart
+                      data={getBarListData(tab)}
+                      unit={selectedTab}
+                      maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
+                      limit={EXPAND_LIMIT}
+                    />
+                  </>
+                ) : (
+                  <AnalyticsPieChartWithLists
                     data={getBarListData(tab)}
                     unit={selectedTab}
                     maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
                     limit={EXPAND_LIMIT}
-                    onViewAll={() => setShowModal(true)}
-                  />
-                        ) : (
-                          <AnalyticsPieChartWithLists
-                            data={getBarListData(tab)}
-                            unit={selectedTab}
-                            maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
-                            limit={EXPAND_LIMIT}
-                            showName={false}
-                            showCopy={true}
-                            onViewAll={() => setShowModal(true)}
-                          />
+                    showName={false}
+                    showCopy={true}
+                    controls={
+                      <div className="flex gap-3">
+                        <div className="flex gap-1 border rounded-lg p-1">
+                          <button
+                            onClick={() => onViewChange("pie")}
+                            className={cn(
+                              "p-2 rounded transition-colors",
+                              view === "pie" 
+                                ? "bg-secondary text-white" 
+                                : "hover:bg-gray-100"
+                            )}
+                          >
+                            <PieChartIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => onViewChange("list")}
+                            className={cn(
+                              "p-2 rounded transition-colors",
+                              view === "list" 
+                                ? "bg-secondary text-white" 
+                                : "hover:bg-gray-100"
+                            )}
+                          >
+                            <ChartBar className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {data && data.length > EXPAND_LIMIT && (
+                          <button
+                            onClick={() => setShowModal(true)}
+                            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+                          >
+                            View All
+                          </button>
                         )}
+                      </div>
+                    }
+                  />
+                )}
               </>
             ) : (
               <div className="flex h-[300px] items-center justify-center">

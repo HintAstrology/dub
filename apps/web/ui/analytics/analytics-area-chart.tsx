@@ -225,10 +225,8 @@ export default function AnalyticsAreaChart({
             <AreaChart
               data={rechartsData}
               margin={{
-                left: 0,
+                left: -30,
                 right: 0,
-                top: 12,
-                bottom: 12,
               }}
             >
               <defs>

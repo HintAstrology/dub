@@ -1,7 +1,5 @@
 "use client";
 
-import type { ComponentType, CSSProperties } from "react";
-import { QrCode, PlusCircle, BarChart3 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,51 +12,71 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { SidebarUserDropdown } from "./sidebar-user-dropdown";
-import { useParams, usePathname } from "next/navigation";
-import Link from "next/link";
-import { cn } from "@dub/utils";
 import { useTrialStatus } from "@/lib/contexts/trial-status-context";
 import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal";
-import { MouseEvent, useMemo } from "react";
-import { Icon } from "@iconify/react";
+import { useUser } from "@/ui/contexts/user";
+import { QRBuilderNewModal } from "@/ui/modals/qr-builder-new/qr-builder-modal";
+import { cn } from "@dub/utils";
+import { QrCode, Plus, BarChart3, CirclePlus } from "lucide-react";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
+import { MouseEvent, useMemo, useState } from "react";
+import { SidebarUserDropdown } from "./sidebar-user-dropdown";
+import type { LucideIcon } from "lucide-react";
 
 type MenuItem = {
-  icon: ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
-  href: string;
+  href?: string;
   exact?: boolean;
   badge?: string;
   onClick?: (e: MouseEvent) => void;
 };
 
 export function AppSidebar() {
+  const user = useUser();
   const { slug } = useParams() as { slug?: string };
   const pathname = usePathname();
   const { isTrialOver } = useTrialStatus();
-  const { setShowTrialExpiredModal, TrialExpiredModalCallback } = useTrialExpiredModal();
+  const { setShowTrialExpiredModal, TrialExpiredModalCallback } =
+    useTrialExpiredModal();
+  const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
 
-  const menuItems: MenuItem[] = useMemo(() => [
-    {
-      icon: ({ className }) => <Icon icon="mage:qr-code" className={className} />,
-      label: "My QR Codes",
-      href: `/${slug}`,
-      exact: true,
-    },
-    {
-      icon: ({ className }) => <Icon icon="streamline:graph" className={className} />,
-      label: "Statistics",
-      href: isTrialOver ? "#" : `/${slug}/analytics`,
-      onClick: isTrialOver
-        ? (e: MouseEvent) => {
-            e.preventDefault();
-            setShowTrialExpiredModal?.(true);
-          }
-        : undefined,
-    },
-  ], [slug, isTrialOver, setShowTrialExpiredModal]);
+  const menuItems: MenuItem[] = useMemo(
+    () => [
+      {
+        icon: CirclePlus,
+        label: "Create QR",
+        onClick: (e: MouseEvent) => {
+          e.preventDefault();
+          setShowQRBuilderModal(true);
+        },
+      },
+      {
+        icon: QrCode,
+        label: "My QR Codes",
+        href: `/${slug}`,
+        exact: true,
+      },
+      {
+        icon: BarChart3,
+        label: "Statistics",
+        href: isTrialOver ? "#" : `/${slug}/analytics`,
+        onClick: isTrialOver
+          ? (e: MouseEvent) => {
+              e.preventDefault();
+              setShowTrialExpiredModal?.(true);
+            }
+          : undefined,
+      },
+    ],
+    [slug, isTrialOver, setShowTrialExpiredModal],
+  );
 
   const isActive = (item: MenuItem) => {
+    if (!item.href) {
+      return false;
+    }
     if (item.exact) {
       return pathname === item.href;
     }
@@ -68,15 +86,24 @@ export function AppSidebar() {
   return (
     <>
       <TrialExpiredModalCallback />
+      <QRBuilderNewModal
+        showModal={showQRBuilderModal}
+        onClose={() => setShowQRBuilderModal(false)}
+        user={user!}
+      />
       <Sidebar
         variant="floating"
         collapsible="icon"
-        className="border-r-0 bg-card p-6 pr-0 [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-[20px] [&>[data-slot=sidebar-inner]]:bg-card [&>[data-slot=sidebar-inner]]:border [&>[data-slot=sidebar-inner]]:border-border [&>[data-slot=sidebar-inner]]:shadow-sm"
+        className="bg-card [&>[data-slot=sidebar-inner]]:bg-card [&>[data-slot=sidebar-inner]]:border-border border-r-0 p-6 pr-0 [&>[data-slot=sidebar-inner]]:border [&>[data-slot=sidebar-inner]]:shadow-sm [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-[20px]"
       >
         <SidebarHeader className="bg-white lg:rounded-[20px]">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" className="gap-2.5 !bg-transparent hover:bg-transparent [&>svg]:size-8" asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="gap-2.5 !bg-transparent hover:bg-transparent [&>svg]:size-8"
+                asChild
+              >
                 <Link href={`/${slug}`}>
                   <QrCode className="text-primary size-8" />
                   <span className="text-xl font-semibold">GetQR</span>
@@ -89,27 +116,41 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton 
-                      asChild 
-                      isActive={isActive(item)}
-                      className={cn(
-                        "transition-colors",
-                        isActive(item) && "bg-primary/10 text-primary font-medium hover:bg-primary/15"
+                {menuItems.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <SidebarMenuItem key={item.label}>
+                      <SidebarMenuButton
+                        asChild={!!item.href}
+                        isActive={isActive(item)}
+                        className={cn(
+                          "transition-colors",
+                          isActive(item) &&
+                            "bg-primary/10 text-primary hover:bg-primary/15 font-medium",
+                        )}
+                        onClick={item.onClick}
+                        tooltip={item.label}
+                      >
+                        {item.href ? (
+                          <Link href={item.href}>
+                            <IconComponent className="size-4" />
+                            <span>{item.label}</span>
+                          </Link>
+                        ) : (
+                          <>
+                            <IconComponent className="size-4" />
+                            <span>{item.label}</span>
+                          </>
+                        )}
+                      </SidebarMenuButton>
+                      {item.badge && (
+                        <SidebarMenuBadge className="bg-primary/10 rounded-full">
+                          {item.badge}
+                        </SidebarMenuBadge>
                       )}
-                      onClick={item.onClick}
-                    >
-                      <Link href={item.href}>
-                        <item.icon className="size-5" />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                    {item.badge && (
-                      <SidebarMenuBadge className="bg-primary/10 rounded-full">{item.badge}</SidebarMenuBadge>
-                    )}
-                  </SidebarMenuItem>
-                ))}
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -121,4 +162,3 @@ export function AppSidebar() {
     </>
   );
 }
-

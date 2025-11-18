@@ -437,16 +437,6 @@ export function AnalyticsFiltersHeader() {
 
   const hasActiveFilters = activeFilters.length > 0;
 
-  const clearAllFilters = () => {
-    const filtersToDelete = activeFilters
-      .map((f) => (f.key === "link" ? ["domain", "key"] : f.key))
-      .flat();
-    queryParams({
-      del: filtersToDelete,
-      scroll: false,
-    });
-  };
-
   return (
     <div className="flex flex-col-reverse gap-3 md:flex-row w-full justify-between">
       <div className="flex w-max flex-col gap-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap lg:gap-2">
@@ -553,15 +543,6 @@ export function AnalyticsFiltersHeader() {
           </label>
         </div>
 
-        {hasActiveFilters && (
-          <Button
-            variant="outline"
-            className="h-10 w-full gap-2 md:w-auto"
-            icon={<Xmark className="h-4 w-4" />}
-            onClick={clearAllFilters}
-            text="Clear"
-          />
-        )}
       </div>
       <div className="w-max flex justify-end">
         <AnalyticsExport />

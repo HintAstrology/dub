@@ -431,7 +431,7 @@ export function AnalyticsFiltersList() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl mb-5">
+    <div className="mx-auto w-full mb-5">
       <Filter.List
         filters={filters}
         activeFilters={activeFilters}

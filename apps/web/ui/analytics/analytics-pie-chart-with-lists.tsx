@@ -1,11 +1,10 @@
 "use client";
 
-import { nFormatter } from "@dub/utils";
-import { Label, Pie, PieChart } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
-import { useContext, useMemo } from "react";
+import { nFormatter } from "@dub/utils";
+import { ReactNode, useContext, useMemo } from "react";
+import { Label, Pie, PieChart } from "recharts";
 import { AnalyticsContext } from "./analytics-provider";
-import { ReactNode } from "react";
 import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
 
 const chartColors = [
@@ -33,6 +32,7 @@ interface AnalyticsPieChartWithListsProps {
   showName?: boolean;
   showCopy?: boolean;
   onViewAll?: () => void;
+  controls?: ReactNode;
 }
 
 export default function AnalyticsPieChartWithLists({
@@ -43,6 +43,7 @@ export default function AnalyticsPieChartWithLists({
   showName = false,
   showCopy = false,
   onViewAll,
+  controls,
 }: AnalyticsPieChartWithListsProps) {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
 
@@ -59,7 +60,10 @@ export default function AnalyticsPieChartWithLists({
   }, [data]);
 
   const displayData = useMemo(() => {
-    return sortedData.slice(0, limit ? Math.min(limit, MAX_VISIBLE_ITEMS) : MAX_VISIBLE_ITEMS);
+    return sortedData.slice(
+      0,
+      limit ? Math.min(limit, MAX_VISIBLE_ITEMS) : MAX_VISIBLE_ITEMS,
+    );
   }, [sortedData, limit]);
 
   const hasMore = sortedData.length > MAX_VISIBLE_ITEMS;
@@ -74,7 +78,8 @@ export default function AnalyticsPieChartWithLists({
 
   const pieChartData = useMemo(() => {
     return displayData.map((item, index) => ({
-      name: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
+      name:
+        item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
       value: item.value,
       fill: chartColors[index % chartColors.length],
       fullName: item.title,
@@ -113,9 +118,10 @@ export default function AnalyticsPieChartWithLists({
   }, [displayData]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[160px_1fr] -mt-2 overflow-hidden relative items-start min-h-[230px]">
-      {/* Pie Chart */}
-      <div className="relative w-full flex items-center justify-center order-first lg:order-first min-w-0 overflow-hidden h-fit">
+    <div className="relative flex flex-col gap-6 overflow-hidden">
+      {/* Pie Chart and Controls */}
+      <div className="flex items-start justify-between gap-8">
+        {/* Pie Chart */}
         <ChartContainer config={chartConfig} className="h-[160px] w-[160px]">
           <PieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
             <ChartTooltip
@@ -142,9 +148,9 @@ export default function AnalyticsPieChartWithLists({
               data={pieChartData}
               dataKey="value"
               nameKey="name"
-              innerRadius={40}
+              innerRadius={55}
               strokeWidth={10}
-              outerRadius={60}
+              outerRadius={80}
               paddingAngle={2}
             >
               <Label
@@ -179,10 +185,13 @@ export default function AnalyticsPieChartWithLists({
             </Pie>
           </PieChart>
         </ChartContainer>
+
+        {/* Controls */}
+        {controls && <div>{controls}</div>}
       </div>
 
-      {/* List with names and Scans */}
-      <div className="min-w-0 h-fit">
+      {/* Scans List */}
+      <div className="relative h-fit min-w-0">
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
@@ -191,43 +200,36 @@ export default function AnalyticsPieChartWithLists({
             const formattedValue = formatValue(item.value);
             // Calculate max length based on available space (approximately 20-25 chars)
             const maxLength = 25;
-            const displayTitle = item.title.length > maxLength 
-              ? `${item.title.slice(0, maxLength)}...` 
-              : item.title;
+            const displayTitle =
+              item.title.length > maxLength
+                ? `${item.title.slice(0, maxLength)}...`
+                : item.title;
             return (
-              <div key={index} className="flex items-center gap-3 min-w-0">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div key={index} className="flex min-w-0 items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2">
                   <div
-                    className="h-2.5 w-2.5 rounded-full shrink-0"
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
                     style={{ backgroundColor: item.color }}
                   />
-                  {item.icon && (
-                    <div className="shrink-0">{item.icon}</div>
-                  )}
-                  <span className="text-foreground text-sm font-medium truncate" title={item.title}>
+                  {item.icon && <div className="shrink-0">{item.icon}</div>}
+                  <span
+                    className="text-foreground truncate text-sm font-medium"
+                    title={item.title}
+                  >
                     {displayTitle}
                   </span>
                 </div>
-                <span className="text-foreground text-sm font-semibold whitespace-nowrap shrink-0">
+                <span className="text-foreground shrink-0 whitespace-nowrap text-sm font-semibold">
                   {formattedValue}
                 </span>
               </div>
             );
           })}
         </div>
+        {/* {hasMore && (
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-20 bg-gradient-to-t from-white via-white/80 to-transparent" />
+        )} */}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
-      {hasMore && onViewAll && (
-        <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center h-max z-20 pointer-events-auto">
-          <button
-            onClick={onViewAll}
-            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 hover:bg-neutral-50 active:bg-neutral-100 shadow-sm"
-          >
-            View All
-          </button>
-        </div>
-      )}
     </div>
   );
 }
-

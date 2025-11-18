@@ -35,10 +35,10 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
       {/* Header with controls */}
       <header className={cn(
-        "bg-card mb-6 rounded-[20px] border border-border px-4 shadow-sm sm:px-6",
+        "bg-card rounded-[20px] border border-border px-4 shadow-sm sm:px-6",
         "[&_*]:no-underline"
       )}>
-        <div className="flex w-full min-h-16 flex-col gap-3 py-3 md:h-16 md:flex-row md:items-center md:justify-between md:gap-4 md:py-0">
+        <div className="flex w-full min-h-16 flex-col gap-3 py-3 md:h-16 md:flex-row md:items-center md:gap-4 md:py-0">
           {/* Filters/Controls */}
           {isAnalyticsPage && (
             <div className="flex w-full items-center gap-2">
@@ -46,7 +46,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             </div>
           )}
           {isQRCodesPage && user && (
-            <div className="flex w-full items-center gap-2 md:w-auto">
+            <div className="flex w-full items-center gap-2">
               <QRHeaderControls user={user} />
             </div>
           )}

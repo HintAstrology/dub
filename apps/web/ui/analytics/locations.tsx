@@ -60,7 +60,6 @@ interface LocationsBarChartProps {
   maxValue: number;
   unit: string;
   limit?: number;
-  onViewAll?: () => void;
   tab?: string;
 }
 
@@ -69,7 +68,6 @@ function LocationsBarChart({
   maxValue,
   unit,
   limit = 6,
-  onViewAll,
   tab,
 }: LocationsBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
@@ -90,16 +88,11 @@ function LocationsBarChart({
     return sorted.slice(0, limit);
   }, [data, limit]);
 
-  // Limit visible bars to maximum 5 (5th one will be transparent)
-  const MAX_VISIBLE_BARS = 4;
-  const SHOW_TRANSPARENT_BAR = displayData.length > MAX_VISIBLE_BARS;
+  // Limit visible bars
+  const MAX_VISIBLE_BARS = 5;
   const visibleBarsData = useMemo(() => {
-    // Show 5 items if there are more than 4, otherwise show all
-    return displayData.slice(
-      0,
-      SHOW_TRANSPARENT_BAR ? MAX_VISIBLE_BARS + 1 : displayData.length,
-    );
-  }, [displayData, SHOW_TRANSPARENT_BAR]);
+    return displayData.slice(0, MAX_VISIBLE_BARS);
+  }, [displayData]);
 
   const displayTotalValue = useMemo(() => {
     return visibleBarsData.reduce((sum, item) => sum + item.value, 0);
@@ -107,7 +100,6 @@ function LocationsBarChart({
 
   const chartData = useMemo(() => {
     return visibleBarsData.map((item, index) => {
-      const isTransparent = SHOW_TRANSPARENT_BAR && index === MAX_VISIBLE_BARS;
       return {
         sr: visibleBarsData.length - index,
         service:
@@ -120,10 +112,9 @@ function LocationsBarChart({
         icon: item.icon,
         title: item.title,
         value: item.value,
-        isTransparent,
       };
     });
-  }, [visibleBarsData, displayTotalValue, SHOW_TRANSPARENT_BAR]);
+  }, [visibleBarsData, displayTotalValue]);
 
   const chartConfig = {
     sales: {
@@ -134,8 +125,8 @@ function LocationsBarChart({
   const needsFade = displayData.length > MAX_VISIBLE_BARS;
 
   return (
-    <div className="-mt-2 grid grid-cols-1 items-start gap-6 overflow-hidden lg:grid-cols-[320px_1fr]">
-      <div className="relative flex h-fit min-w-0 items-center justify-center overflow-hidden py-6 pl-2 pr-6">
+    <div className="grid grid-cols-1 items-start gap-6 overflow-hidden lg:grid-cols-[320px_1fr]">
+      <div className="relative flex h-fit min-w-0 items-center justify-center overflow-hidden pl-2 pr-6">
         <ChartContainer
           config={chartConfig}
           className={
@@ -152,7 +143,7 @@ function LocationsBarChart({
             barCategoryGap={4}
             margin={{
               top: 0,
-              bottom: needsFade ? 10 : 0,
+              bottom: needsFade ? 20 : 0,
             }}
           >
             <CartesianGrid
@@ -205,7 +196,6 @@ function LocationsBarChart({
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.fill}
-                  opacity={entry.isTransparent ? 0.25 : 1}
                 />
               ))}
               <LabelList
@@ -214,13 +204,6 @@ function LocationsBarChart({
                 fill="hsl(var(--muted-foreground))"
                 className="text-xs"
                 offset={5}
-                formatter={(value: string, entry: any) => {
-                  const dataEntry = chartData.find((d) => d.title === value);
-                  if (dataEntry?.isTransparent) {
-                    return value ? `${value}...` : "";
-                  }
-                  return value;
-                }}
                 content={(props: any) => {
                   if (!props) return null;
                   const { x, y, width, height, value, payload } = props;
@@ -267,17 +250,6 @@ function LocationsBarChart({
             </Bar>
           </BarChart>
         </ChartContainer>
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-20 bg-gradient-to-t from-white via-white/80 to-transparent" />
-        {needsFade && onViewAll && (
-          <div className="pointer-events-auto absolute bottom-0 left-0 right-0 z-20 flex h-max items-end justify-center">
-            <button
-              onClick={onViewAll}
-              className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
-            >
-              View All
-            </button>
-          </div>
-        )}
       </div>
       <div className="min-w-0">
         <div className="mb-3 flex justify-end">
@@ -460,49 +432,57 @@ export default function Locations({
       </Modal>
 
       <Card className="gap-4 overflow-hidden pt-6">
-        <CardContent className="relative overflow-hidden px-6">
-          {/* View Toggle */}
-          <div className="mb-4 flex justify-start">
-            <div className="flex gap-1 rounded-lg border p-1">
-              <button
-                onClick={() => onViewChange("pie")}
-                className={cn(
-                  "rounded p-2 transition-colors",
-                  view === "pie"
-                    ? "bg-secondary text-white"
-                    : "hover:bg-gray-100",
-                )}
-              >
-                <PieChartIcon className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => onViewChange("list")}
-                className={cn(
-                  "rounded p-2 transition-colors",
-                  view === "list"
-                    ? "bg-secondary text-white"
-                    : "hover:bg-gray-100",
-                )}
-              >
-                <ChartBar className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
+        <CardContent className="relative overflow-hidden px-6 min-h-[392px]">
           {data ? (
             data.length > 0 ? (
               <>
                 {view === "list" ? (
-                  <LocationsBarChart
-                    data={getBarListData(tab)}
-                    unit={selectedTab}
-                    maxValue={Math.max(
-                      ...(data?.map((d) => d[dataKey] ?? 0) ?? [0]),
-                    )}
-                    limit={EXPAND_LIMIT}
-                    onViewAll={() => setShowModal(true)}
-                    tab={tab}
-                  />
+                  <>
+                    {/* Controls for Bar Chart - Top */}
+                    <div className="flex gap-3 justify-end mb-4">
+                      <div className="flex gap-1 rounded-lg border p-1">
+                        <button
+                          onClick={() => onViewChange("pie")}
+                          className={cn(
+                            "rounded p-2 transition-colors",
+                            view === "pie"
+                              ? "bg-secondary text-white"
+                              : "hover:bg-gray-100",
+                          )}
+                        >
+                          <PieChartIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => onViewChange("list")}
+                          className={cn(
+                            "rounded p-2 transition-colors",
+                            view === "list"
+                              ? "bg-secondary text-white"
+                              : "hover:bg-gray-100",
+                          )}
+                        >
+                          <ChartBar className="h-4 w-4" />
+                        </button>
+                      </div>
+                      {data && data.length > EXPAND_LIMIT && (
+                        <button
+                          onClick={() => setShowModal(true)}
+                          className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+                        >
+                          View All
+                        </button>
+                      )}
+                    </div>
+                    <LocationsBarChart
+                      data={getBarListData(tab)}
+                      unit={selectedTab}
+                      maxValue={Math.max(
+                        ...(data?.map((d) => d[dataKey] ?? 0) ?? [0]),
+                      )}
+                      limit={EXPAND_LIMIT}
+                      tab={tab}
+                    />
+                  </>
                 ) : (
                   <AnalyticsPieChartWithLists
                     data={getBarListData(tab)}
@@ -512,7 +492,42 @@ export default function Locations({
                     )}
                     limit={EXPAND_LIMIT}
                     showName={false}
-                    onViewAll={() => setShowModal(true)}
+                    controls={
+                      <div className="flex gap-3">
+                        <div className="flex gap-1 rounded-lg border p-1">
+                          <button
+                            onClick={() => onViewChange("pie")}
+                            className={cn(
+                              "rounded p-2 transition-colors",
+                              view === "pie"
+                                ? "bg-secondary text-white"
+                                : "hover:bg-gray-100",
+                            )}
+                          >
+                            <PieChartIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => onViewChange("list")}
+                            className={cn(
+                              "rounded p-2 transition-colors",
+                              view === "list"
+                                ? "bg-secondary text-white"
+                                : "hover:bg-gray-100",
+                            )}
+                          >
+                            <ChartBar className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {data && data.length > EXPAND_LIMIT && (
+                          <button
+                            onClick={() => setShowModal(true)}
+                            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+                          >
+                            View All
+                          </button>
+                        )}
+                      </div>
+                    }
                   />
                 )}
               </>
