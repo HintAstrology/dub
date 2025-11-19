@@ -3,8 +3,6 @@ import { convertSessionUserToCustomerBody, getSession } from "@/lib/auth";
 import { CancellationFlowModule } from "@/ui/cancellation-flow/cancellation-flow.module";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { redirect } from "next/navigation";
-import { prisma } from "@dub/prisma";
-import { User } from "@dub/prisma/client";
 
 const pageName = "cancel_flow_or_return";
 

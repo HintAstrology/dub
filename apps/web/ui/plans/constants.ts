@@ -73,6 +73,6 @@ export const SPECIAL_OFFER_PLAN: IPricingPlan = {
   currency: "USD",
   interval: "month",
   description: "Billed monthly",
-  paymentPlan: "PRICE_SPECIAL_MONTH_PLAN",
+  paymentPlan: "PRICE_RETENTION_OFFER_MONTH",
   duration: 1,
 };
