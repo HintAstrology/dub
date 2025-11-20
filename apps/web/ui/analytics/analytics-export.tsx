@@ -5,15 +5,15 @@ import { useState } from "react";
 import { useDownloadAnalyticsFiltered } from "./utils";
 
 export const sortOptions = [
-    {
-      display: "Download CSV",
-      slug: "csv",
-    },
-    {
-      display: "Download XLSX",
-      slug: "xlsx",
-    },
-]
+  {
+    display: "Download CSV",
+    slug: "csv",
+  },
+  {
+    display: "Download XLSX",
+    slug: "xlsx",
+  },
+];
 
 export default function AnalyticsExport() {
   const [openPopover, setOpenPopover] = useState(false);
@@ -21,21 +21,21 @@ export default function AnalyticsExport() {
   const { download } = useDownloadAnalyticsFiltered();
 
   const onDownloadClick = (fileType) => {
-    download(fileType)
-  }
+    download(fileType);
+  };
 
   return (
-    <div className="w-full" >
+    <div className="w-full">
       <Popover
         content={
-          <div className="w-full p-2 flex flex-col">
+          <div className="flex w-full flex-col p-2">
             {sortOptions.map(({ display, slug }) => (
               <Button
                 key={slug}
                 variant="ghost"
                 className="w-max justify-start"
                 onClick={() => {
-                  onDownloadClick(slug)
+                  onDownloadClick(slug);
                   setOpenPopover(false);
                 }}
               >
