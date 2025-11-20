@@ -21,6 +21,7 @@ export interface Session {
     defaultPartnerId?: string;
     dubPartnerId?: string;
     paymentData?: any;
+    discountOffered?: boolean;
     source: string;
   };
 }
@@ -79,6 +80,7 @@ export const convertSessionUserToCustomerBody = (
     sessions: options?.sessions || sessionUser.paymentData?.sessions,
     toxic: sessionUser.paymentData?.toxic || false,
     isPaidUser: sessionUser?.source === "paid",
+    discountOffered: sessionUser.discountOffered || false,
   };
 
   return customerBody;

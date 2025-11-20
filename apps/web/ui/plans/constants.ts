@@ -11,6 +11,7 @@ export const PLAN_FEATURES = [
 export interface IPricingPlan {
   id: string;
   name: string;
+  label: string;
   price: number;
   currency: string;
   interval: "month" | "year";
@@ -26,6 +27,7 @@ export const PRICING_PLANS: IPricingPlan[] = [
   {
     id: "annual",
     name: "12 months",
+    label: "12 months",
     price: 19.99,
     currency: "USD",
     interval: "month",
@@ -39,6 +41,7 @@ export const PRICING_PLANS: IPricingPlan[] = [
   {
     id: "semester",
     name: "3 months",
+    label: "3 months",
     price: 29.99,
     currency: "USD",
     interval: "month",
@@ -52,6 +55,7 @@ export const PRICING_PLANS: IPricingPlan[] = [
   {
     id: "quarterly",
     name: "1 month",
+    label: "1 month",
     price: 39.99,
     currency: "USD",
     interval: "month",
@@ -60,3 +64,15 @@ export const PRICING_PLANS: IPricingPlan[] = [
     duration: 1,
   },
 ];
+
+export const SPECIAL_OFFER_PLAN: IPricingPlan = {
+  id: "special",
+  name: "1 month",
+  label: "1 month (50% OFF FOREVER)",
+  price: 19.99,
+  currency: "USD",
+  interval: "month",
+  description: "Billed monthly",
+  paymentPlan: "PRICE_RETENTION_OFFER_MONTH",
+  duration: 1,
+};
