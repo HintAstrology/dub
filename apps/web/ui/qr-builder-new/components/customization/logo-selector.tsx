@@ -424,6 +424,7 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
         }`}
         styleButtonClassName="[&_img]:h-10 [&_img]:w-10 p-2"
         disabled={disabled}
+        gridMinWidth={60}
       />
     </motion.div>
   );
