@@ -4,6 +4,18 @@ import CardSecondPreview from "@/ui/qr-builder-new/assets/icons/frames/card-2-pr
 import CardSecond from "@/ui/qr-builder-new/assets/icons/frames/card-2.svg";
 import CardThirdPreview from "@/ui/qr-builder-new/assets/icons/frames/card-3-preview.svg";
 import CardThird from "@/ui/qr-builder-new/assets/icons/frames/card-3.svg";
+import CardTenthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-10-preview.svg";
+import CardTenth from "@/ui/qr-builder-new/assets/icons/frames/card-10-frame.svg";
+import CardEleventhPreview from "@/ui/qr-builder-new/assets/icons/frames/card-11-preview.svg";
+import CardEleventh from "@/ui/qr-builder-new/assets/icons/frames/card-11-frame.svg";
+import CardTwelfthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-12-preview.svg";
+import CardTwelfth from "@/ui/qr-builder-new/assets/icons/frames/card-12-frame.svg";
+import CardThirteenthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-13-preview.svg";
+import CardThirteenth from "@/ui/qr-builder-new/assets/icons/frames/card-13-frame.svg";
+import CardFourteenthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-14-preview.svg";
+import CardFourteenth from "@/ui/qr-builder-new/assets/icons/frames/card-14-frame.svg";
+import CardFifteenthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-15-preview.svg";
+import CardFifteenth from "@/ui/qr-builder-new/assets/icons/frames/card-15-frame.svg";
 import CardPreview from "@/ui/qr-builder-new/assets/icons/frames/card-preview.svg";
 import Card from "@/ui/qr-builder-new/assets/icons/frames/card.svg";
 import ClipboardFramePreview from "@/ui/qr-builder-new/assets/icons/frames/clipboard-preview.svg";
@@ -48,6 +60,18 @@ export const preloadAllFrames = async () => {
     CardSecondPreview,
     CardThird,
     CardThirdPreview,
+    CardTenth,
+    CardTenthPreview,
+    CardEleventh,
+    CardEleventhPreview,
+    CardTwelfth,
+    CardTwelfthPreview,
+    CardThirteenth,
+    CardThirteenthPreview,
+    CardFourteenth,
+    CardFourteenthPreview,
+    CardFifteenth,
+    CardFifteenthPreview,
     Wreath,
     WreathPreview,
     Envelope,
