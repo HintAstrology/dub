@@ -8,6 +8,8 @@ import {
   intervals,
 } from "@/lib/analytics/constants";
 import z from "@/lib/zod";
+import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import {
   CONTINENT_CODES,
   COUNTRY_CODES,
@@ -19,7 +21,6 @@ import {
 import { booleanQuerySchema } from "./misc";
 import { parseDateSchema } from "./utils";
 import { utmTagsSchema } from "./utm";
-import { EQRType, QR_TYPES } from '@/ui/qr-builder/constants/get-qr-config';
 
 const analyticsEvents = z
   .enum([...EVENT_TYPES, "composite"], {
@@ -223,6 +224,7 @@ export const analyticsQuerySchema = z
       .describe(
         "If true (clicks only), return 1 event per unique identity_hash.",
       ),
+      format: z.enum(["csv", "xlsx"]).optional()
   })
   .merge(utmTagsSchema);
 

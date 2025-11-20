@@ -7,6 +7,9 @@ import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
 import BarList from "./bar-list";
 import { useAnalyticsFilterOption } from "./utils";
+import { Icon } from "@iconify/react";
+import { Sliders } from "@dub/ui";
+import { QR_Icons } from "../qr-builder-new/constants/get-qr-config";
 
 export default function TopLinks() {
   const { queryParams, searchParams } = useRouterStuff();
@@ -14,7 +17,7 @@ export default function TopLinks() {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
-  const [tab, setTab] = useState<"links" | "urls">("links");
+  const [tab, setTab] = useState<"links" | "urls" | 'types'>("links");
   const { data } = useAnalyticsFilterOption({
     groupBy: `top_${tab}`,
   });
@@ -24,6 +27,7 @@ export default function TopLinks() {
       className="md:col-span-2"
       tabs={[
         { id: "links", label: "QR Name", icon: Hyperlink },
+        { id: "types", label: "QR Type", icon: Sliders },
         { id: "urls", label: "Destination URLs", icon: Globe },
       ]}
       expandLimit={8}
@@ -39,16 +43,16 @@ export default function TopLinks() {
               data={
                 data
                   ?.map((d) => ({
-                    icon: (
+                    icon: tab === 'types' ? <Icon icon={QR_Icons[d.qr_type]} className="size-5" /> : (
                       <LinkLogo
                         apexDomain={getApexDomain(d.url)}
                         className="size-5 sm:size-5"
                       />
                     ),
                     title:
-                      (tab === "links" && d["shortLink"]
-                        ? d["shortLink"]
-                        : d.url) ?? "Unknown",
+                    tab === "types"
+                      ? d.qr_type
+                      : (tab === "links" && d["shortLink"] ? d["shortLink"] : d.url) ?? "Unknown",
                     // TODO: simplify this once we switch from domain+key to linkId
                     href: queryParams({
                       ...((tab === "links" &&

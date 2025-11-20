@@ -4,9 +4,9 @@ import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { Session } from "@/lib/auth/utils";
 import useQrs from "@/lib/swr/use-qrs.ts";
 import { UserProvider } from "@/ui/contexts/user";
-import { useQRBuilder } from "@/ui/modals/qr-builder";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
-import QrCodeSort from "@/ui/qr-code/qr-code-sort.tsx";
+import { CreateQRButton, QRBuilderNewModal } from "@/ui/modals/qr-builder-new";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
+import QrCodeSort from "@/ui/qr-code/components/qr-code-sort";
 import QrCodesContainer from "@/ui/qr-code/qr-codes-container.tsx";
 import { QrCodesDisplayProvider } from "@/ui/qr-code/qr-codes-display-provider.tsx";
 import { SearchBoxPersisted } from "@/ui/shared/search-box";
@@ -15,23 +15,26 @@ import { ShieldAlert } from "@dub/ui/icons";
 import { ICustomerBody } from "core/integration/payment/config";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { NewQrProvider } from "./helpers/new-qr-context";
 
 interface WorkspaceQRsClientProps {
-  initialQrs: QrStorageData[];
+  initialQrs: TQrServerData[];
   featuresAccess: FeaturesAccess;
   user: Session["user"];
   cookieUser: ICustomerBody | null;
+  newQrId?: string | null;
 }
 
 export default function WorkspaceQRsClient({
   initialQrs,
   featuresAccess,
   user,
+  newQrId,
 }: WorkspaceQRsClientProps) {
   return (
     <UserProvider user={user}>
-      <NewQrProvider>
+      <NewQrProvider newQrId={newQrId}>
         <QrCodesDisplayProvider>
           <WorkspaceQRs
             initialQrs={initialQrs}
@@ -49,18 +52,21 @@ function WorkspaceQRs({
   featuresAccess,
   user,
 }: {
-  initialQrs: QrStorageData[];
+  initialQrs: TQrServerData[];
   featuresAccess: FeaturesAccess;
   user: Session["user"];
 }) {
   const router = useRouter();
   const { isValidating } = useQrs({}, {}, true); // listenOnly mode
-
-  const { CreateQRButton, QRBuilderModal } = useQRBuilder();
+  const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
 
   return (
     <>
-      <QRBuilderModal />
+      <QRBuilderNewModal
+        showModal={showQRBuilderModal}
+        onClose={() => setShowQRBuilderModal(false)}
+        user={user}
+      />
 
       <div className="flex w-full items-center pt-2">
         <MaxWidthWrapper className="flex flex-col gap-y-3">
@@ -122,7 +128,7 @@ function WorkspaceQRs({
                 </div>
 
                 <div className="grow-0">
-                  <CreateQRButton />
+                  <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
                 </div>
               </div>
             </div>
@@ -132,7 +138,13 @@ function WorkspaceQRs({
 
       <div className="mt-3">
         <QrCodesContainer
-          CreateQrCodeButton={featuresAccess ? CreateQRButton : () => <></>}
+          CreateQrCodeButton={
+            featuresAccess
+              ? () => (
+                  <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
+                )
+              : () => <></>
+          }
           featuresAccess={featuresAccess.featuresAccess}
           initialQrs={initialQrs}
           user={user}

@@ -1,8 +1,7 @@
 "use client";
 
-import { convertQrStorageDataToBuilder } from "@/ui/qr-builder/helpers/data-converters.ts";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
-import { useQrOperations } from "@/ui/qr-code/hooks/use-qr-operations";
+import { Session } from "@/lib/auth";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr";
 import { Button, Input, Modal } from "@dub/ui";
@@ -15,21 +14,25 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+import { useNewQrOperations } from "../qr-builder-new/hooks/use-qr-operations";
 
 interface QRRenameModalProps {
-  qrCode: QrStorageData;
+  qrCode: TQrServerData;
   showQRRenameModal: boolean;
   setShowQRRenameModal: Dispatch<SetStateAction<boolean>>;
+  user: Session["user"];
 }
 
 function QRRenameModal({
   qrCode,
   showQRRenameModal,
   setShowQRRenameModal,
+  user,
 }: QRRenameModalProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [name, setName] = useState(qrCode.title || "");
-  const { updateQrWithOriginal } = useQrOperations();
+
+  const { updateQRTitle } = useNewQrOperations({ initialQrData: qrCode, user });
 
   const handleSave = async () => {
     if (!qrCode?.id) {
@@ -37,18 +40,10 @@ function QRRenameModal({
       return;
     }
 
-    if (name === qrCode.title) {
-      setShowQRRenameModal(false);
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
-      const qrBuilderData = convertQrStorageDataToBuilder(qrCode);
-      qrBuilderData.title = name;
-
-      const success = await updateQrWithOriginal(qrCode, qrBuilderData);
+      const success = await updateQRTitle(name);
 
       if (success) {
         setShowQRRenameModal(false);
@@ -134,8 +129,11 @@ function QRRenameModal({
   );
 }
 
-export function useQRRenameModal(data: { qrCode: QrStorageData }) {
-  const { qrCode } = data;
+export function useQRRenameModal(data: {
+  qrCode: TQrServerData;
+  user: Session["user"];
+}) {
+  const { qrCode, user } = data;
   const [showQRRenameModal, setShowQRRenameModal] = useState(false);
 
   const QRRenameModalCallback = useCallback(() => {
@@ -144,9 +142,10 @@ export function useQRRenameModal(data: { qrCode: QrStorageData }) {
         qrCode={qrCode}
         showQRRenameModal={showQRRenameModal}
         setShowQRRenameModal={setShowQRRenameModal}
+        user={user}
       />
     );
-  }, [qrCode, showQRRenameModal]);
+  }, [qrCode, showQRRenameModal, user]);
 
   return useMemo(
     () => ({

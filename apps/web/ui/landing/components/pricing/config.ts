@@ -8,9 +8,9 @@ export type PricingPlan = {
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
-    badge: "7-Day Trial",
-    title: "Get Started",
-    plan: "$0.99/ 7 days",
+    badge: "then $39.99/month",
+    title: "7-Day Trial",
+    plan: "$0.99/7 days",
     planFeatures: [
       "Unlimited QR codes",
       "Advanced analytics",
@@ -18,18 +18,18 @@ export const PRICING_PLANS: PricingPlan[] = [
     ],
     withButton: true,
   },
+  // {
+  //   badge: "Most Flexible",
+  //   title: "Monthly",
+  //   plan: "$39.99/month",
+  //   planFeatures: [
+  //     "Unlimited QR codes",
+  //     "Advanced analytics",
+  //     "Full customization",
+  //   ],
+  // },
   {
-    badge: "Most Flexible",
-    title: "Monthly",
-    plan: "$39.99/month",
-    planFeatures: [
-      "Unlimited QR codes",
-      "Advanced analytics",
-      "Full customization",
-    ],
-  },
-  {
-    badge: "Save 15%",
+    badge: "Save 25%",
     title: "Quarterly",
     plan: "$29.99/month",
     planFeatures: [
@@ -39,7 +39,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     ],
   },
   {
-    badge: "Save 30%",
+    badge: "Save 50%",
     title: "Annual",
     plan: "$19.99/month",
     planFeatures: [

@@ -1,4 +1,4 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { useRouterStuff } from "@dub/ui";
 import { fetcher } from "@dub/utils";
 import { useSession } from "next-auth/react";
@@ -32,7 +32,7 @@ export default function useQrs(
   }, []);
 
   // If listenOnly is true, use standard params to read from the same cache as the main data fetcher
-  const queryParams = listenOnly 
+  const queryParams = listenOnly
     ? { sortBy: "createdAt", showArchived: true, ...opts }
     : opts;
 
@@ -40,7 +40,7 @@ export default function useQrs(
     data: qrs,
     isValidating,
     error,
-  } = useSWR<QrStorageData[]>(
+  } = useSWR<TQrServerData[]>(
     workspaceId
       ? `/api/qrs${getQueryString(
           {

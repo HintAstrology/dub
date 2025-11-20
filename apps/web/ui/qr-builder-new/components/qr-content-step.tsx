@@ -1,0 +1,74 @@
+"use client";
+
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { useQrBuilderContext } from "../contexts/qr-builder-context";
+import { QRFormRef } from "../types/qr-form-ref";
+import { QrFormResolver } from "./qr-form-resolver/qr-form-resolver";
+
+export interface QRContentStepRef {
+  validateForm: () => Promise<boolean>;
+  form: any;
+  getValues: () => any;
+}
+
+export const QrContentStep = forwardRef<QRContentStepRef, {}>((_, ref) => {
+  const {
+    selectedQrType,
+    handleFormSubmit,
+    formData,
+    updateCurrentFormValues,
+    setIsFormValid,
+  } = useQrBuilderContext();
+  const formRef = useRef<QRFormRef>(null);
+
+  useImperativeHandle(ref, () => ({
+    validateForm: async () => {
+      if (formRef.current) {
+        return await formRef.current.validate();
+      }
+      return false;
+    },
+    form: formRef.current?.form,
+    getValues: () => {
+      if (formRef.current) {
+        return formRef.current.getValues();
+      }
+      return null;
+    },
+  }));
+
+  useEffect(() => {
+    if (formRef.current?.form) {
+      const hasExistingData = formData;
+
+      setIsFormValid(hasExistingData ? true : false);
+
+      const subscription = formRef.current.form.watch((values) => {
+        updateCurrentFormValues(values);
+
+        const isValid = formRef.current?.form.formState.isValid ?? false;
+        setIsFormValid(isValid);
+      });
+
+      return () => subscription.unsubscribe();
+    }
+  }, [selectedQrType, updateCurrentFormValues, setIsFormValid, formData]);
+
+  if (!selectedQrType) {
+    return (
+      <div className="flex items-center justify-center p-8 text-gray-500">
+        <p>Please select a QR code type first.</p>
+      </div>
+    );
+  }
+
+  return (
+    <QrFormResolver
+      key={selectedQrType}
+      ref={formRef}
+      qrType={selectedQrType}
+      onSubmit={handleFormSubmit}
+      defaultValues={formData || undefined}
+    />
+  );
+});

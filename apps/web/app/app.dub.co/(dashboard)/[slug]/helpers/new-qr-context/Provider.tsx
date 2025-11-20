@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useState, SetStateAction, Dispatch } from "react";
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 
 interface NewQrContextType {
   newQrId?: string | null;
@@ -13,14 +20,15 @@ const Context = createContext<NewQrContextType>({});
 // Provider props interface
 interface ProviderProps {
   children: ReactNode;
+  newQrId?: string | null;
 }
 
 // Provider component
-export function NewQrProvider({ children }: ProviderProps) {
-  const [newQrId, setNewQrId] = useState<string | null>(null);
+export function NewQrProvider({ children, newQrId }: ProviderProps) {
+  const [newQrIdState, setNewQrIdState] = useState<string | null>(newQrId || null);
 
   return (
-    <Context.Provider value={{ newQrId, setNewQrId }}>
+    <Context.Provider value={{ newQrId: newQrIdState, setNewQrId: setNewQrIdState }}>
       {children}
     </Context.Provider>
   );

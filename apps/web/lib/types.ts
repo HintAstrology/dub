@@ -69,7 +69,9 @@ import {
   WebhookSchema,
 } from "./zod/schemas/webhooks";
 
-export type LinkProps = Link & { qr?: { id: string, qrType: string, title: string } };
+export type LinkProps = Link & {
+  qr?: { id: string; qrType: string; title: string };
+};
 
 // used on client side (e.g. Link builder)
 // TODO: standardize this with ExpandedLink
@@ -443,3 +445,12 @@ export type QRProps = Qr;
 export type NewQrProps = z.infer<typeof createQrBodySchema>;
 export type UpdateQrProps = Omit<NewQrProps, "id"> &
   z.infer<typeof updateQrBodySchema>;
+
+/**
+ * QR code data from database with all relations included
+ */
+export type TQrStorageData = QRProps & {
+  user: UserProps;
+  link: LinkProps;
+  file?: File;
+};

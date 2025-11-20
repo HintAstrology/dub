@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@dub/prisma';
-import { CUSTOMER_IO_TEMPLATES, sendEmail } from '@dub/email';
-import { createAutoLoginURL } from '@/lib/auth/jwt-signin';
+import { createAutoLoginURL } from "@/lib/auth/jwt-signin";
+import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
+import { prisma } from "@dub/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 type PaymentStatus =
-  | 'PENDING'
-  | 'FAILED'
-  | 'AUTHORIZED'
-  | 'SETTLING'
-  | 'PARTIALLY_SETTLED'
-  | 'SETTLED'
-  | 'DECLINED'
-  | 'CANCELLED';
+  | "PENDING"
+  | "FAILED"
+  | "AUTHORIZED"
+  | "SETTLING"
+  | "PARTIALLY_SETTLED"
+  | "SETTLED"
+  | "DECLINED"
+  | "CANCELLED";
 
 type PaymentRequest = {
   payment: {
@@ -21,6 +21,7 @@ type PaymentRequest = {
       email?: string;
       plan_name?: string;
       payment_subtype?: string;
+      dunning_attempt?: number;
     };
     customer: { emailAddress?: string };
     status: PaymentStatus;
@@ -47,15 +48,16 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
   try {
     const body: PaymentRequest = await req.json();
 
-    console.log('Primer status');
+    console.log("Primer status");
     console.log(body);
 
     const email =
       body.payment.metadata.email_address ||
       body.payment.metadata.email ||
       body.payment.customer.emailAddress;
+    const isDunningAttempt = !!body.payment.metadata.dunning_attempt;
 
-    if (!FAILED_STATUSES.includes(body.payment.status)) {
+    if (!FAILED_STATUSES.includes(body.payment.status) || isDunningAttempt) {
       return NextResponse.json({ success: true });
     }
 
@@ -68,15 +70,15 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
         email: true,
       },
     });
-  
+
     if (!user?.email) {
       return NextResponse.json(
-        { success: false, error: 'User not found' },
+        { success: false, error: "User not found" },
         { status: 404 },
       );
     }
 
-    const loginUrl = await createAutoLoginURL(user.id, '/account/plans');
+    const loginUrl = await createAutoLoginURL(user.id, "/account/plans");
 
     if (body.payment.metadata.payment_subtype === "FIRST_PAYMENT") {
       await sendEmail({
@@ -106,6 +108,9 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error?.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error?.message },
+      { status: 500 },
+    );
   }
 }

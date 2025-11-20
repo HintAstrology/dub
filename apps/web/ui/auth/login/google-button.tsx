@@ -1,5 +1,4 @@
-import { QRBuilderData } from "@/ui/qr-builder/types/types";
-import { Button, useLocalStorage } from "@dub/ui";
+import { Button } from "@dub/ui";
 import { Google } from "@dub/ui/icons";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import { trackClientEvents } from "core/integration/analytic/services/analytic.service.ts";

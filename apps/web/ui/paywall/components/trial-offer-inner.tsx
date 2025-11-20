@@ -1,12 +1,11 @@
 "use client";
 
 import { createUserAccountAction } from "@/lib/actions/create-user-account";
+import { NewQrProps } from "@/lib/types";
 import { showMessage } from "@/ui/auth/helpers";
-import { AvatarsComponent } from "@/ui/modals/trial-offer-with-qr-preview/components/avatars.component";
-import { CreateSubscriptionFlow } from "@/ui/modals/trial-offer-with-qr-preview/components/create-subscription-flow.component";
-import { useQrCustomization } from "@/ui/qr-builder/hooks/use-qr-customization";
-import { QRCanvas } from "@/ui/qr-builder/qr-canvas";
-import { QRBuilderData, QrStorageData } from "@/ui/qr-builder/types/types";
+import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
+import { extractCustomizationData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { useQRCodeStyling } from "@/ui/qr-builder-new/hooks/use-qr-code-styling";
 import { FiveStarsComponent } from "@/ui/shared/five-stars.component";
 import { Button, useLocalStorage, useMediaQuery } from "@dub/ui";
 import { Theme } from "@radix-ui/themes";
@@ -19,8 +18,11 @@ import { Check, Gift } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
-import { FC, useMemo, useRef, useState } from "react";
+import { Options } from "qr-code-styling";
+import { FC, useMemo, useState } from "react";
 import { MOCK_QR } from "../constants/mock-qr";
+import { AvatarsComponent } from "./avatars.component";
+import { CreateSubscriptionFlow } from "./create-subscription-flow.component";
 
 const FEATURES = [
   "Download your QR code in PNG, JPG, or SVG",
@@ -32,41 +34,40 @@ const FEATURES = [
 
 interface ITrialOfferProps {
   user: ICustomerBody | null;
-  firstQr: QRBuilderData | null;
+  qrDataToCreate: NewQrProps | null;
   isPaidTraffic: boolean;
 }
 
 export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
   user,
-  firstQr,
+  qrDataToCreate,
   isPaidTraffic,
 }) => {
   const router = useRouter();
   const { isMobile } = useMediaQuery();
 
   const [clientToken, setClientToken] = useState<string | null>(null);
-  const [signupMethod] = useLocalStorage<
-    "email" | "google" | null
-  >("signup-method", null);
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const memoizedQrData = useMemo(() => {
-    return firstQr
-      ? ({
-          ...firstQr,
-          link: {
-            shortLink: process.env.NEXT_PUBLIC_APP_DOMAIN
-              ? `${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-              : "http://localhost:8888",
-          },
-        } as QRBuilderData)
-      : MOCK_QR;
-  }, [firstQr]);
-
-  const { qrCode: demoBuiltQrCodeObject } = useQrCustomization(
-    memoizedQrData as QrStorageData,
-    true,
+  const [signupMethod] = useLocalStorage<"email" | "google" | null>(
+    "signup-method",
+    null,
   );
+
+  const memoizedQrData = useMemo(() => {
+    return qrDataToCreate ? qrDataToCreate : MOCK_QR;
+  }, [qrDataToCreate]);
+
+  const customizationData = useMemo(() => {
+    return extractCustomizationData(
+      memoizedQrData.styles as Options,
+      memoizedQrData.frameOptions,
+      memoizedQrData.logoOptions,
+    );
+  }, [memoizedQrData]);
+
+  const { svgString } = useQRCodeStyling({
+    customizationData,
+    defaultData: `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}/qr-complete-setup`,
+  });
 
   const { executeAsync } = useAction(createUserAccountAction, {
     onError({ error }) {
@@ -113,7 +114,6 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
     await executeAsync({
       email: user!.email!,
       password: "defaultPassword12Secret",
-      qrDataToCreate: firstQr,
     });
   };
 
@@ -156,12 +156,12 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
       event: EAnalyticEvents.AUTH_ERROR,
       params: {
         page_name: "paywall",
-          auth_type: "signup",
-          auth_method: signupMethod ?? "email",
-          email: user?.email,
-          event_category: "nonAuthorized",
-          error_code: errorCode,
-          error_message: errorMessage,
+        auth_type: "signup",
+        auth_method: signupMethod ?? "email",
+        email: user?.email,
+        event_category: "nonAuthorized",
+        error_code: errorCode,
+        error_message: errorMessage,
       },
     });
   };
@@ -171,7 +171,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
       <div className="flex w-full flex-col overflow-y-auto sm:flex-row">
         <div className="flex grow flex-col items-center gap-4 bg-neutral-50 p-6">
           <div className="flex flex-col gap-2 text-center">
-            {firstQr && (
+            {qrDataToCreate && (
               <h2 className="text-primary !mt-0 truncate text-2xl font-bold">
                 Your QR Code is Ready!
               </h2>
@@ -179,15 +179,10 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
           </div>
 
           <div className="relative flex w-full max-w-[300px] flex-col justify-center gap-2">
-            <QRCanvas
-              ref={canvasRef}
-              qrCode={demoBuiltQrCodeObject}
-              width={300}
-              height={300}
-            />
+            <QRCanvas svgString={svgString} width={300} height={300} />
 
             <span className="text-center text-sm">
-              {firstQr?.title || MOCK_QR.title}
+              {qrDataToCreate?.title || MOCK_QR.title}
             </span>
           </div>
 
@@ -202,7 +197,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
               <Button
                 onClick={onScrollToPaymentBlock}
                 className="max-w-md"
-                text={firstQr ? "Download Now!" : "Create QR Noew!"}
+                text={qrDataToCreate ? "Download Now!" : "Create QR Noew!"}
               />
             </div>
           ) : null}
@@ -220,7 +215,7 @@ export const TrialOfferInner: FC<Readonly<ITrialOfferProps>> = ({
         <div className="flex grow flex-col gap-4 p-6 sm:min-w-[50%] sm:max-w-[50%] sm:basis-[50%]">
           <div className="flex flex-col gap-2 text-center">
             <h2 className="text-neutral !mt-0 truncate text-2xl font-bold">
-              {isPaidTraffic && firstQr
+              {isPaidTraffic && qrDataToCreate
                 ? "Download Your QR Code"
                 : "Unlock 7-Day Full Access"}
             </h2>

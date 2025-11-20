@@ -1,5 +1,6 @@
 import { TRIGGER_TYPES } from "@/lib/analytics/constants";
 import z from "@/lib/zod";
+import { EQRType } from "@/ui/qr-builder-new/types/qr-type"
 import { CONTINENT_CODES, COUNTRY_CODES } from "@dub/utils";
 
 const analyticsTriggersResponse = z
@@ -227,6 +228,8 @@ export const analyticsResponse = {
     })
     .openapi({ ref: "AnalyticsOS" }),
 
+  download: z.any(),
+
   triggers: analyticsTriggersResponse,
   trigger: analyticsTriggersResponse, // backwards compatibility
 
@@ -299,22 +302,26 @@ export const analyticsResponse = {
       createdAt: z
         .string()
         .describe("The creation timestamp of the short link"),
-      qr: z.object({
-        id: z.string().describe("The unique ID of the QR code"),
-        qrType: z.enum([
-          "website",
-          "whatsapp",
-          "social",
-          "wifi",
-          "app",
-          "pdf",
-          "image",
-          "video",
-          "feedback",
-          "email",
-        ]).describe("The type of QR code"),
-        title: z.string().nullish().describe("The title of the QR code"),
-      }).optional(),
+      qr: z
+        .object({
+          id: z.string().describe("The unique ID of the QR code"),
+          qrType: z
+            .enum([
+              "website",
+              "whatsapp",
+              "social",
+              "wifi",
+              "app",
+              "pdf",
+              "image",
+              "video",
+              "feedback",
+              "email",
+            ])
+            .describe("The type of QR code"),
+          title: z.string().nullish().describe("The title of the QR code"),
+        })
+        .optional(),
       clicks: z
         .number()
         .describe("The number of clicks from this link")
@@ -355,6 +362,15 @@ export const analyticsResponse = {
         .default(0),
     })
     .openapi({ ref: "AnalyticsTopUrls" }),
+  top_types: z.object({
+    qr_type: z
+      .enum(Object.values(EQRType) as [string, ...string[]])
+      .describe("The type of QR code"),
+    clicks: z
+      .number()
+      .describe("The number of scans of this QR")
+      .default(0),
+  }),
 
   utm_sources: z
     .object({
