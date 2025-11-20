@@ -27,8 +27,8 @@ export default function TopLinks() {
       className="md:col-span-2"
       tabs={[
         { id: "links", label: "QR Name", icon: Hyperlink },
-        { id: "urls", label: "Destination URLs", icon: Globe },
         { id: "types", label: "QR Type", icon: Sliders },
+        { id: "urls", label: "Destination URLs", icon: Globe },
       ]}
       expandLimit={8}
       hasMore={(data?.length ?? 0) > 8}
