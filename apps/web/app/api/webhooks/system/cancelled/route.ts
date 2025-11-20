@@ -1,7 +1,9 @@
-import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
-import { prisma } from "@dub/prisma";
-import { format } from "date-fns";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@dub/prisma';
+import { CUSTOMER_IO_TEMPLATES, sendEmail } from '@dub/email';
+import { format } from 'date-fns';
+import { trackMixpanelApiService } from 'core/integration/analytic/services/track-mixpanel-api.service';
+import { EAnalyticEvents } from 'core/integration/analytic/interfaces/analytic.interface';
 import { addMixpanelPropertyApiService } from 'core/integration/analytic/services/add-mixpanel-property-api.service';
 
 interface IDataRes {
@@ -14,14 +16,13 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
   try {
     const body = await req.json();
 
-    console.log('scheduled_for_cancellation');
+    console.log('cancelled');
     console.log(body);
 
     const email = body.subscription?.attributes?.email || body.user?.email;
-    const nextBillingDate = body.subscription?.nextBillingDate;
     const changeType = body.type;
 
-    if (changeType !== 'scheduled_for_cancellation') {
+    if (changeType !== 'cancelled') {
       return NextResponse.json({ success: false, error: 'Bad request' }, { status: 400 });
     }
 
@@ -45,18 +46,8 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
     await addMixpanelPropertyApiService({
       userId: user.id,
       values: {
-        scheduled_for_cancellation: true,
+        cancelled: true,
       },
-    });
-
-    await sendEmail({
-      email: user.email,
-      subject: "Subscription Cancelled",
-      template: CUSTOMER_IO_TEMPLATES.SUBSCRIPTION_CANCELLATION,
-      messageData: {
-        end_date: format(new Date(nextBillingDate), 'yyyy-MM-dd'),
-      },
-      customerId: user.id,
     });
 
     return NextResponse.json({ success: true });
