@@ -46,6 +46,7 @@ export const FRAMES: IStyleOption[] = [
     id: "frame-none",
     type: "none",
     icon: NoLogoIcon,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card",
@@ -54,6 +55,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, Card, 0.75, 50, 5);
     },
     icon: CardPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-1",
@@ -62,6 +64,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, CardFirst, 0.75, 50, 5);
     },
     icon: CardFirstPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-2",
@@ -71,6 +74,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardSecondPreview,
     defaultTextColor: BLACK_COLOR,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-3",
@@ -80,6 +84,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardThirdPreview,
     defaultTextColor: BLACK_COLOR,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-wreath",
@@ -88,6 +93,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, Wreath, 0.65, 81, 40);
     },
     icon: WreathPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-envelope",
@@ -97,6 +103,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: EnvelopePreview,
     defaultTextColor: BLACK_COLOR,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-waitress",
@@ -106,6 +113,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: WaitressPreview,
     defaultTextColor: BLACK_COLOR,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-coffee-cup",
@@ -115,6 +123,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CoffeeCupPreview,
     defaultTextColor: BLACK_COLOR,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-scooter",
@@ -123,6 +132,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, Scooter, 0.457, 43, 48);
     },
     icon: ScooterPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-clipboard",
@@ -131,6 +141,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, ClipboardFrame, 0.72, 60, 55);
     },
     icon: ClipboardFramePreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-7",
@@ -139,6 +150,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, CardSeventh, 0.75, 50, 5);
     },
     icon: CardSeventhPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-8",
@@ -147,6 +159,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, CardEighth, 0.739, 52, 7);
     },
     icon: CardEighthPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-9",
@@ -155,6 +168,7 @@ export const FRAMES: IStyleOption[] = [
       await embedQRIntoFrame(qr, options, CardNinth, 0.62, 90, 20);
     },
     icon: CardNinthPreview,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-4",
@@ -164,6 +178,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardForthPreview,
     defaultTextColor: BLACK_COLOR,
+    preset:'darkTextPreset'
   },
   {
     id: "frame-card-5",
@@ -173,6 +188,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardFifthPreview,
     defaultTextColor: BLACK_COLOR,
+    preset:'darkTextPreset'
   },
   {
     id: "frame-card-6-ver",
@@ -182,6 +198,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardSixthVerPreview,
     disableFrameText: true,
+    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-6-hor",
@@ -191,6 +208,7 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardSixthHorPreview,
     disableFrameText: true,
+    preset: 'ligthTextPreset'
   },
   
 ];

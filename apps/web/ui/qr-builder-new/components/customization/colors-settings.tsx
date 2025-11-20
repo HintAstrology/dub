@@ -68,11 +68,11 @@ export const ColorsSettings: FC<ColorsSettingsProps> = ({
   );
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 w-full">
       <div className="flex w-full flex-col items-start gap-4 text-sm md:flex-row">
         <div className="flex w-full flex-row items-end gap-2">
           <ColorPickerInput
-            label="QR colour"
+            label="QR Color"
             value={foregroundColor}
             onChange={handleForegroundColorChange}
             disabled={disabled}
@@ -94,33 +94,6 @@ export const ColorsSettings: FC<ColorsSettingsProps> = ({
             </motion.div>
           )}
         </div>
-
-        {!frameSelected && (
-          <div className="flex w-full flex-row items-end gap-2">
-            <ColorPickerInput
-              label="Background colour"
-              value={backgroundColor}
-              onChange={handleBackgroundColorChange}
-              disabled={disabled}
-            />
-            {!isWhiteHex(backgroundColor) && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  variant="secondary"
-                  className="border-border-500 h-11 max-w-11 p-3"
-                  onClick={() => handleBackgroundColorChange(WHITE_COLOR)}
-                  icon={<RotateCcw className="text-neutral h-5 w-5" />}
-                  disabled={disabled}
-                />
-              </motion.div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

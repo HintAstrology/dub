@@ -44,7 +44,7 @@ export const ShapeSelector: FC<ShapeSelectorProps> = ({
     <div className="flex w-full flex-col gap-4 pb-6">
       <div className="flex flex-col gap-4">
         <StylePicker
-          label="Corner Square Style"
+          label="Corner Square shape"
           styleOptions={CORNER_SQUARE_STYLES}
           value={shapeData.cornerSquareStyle}
           onSelect={handleCornerSquareStyleChange}
@@ -55,7 +55,7 @@ export const ShapeSelector: FC<ShapeSelectorProps> = ({
         />
 
         <StylePicker
-          label="Corner Dot Style"
+          label="Corner Dot shape"
           styleOptions={CORNER_DOT_STYLES}
           value={shapeData.cornerDotStyle}
           onSelect={handleCornerDotStyleChange}
