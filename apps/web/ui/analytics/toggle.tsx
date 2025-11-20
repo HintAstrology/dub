@@ -36,7 +36,7 @@ export default function Toggle({
   return (
     <>
       <div
-        className={cn("py-3 md:py-3", {
+        className={cn("py-2", {
           "sticky top-14 z-10 bg-neutral-50": dashboardProps,
           "sticky top-16 z-10 bg-neutral-50": adminPage || demoPage,
           "shadow-md": scrolled && dashboardProps,

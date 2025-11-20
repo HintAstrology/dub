@@ -92,7 +92,7 @@ function StatsGrid() {
 
  
   return hide ? null : (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Tabs Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* TopLinks Tabs */}
@@ -150,7 +150,7 @@ function StatsGrid() {
       </div>
 
       {/* Content Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 w-full items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full items-start -mt-2">
         {!dashboardProps && <TopLinks tab={topLinksTab} view={topLinksView} onViewChange={setTopLinksView} />}
         <Locations tab={locationsTab} view={locationsView} onViewChange={setLocationsView} />
         <Devices tab={devicesTab} view={devicesView} onViewChange={setDevicesView} />

@@ -1,8 +1,9 @@
 "use client";
 
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { CopyButton } from "@dub/ui";
 import { nFormatter } from "@dub/utils";
-import { ReactNode, useContext, useMemo } from "react";
+import { ReactNode, useContext, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { AnalyticsContext } from "./analytics-provider";
 import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
@@ -46,6 +47,7 @@ export default function AnalyticsPieChartWithLists({
   controls,
 }: AnalyticsPieChartWithListsProps) {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
@@ -136,7 +138,7 @@ export default function AnalyticsPieChartWithLists({
                       value={formatValue(data.value)}
                       percentage={data.percentage}
                       copyValue={data.fullName}
-                      showCopy={showCopy}
+                      showCopy={false}
                       active={active}
                     />
                   );
@@ -199,13 +201,18 @@ export default function AnalyticsPieChartWithLists({
           {list1Data.map((item, index) => {
             const formattedValue = formatValue(item.value);
             // Calculate max length based on available space (approximately 20-25 chars)
-            const maxLength = 25;
+            const maxLength = 40;
             const displayTitle =
               item.title.length > maxLength
                 ? `${item.title.slice(0, maxLength)}...`
                 : item.title;
             return (
-              <div key={index} className="flex min-w-0 items-center gap-3">
+              <div
+                key={index}
+                className="flex min-w-0 items-center gap-3 group"
+                onMouseEnter={() => showCopy && setHoveredIndex(index)}
+                onMouseLeave={() => showCopy && setHoveredIndex(null)}
+              >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <div
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -218,6 +225,13 @@ export default function AnalyticsPieChartWithLists({
                   >
                     {displayTitle}
                   </span>
+                  {showCopy && hoveredIndex === index && (
+                    <CopyButton
+                      value={item.title}
+                      variant="neutral"
+                      className="h-4 w-4 p-0.5"
+                    />
+                  )}
                 </div>
                 <span className="text-foreground shrink-0 whitespace-nowrap text-sm font-semibold">
                   {formattedValue}

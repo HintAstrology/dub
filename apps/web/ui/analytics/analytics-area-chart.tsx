@@ -1,42 +1,42 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
 import { formatDateTooltip } from "@/lib/analytics/format-date-tooltip";
 import { EventType } from "@/lib/analytics/types";
 import { editQueryString } from "@/lib/analytics/utils";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
+import {
+  ChromeIcon,
+  GlobeIcon,
+  LayoutGridIcon,
+  MonitorIcon,
+  QrCodeIcon,
+  SmartphoneIcon,
+  TagIcon,
+  TrendingDown,
+  TrendingUp,
+  UsersIcon,
+} from "lucide-react";
 import { useContext, useMemo } from "react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
-  transformToRechartsData,
   getChartColor,
-  getYAxisConfig,
   getDataKey,
+  getYAxisConfig,
+  transformToRechartsData,
 } from "./chart-helpers";
 import {
   DashboardStats,
   formatPercentageChange,
-  getQrTypeLabel,
-  getCountryName,
-  formatStatValue,
   formatStatChange,
+  formatStatValue,
+  getCountryName,
+  getQrTypeLabel,
 } from "./stats-helpers";
-import {
-  QrCodeIcon,
-  UsersIcon,
-  TagIcon,
-  LayoutGridIcon,
-  SmartphoneIcon,
-  GlobeIcon,
-  ChromeIcon,
-  MonitorIcon,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import {
   type ChartConfig,
@@ -137,7 +137,7 @@ export default function AnalyticsAreaChart({
 
   const rechartsData = useMemo(
     () => transformToRechartsData(chartData, resource, saleUnit),
-    [chartData, resource, saleUnit]
+    [chartData, resource, saleUnit],
   );
 
   const dataKey = getDataKey(resource);
@@ -218,9 +218,81 @@ export default function AnalyticsAreaChart({
   }
 
   return (
-    <Card className={cn("grid gap-4 p-3 sm:p-4 md:p-6 lg:grid-cols-[70%_30%] border-none")}>
-        <div className="space-y-4 flex flex-col overflow-x-auto">
-          <div className="h-56 w-full min-w-[600px] sm:h-80 sm:min-w-0 md:h-96">
+    <Card className={cn("flex flex-col gap-4 border-none p-3 sm:p-4 md:p-4")}>
+      <div className="flex flex-col gap-4">
+        <CardContent className="grow p-0">
+          <div className="flex gap-4 pb-2 overflow-x-auto">
+            {statsData.map((stat, index) => {
+              const isNumeric =
+                stat.isNumeric &&
+                typeof stat.change === "object" &&
+                stat.change !== null;
+              const changeValue =
+                typeof stat.change === "string"
+                  ? stat.change
+                  : stat.change?.text || "-";
+              const isPositive =
+                typeof stat.change === "object" && stat.change?.isPositive;
+
+              return (
+                <div
+                  key={index}
+                  className="bg-muted min-w-[180px] flex flex-col gap-2 rounded-lg p-2"
+                >
+                  <span className="text-muted-foreground text-xs font-medium">
+                    {stat.title}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="size-10 rounded-sm">
+                      <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
+                        {stat.icon}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">
+                        {stat.value}
+                      </span>
+                      {!isNumeric && (
+                        <span className="text-muted-foreground text-xs">
+                          {changeValue}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {isNumeric && (
+                    <div className="mt-auto flex items-center gap-1.5">
+                      {isPositive !== undefined &&
+                        (isPositive ? (
+                          <TrendingUp className="h-3 w-3 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 text-orange-600" />
+                        ))}
+                      <span
+                        className={`text-xs font-medium ${
+                          isPositive === true
+                            ? "text-green-600"
+                            : isPositive === false
+                              ? "text-orange-600"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        {changeValue}
+                      </span>
+                      {stat.comparisonPeriod && (
+                        <span className="text-muted-foreground text-xs">
+                          {stat.comparisonPeriod}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </div>
+      <div className="flex flex-col space-y-4 overflow-x-auto">
+        <div className="h-56 w-full min-w-[600px] sm:h-80 sm:min-w-0 md:h-96">
           <ChartContainer config={chartConfig} className="h-full w-full">
             <AreaChart
               data={rechartsData}
@@ -279,7 +351,11 @@ export default function AnalyticsAreaChart({
                       resource === "sales" && saleUnit === "saleAmount"
                         ? currencyFormatter(value as number)
                         : nFormatter(value as number, { full: true }),
-                      resource === "clicks" ? "Scans" : resource === "leads" ? "Leads" : "Sales",
+                      resource === "clicks"
+                        ? "Scans"
+                        : resource === "leads"
+                          ? "Leads"
+                          : "Sales",
                     ]}
                   />
                 }
@@ -295,68 +371,6 @@ export default function AnalyticsAreaChart({
             </AreaChart>
           </ChartContainer>
         </div>
-      </div>
-      <div className="flex flex-col gap-4 px-2">
-        <CardContent className="grow p-0">
-          <div className="grid grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2">
-            {statsData.map((stat, index) => {
-              const isNumeric = stat.isNumeric && typeof stat.change === "object" && stat.change !== null;
-              const changeValue = typeof stat.change === "string" ? stat.change : stat.change?.text || "-";
-              const isPositive = typeof stat.change === "object" && stat.change?.isPositive;
-
-              return (
-                <div
-                  key={index}
-                  className="bg-muted flex flex-col gap-2 rounded-lg p-2"
-                >
-                  <span className="text-muted-foreground text-xs font-medium">
-                    {stat.title}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="size-10 rounded-sm">
-                      <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
-                        {stat.icon}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold">{stat.value}</span>
-                      {!isNumeric && (
-                        <span className="text-xs text-muted-foreground">{changeValue}</span>
-                      )}
-                    </div>
-                  </div>
-                  {isNumeric && (
-                    <div className="flex items-center gap-1.5 mt-auto">
-                      {isPositive !== undefined && (
-                        isPositive ? (
-                          <TrendingUp className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <TrendingDown className="h-3 w-3 text-orange-600" />
-                        )
-                      )}
-                      <span
-                        className={`text-xs font-medium ${
-                          isPositive === true
-                            ? "text-green-600"
-                            : isPositive === false
-                              ? "text-orange-600"
-                              : "text-muted-foreground"
-                        }`}
-                      >
-                        {changeValue}
-                      </span>
-                      {stat.comparisonPeriod && (
-                        <span className="text-xs text-muted-foreground">
-                          {stat.comparisonPeriod}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
       </div>
     </Card>
   );

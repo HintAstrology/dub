@@ -62,7 +62,7 @@ export function SidebarUserDropdown() {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{userName}</span>
-                <span className="truncate text-xs text-muted-foreground">{userEmail}</span>
+                {/* <span className="truncate text-xs text-muted-foreground">{userEmail}</span> */}
               </div>
               <ChevronRightIcon className="ml-auto size-4 transition-transform duration-200 max-lg:rotate-270 [[data-state=open]>&]:rotate-90 lg:[[data-state=open]>&]:-rotate-180" />
             </SidebarMenuButton>

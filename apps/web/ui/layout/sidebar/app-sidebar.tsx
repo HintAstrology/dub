@@ -42,6 +42,9 @@ export function AppSidebar() {
     useTrialExpiredModal();
   const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
 
+  // Use slug from params, or fall back to user's default workspace
+  const workspaceSlug = slug || user?.defaultWorkspace;
+
   const menuItems: MenuItem[] = useMemo(
     () => [
       {
@@ -55,13 +58,13 @@ export function AppSidebar() {
       {
         icon: QrCode,
         label: "My QR Codes",
-        href: `/${slug}`,
+        href: workspaceSlug ? `/${workspaceSlug}` : '#',
         exact: true,
       },
       {
         icon: BarChart3,
         label: "Statistics",
-        href: isTrialOver ? "#" : `/${slug}/analytics`,
+        href: isTrialOver ? "#" : (workspaceSlug ? `/${workspaceSlug}/analytics` : '#'),
         onClick: isTrialOver
           ? (e: MouseEvent) => {
               e.preventDefault();
@@ -70,7 +73,7 @@ export function AppSidebar() {
           : undefined,
       },
     ],
-    [slug, isTrialOver, setShowTrialExpiredModal],
+    [workspaceSlug, isTrialOver, setShowTrialExpiredModal],
   );
 
   const isActive = (item: MenuItem) => {
@@ -94,7 +97,7 @@ export function AppSidebar() {
       <Sidebar
         variant="floating"
         collapsible="icon"
-        className="bg-card [&>[data-slot=sidebar-inner]]:bg-card [&>[data-slot=sidebar-inner]]:border-border border-r-0 p-6 pr-0 [&>[data-slot=sidebar-inner]]:border [&>[data-slot=sidebar-inner]]:shadow-sm [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-[20px]"
+        className="bg-card [&>[data-slot=sidebar-inner]]:bg-card [&>[data-slot=sidebar-inner]]:border-border border-r-0 p-4 pr-0 [&>[data-slot=sidebar-inner]]:border [&>[data-slot=sidebar-inner]]:shadow-sm [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-[20px]"
       >
         <SidebarHeader className="bg-white lg:rounded-[20px]">
           <SidebarMenu>
@@ -104,7 +107,7 @@ export function AppSidebar() {
                 className="gap-2.5 !bg-transparent hover:bg-transparent [&>svg]:size-8"
                 asChild
               >
-                <Link href={`/${slug}`}>
+                <Link href={workspaceSlug ? `/${workspaceSlug}` : '#'}>
                   <QrCode className="text-primary size-8" />
                   <span className="text-xl font-semibold">GetQR</span>
                 </Link>
