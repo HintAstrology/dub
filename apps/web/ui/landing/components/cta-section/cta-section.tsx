@@ -18,7 +18,7 @@ export const CTASection: FC<ICTASectionProps> = ({
 }) => {
   return (
     <section className="relative py-6 lg:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6 lg:px-8 lg:py-14">
         <Card className="group border-none shadow relative overflow-hidden rounded-3xl pt-6">
 
           <CardContent className="relative flex items-center gap-8 px-6 sm:max-lg:flex-col md:gap-16 md:px-12 lg:py-14">

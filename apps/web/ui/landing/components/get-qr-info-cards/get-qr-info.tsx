@@ -8,7 +8,7 @@ import { GET_QR_CARDS } from "./config.ts";
 export const GetQRInfoCardsSection: FC = () => {
   return (
     <section className="py-6 lg:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6 lg:px-8 lg:py-14">
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle
             titleFirstPart={"Create QR In 3 Simple Steps"}
