@@ -10,7 +10,9 @@ interface GetQRFeaturesCardsSectionProps {
   initialTab?: string;
 }
 
-export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = () => {
+export const GetQRFeaturesCardsSection: FC<
+  GetQRFeaturesCardsSectionProps
+> = () => {
   return (
     <section id="features" className="relative overflow-hidden py-6 lg:py-14">
       {/* Background gradient effects */}
@@ -19,11 +21,12 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = () 
         <div className="bg-secondary/5 absolute bottom-0 right-1/4 h-96 w-96 rounded-full blur-3xl" />
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6 lg:px-8 lg:py-14">
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
-          <SectionTitle
-            titleFirstPart="More Than Just a QR Code Generator"
-          />
+          <SectionTitle titleFirstPart="More Than Just a QR Code Generator" />
+          <p className="text-muted-foreground max-w-4xl text-center text-base md:text-lg">
+            Own the full lifecycle: creation, refinement, data insights.
+          </p>
         </div>
 
         {/* Cards Grid - vertical on mobile, horizontal on desktop */}
@@ -31,7 +34,7 @@ export const GetQRFeaturesCardsSection: FC<GetQRFeaturesCardsSectionProps> = () 
           {GET_QR_FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="bg-white group relative overflow-hidden rounded-xl p-6 shadow transition-all duration-300 hover:shadow-md"
+              className="group relative overflow-hidden rounded-xl bg-white p-6 shadow transition-all duration-300 hover:shadow-md"
             >
               <div className="flex flex-col gap-4">
                 {/* Icon */}

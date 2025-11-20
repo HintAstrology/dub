@@ -22,7 +22,7 @@ interface IFaqSectionProps {
 export const FAQSection: FC<IFaqSectionProps> = ({ faqItems }) => {
   return (
     <section className="py-6 lg:py-14">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* FAQ Header */}
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle
