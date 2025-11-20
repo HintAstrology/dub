@@ -21,6 +21,7 @@ type PaymentRequest = {
       email?: string;
       plan_name?: string;
       payment_subtype?: string;
+      dunning_attempt?: number;
     };
     customer: { emailAddress?: string };
     status: PaymentStatus;
@@ -54,8 +55,9 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
       body.payment.metadata.email_address ||
       body.payment.metadata.email ||
       body.payment.customer.emailAddress;
+    const isDunningAttempt = !!body.payment.metadata.dunning_attempt;
 
-    if (!FAILED_STATUSES.includes(body.payment.status)) {
+    if (!FAILED_STATUSES.includes(body.payment.status) || isDunningAttempt) {
       return NextResponse.json({ success: true });
     }
 
