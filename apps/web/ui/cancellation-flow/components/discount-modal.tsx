@@ -5,7 +5,7 @@ import { Theme } from "@radix-ui/themes";
 import { useUpdateSubscriptionMutation } from 'core/api/user/subscription/subscription.hook';
 import { setPeopleAnalytic, trackClientEvents } from 'core/integration/analytic';
 import { EAnalyticEvents } from 'core/integration/analytic/interfaces/analytic.interface';
-import { getChargePeriodDaysIdByPlan, ICustomerBody, TPaymentPlan } from 'core/integration/payment/config';
+import { getChargePeriodDaysIdByPlan, ICustomerBody } from 'core/integration/payment/config';
 import { Heart, TriangleAlert } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,6 +21,10 @@ import { mutate } from 'swr';
 import { format } from "date-fns";
 import { Button } from '@/components/ui/button';
 import { cn } from '@dub/utils';
+import { generateTrackingUpsellEvent } from 'core/services/events/upsell-events.service';
+import { useCreateUserPaymentMutation } from 'core/api/user/payment/payment.hook';
+import { IGetPrimerClientPaymentInfoRes } from 'core/integration/payment/server';
+import { pollPaymentStatus } from 'core/integration/payment/client/services/payment-status.service';
 
 const SPECIAL_PLAN = "PRICE_RETENTION_OFFER_MONTH";
 
@@ -35,6 +39,7 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
   const [isSecondStep, setIsSecondStep] = useState(false);
   const router = useRouter();
 
+  const { trigger: triggerCreateUserPayment } = useCreateUserPaymentMutation();
   const { trigger: triggerUpdateSubscription } =
     useUpdateSubscriptionMutation();
   
@@ -46,44 +51,110 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
     setShowModal(false);
   };
 
-  const justDowngradePlan = useCallback(async () => {
-    await triggerUpdateSubscription({
+  const payAndUpdatePlan = async () => {
+    setIsProcessing(true);
+
+    generateTrackingUpsellEvent({
+      user,
       paymentPlan: SPECIAL_PLAN,
-    })
-      .then(async (res) => {
-        const chargePeriodDays = getChargePeriodDaysIdByPlan({
-          paymentPlan: SPECIAL_PLAN,
-          user,
-        });
+      stage: "attempt",
+      additionalParams: {
+        billing_action: "upgrade",
+      },
+    });
 
-        toast.success(
-          `You’ve updated to the discounted monthly plan. It will take effect on ${format(
-            new Date(res?.data?.nextBillingDate || ""),
-            "yyyy-MM-dd",
-          )}. No charge today!`,
-        );
+    const createPaymentRes = await triggerCreateUserPayment({
+      paymentPlan: SPECIAL_PLAN,
+    });
 
-        setPeopleAnalytic({
-          plan_name: SPECIAL_PLAN,
-          charge_period_days: chargePeriodDays,
-        });
+    if (!createPaymentRes?.success) {
+      setIsProcessing(false);
+      generateTrackingUpsellEvent({
+        user,
+        paymentPlan: SPECIAL_PLAN,
+        stage: "error",
+        additionalParams: {
+          error_code: "PAYMENT_CREATION_FAILED",
+          billing_action: "upgrade",
+        },
+      });
+      toast.error(`Payment creation failed.`);
 
-        await mutate("/api/user");
+      return;
+    }
 
-        // Force refresh the page cache
+    const onError = (info?: IGetPrimerClientPaymentInfoRes) => {
+      setIsProcessing(false);
 
-        router.refresh();
-        router.push("/");
-      })
-      .catch((error) => {
-        setIsProcessing(false);
-        toast.error(
-          `The plan updating failed: ${error?.code ?? error?.message}`,
-        );
+      generateTrackingUpsellEvent({
+        user,
+        paymentPlan: SPECIAL_PLAN,
+        stage: "error",
+        paymentId: info?.id ?? createPaymentRes?.data?.paymentId,
+        additionalParams: {
+          error_code: info?.statusReason?.code ?? info?.status ?? null,
+          billing_action: "upgrade",
+        },
       });
 
-    return;
-  }, []);
+      toast.error(
+        `Payment failed: ${info?.statusReason?.code ?? info?.status ?? "unknown error"}`,
+      );
+    };
+
+    const onPurchased = async (info: IGetPrimerClientPaymentInfoRes) => {
+      await triggerUpdateSubscription({
+        paymentId: info.id,
+        paymentPlan: SPECIAL_PLAN,
+      })
+        .then(async (res) => {
+          generateTrackingUpsellEvent({
+            user,
+            paymentPlan: SPECIAL_PLAN,
+            stage: "success",
+            paymentId: info?.id,
+            additionalParams: {
+              billing_action: "upgrade",
+            },
+          });
+
+          toast.success(
+            `You’ve updated to the discounted monthly plan. It will take effect on ${format(
+              new Date(res?.data?.nextBillingDate || ""),
+              "yyyy-MM-dd",
+            )}. No charge today!`,
+          );
+
+          const chargePeriodDays = getChargePeriodDaysIdByPlan({
+            paymentPlan: SPECIAL_PLAN,
+            user,
+          });
+
+          setPeopleAnalytic({
+            plan_name: SPECIAL_PLAN,
+            charge_period_days: chargePeriodDays,
+          });
+
+          await mutate("/api/user");
+
+          // Force refresh the page cache
+          router.refresh();
+          router.push("/");
+        })
+        .catch((error) =>
+          toast.error(
+            `The plan updating failed: ${error?.code ?? error?.message}`,
+          ),
+        );
+    };
+
+    await pollPaymentStatus({
+      paymentId: createPaymentRes!.data!.paymentId,
+      onPurchased,
+      onError,
+      initialStatus: createPaymentRes!.data!.status,
+    });
+  };
 
   const handleUpdatePlan = useCallback(async () => {
     setIsProcessing(true);
@@ -100,8 +171,8 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
       sessionId: user.id,
     });
 
-    await justDowngradePlan()
-  }, [user, justDowngradePlan]);
+    await payAndUpdatePlan();
+  }, [user]);
 
   return (
     <Modal
