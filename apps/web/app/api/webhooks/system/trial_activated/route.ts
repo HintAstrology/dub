@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@dub/prisma';
-import { CUSTOMER_IO_TEMPLATES, sendEmail } from '@dub/email';
-import { format } from 'date-fns';
 import { EAnalyticEvents } from 'core/integration/analytic/interfaces/analytic.interface';
-import { trackMixpanelApiService } from 'core/integration/analytic/services/track-mixpanel-api.service';
+import { addMixpanelPropertyApiService } from 'core/integration/analytic/services/add-mixpanel-property-api.service';
 
 interface IDataRes {
   success: boolean;
@@ -42,11 +40,11 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
       );
     }
 
-    await trackMixpanelApiService({
-      event: EAnalyticEvents.TRIAL_ACTIVATED,
-      params: {},
-      email: user.email!,
+    await addMixpanelPropertyApiService({
       userId: user.id,
+      values: {
+        trial_activated: true,
+      },
     });
 
     return NextResponse.json({ success: true });
