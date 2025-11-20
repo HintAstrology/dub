@@ -31,6 +31,8 @@ const config: Config = {
           "ui-monospace",
           "monospace",
         ],
+        anton: ["var(--font-anton)"],
+        caveat: ["var(--font-caveat)"]
       },
       fontSize: {
         "2xs": [
