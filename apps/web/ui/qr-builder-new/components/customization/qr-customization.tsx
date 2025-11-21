@@ -169,7 +169,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
   // Mobile: Tabs
   if (isMobile) {
     return (
-      <Tabs value={activeTab} onValueChange={handleAccordionChange} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleAccordionChange} className="w-full !overflow-visible">
         <TabsList className="w-full grid grid-cols-3 gap-2 bg-transparent h-auto p-0">
           {QR_STYLES_OPTIONS.map((tab) => {
             return (
@@ -197,7 +197,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
             tab.id === "logo" ? logoSelector : null;
 
           return (
-            <TabsContent key={tab.id} value={tab.label} className="mt-4">
+            <TabsContent key={tab.id} value={tab.label} className="mt-4 !overflow-visible">
               {selectorContent}
             </TabsContent>
           );
@@ -252,7 +252,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="pt-2 ">
+            <AccordionContent className="pt-2">
               {selectorContent}
             </AccordionContent>
           </AccordionItem>
