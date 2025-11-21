@@ -306,7 +306,7 @@ export const QRBuilderInner = () => {
                         style={{ minWidth: 0 }}
                       >
                         {!isCustomizationStep ? (
-                          <div className="relative inline-block max-h-[200px] overflow-hidden">
+                          <div className="relative inline-block max-h-[200px] overflow-visible">
                             <motion.div
                               key={
                                 currentQRType
