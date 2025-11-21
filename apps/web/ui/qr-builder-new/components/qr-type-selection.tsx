@@ -58,7 +58,7 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
                 isActive={isSelected}
                 className="text-primary size-8 shrink-0"
               />
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex min-w-0 flex-1 flex-col">
                 <h3 className="text-base font-semibold text-black">
                   {type.label}
                 </h3>

@@ -78,9 +78,9 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                     What's included:
                   </h4>
                   {plan.planFeatures.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center gap-3">
-                      <CheckIcon className="text-muted-foreground h-5 w-5 flex-shrink-0" />
-                      <span className="text-card-foreground font-medium">
+                    <div key={featureIndex} className="flex items-center gap-2">
+                      <CheckIcon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                      <span className="text-muted-foreground pb-1 text-lg">
                         {feature}
                       </span>
                     </div>

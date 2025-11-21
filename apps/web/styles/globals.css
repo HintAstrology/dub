@@ -257,6 +257,11 @@ select:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s !important;
 }
 
+/* Ensure tooltips appear above dialogs/modals */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
 @theme inline {
   @keyframes marquee {
   from {

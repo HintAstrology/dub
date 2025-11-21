@@ -25,7 +25,7 @@ export const StyleButton: FC<StyleButtonProps> = ({
   return (
     <button
       className={cn(
-        "rounded-md border p-3 transition",
+        "rounded-md border transition",
         selected
           ? "border-secondary"
           : "border-border-300 hover:border-secondary",

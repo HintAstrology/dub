@@ -5,7 +5,7 @@ import { default as woman } from "../assets/avatars/woman.png";
 const usersWithAvatar = [
   {
     name: "John",
-    avatar: man,
+    avatar: { src: "https://randomuser.me/api/portraits/women/44.jpg" },
   },
   {
     name: "Anna",
@@ -13,7 +13,6 @@ const usersWithAvatar = [
   },
   {
     name: "S",
-    avatar: { src: "https://randomuser.me/api/portraits/men/42.jpg" },
   },
   {
     name: "Lane",
@@ -21,7 +20,7 @@ const usersWithAvatar = [
   },
   {
     name: "Sarah",
-    avatar: { src: "https://randomuser.me/api/portraits/women/44.jpg" },
+    avatar: man,
   },
 ];
 
