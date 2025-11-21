@@ -50,7 +50,7 @@ export default function AnalyticsExport() {
         openPopover={openPopover}
         setOpenPopover={setOpenPopover}
       > 
-        <Button text='Download data' onClick={() => setOpenPopover(!openPopover)} />
+        <Button text='Export data' onClick={() => setOpenPopover(!openPopover)} />
       </Popover>
     </div>
   );
