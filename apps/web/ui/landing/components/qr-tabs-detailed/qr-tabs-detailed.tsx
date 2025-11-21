@@ -88,7 +88,7 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
             <TabsContent key={type.id} value={type.id}>
               <div className="flex flex-col items-center justify-between gap-8 lg:flex-row lg:gap-12">
                 {/* Left side - Content */}
-                <div className="w-full lg:w-1/2">
+                <div className="w-full lg:w-1/2 mt-4 md:mt-0">
                   <div className="flex flex-col gap-6">
                     <h3 className="text-card-foreground text-2xl font-bold md:text-3xl">
                       {type.label}
