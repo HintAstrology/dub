@@ -9,6 +9,7 @@ import { FC, useState } from "react";
 import { toast } from "sonner";
 import { DiscountModal } from "./components/discount-modal";
 import { ICustomerBody } from 'core/integration/payment/config';
+import { SessionProvider } from 'next-auth/react';
 
 interface ICancellationFlowModuleProps {
   pageName: string;
@@ -88,30 +89,32 @@ export const CancellationFlowModule: FC<
   };
 
   return (
-    <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
-      <DiscountModal showModal={showDiscountModal} setShowModal={setShowDiscountModal} user={user} />
-      <h1 className="text-center text-2xl font-semibold lg:text-2xl">
-        Are you sure you want to cancel your subscription?
-      </h1>
-      <p className="text-default-700 text-center text-sm">
-        After you cancel, you’ll still have access until the end of your current
-        billing period. But once it ends, everything you've unlocked will
-        disappear.
-      </p>
-      <div className="flex w-full flex-col gap-2">
-        <Button
-          loading={isCancellingSchedule}
-          disabled={isLoading || isCancellingSchedule}
-          className="border-none bg-red-500 font-semibold text-white"
-          onClick={handleCancelSubscription}
-          text="Cancel Subscription"
-        />
-        <Button
-          disabled={isLoading || isCancellingSchedule}
-          onClick={handleLinkToWorkspaceClick}
-          text="Return to workspace"
-        />
+    <SessionProvider>
+      <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
+        <DiscountModal showModal={showDiscountModal} setShowModal={setShowDiscountModal} user={user} />
+        <h1 className="text-center text-2xl font-semibold lg:text-2xl">
+          Are you sure you want to cancel your subscription?
+        </h1>
+        <p className="text-default-700 text-center text-sm">
+          After you cancel, you’ll still have access until the end of your current
+          billing period. But once it ends, everything you've unlocked will
+          disappear.
+        </p>
+        <div className="flex w-full flex-col gap-2">
+          <Button
+            loading={isCancellingSchedule}
+            disabled={isLoading || isCancellingSchedule}
+            className="border-none bg-red-500 font-semibold text-white"
+            onClick={handleCancelSubscription}
+            text="Cancel Subscription"
+          />
+          <Button
+            disabled={isLoading || isCancellingSchedule}
+            onClick={handleLinkToWorkspaceClick}
+            text="Return to workspace"
+          />
+        </div>
       </div>
-    </div>
+    </SessionProvider>
   );
 };
