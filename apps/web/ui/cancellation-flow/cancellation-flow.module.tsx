@@ -23,6 +23,7 @@ export const CancellationFlowModule: FC<
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showDiscountModal, setShowDiscountModal] = useState<boolean>(false);
+  const [discountOffered, setDiscountOffered] = useState<boolean>(!!user.discountOffered);
 
   const {
     trigger: cancelSubscriptionSchedule,
@@ -31,8 +32,16 @@ export const CancellationFlowModule: FC<
 
   const handleCancelSubscription = async () => {
     console.log("user", user);
-    if (!user.discountOffered) {
+    if (!discountOffered) {
       setShowDiscountModal(true);
+      setDiscountOffered(true);
+      await fetch("/api/user", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ discountOffered: true }),
+      });
       return;
     }
 
