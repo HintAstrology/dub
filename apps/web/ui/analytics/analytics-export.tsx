@@ -1,8 +1,8 @@
 import { IconMenu, Popover } from "@dub/ui";
-import { cn } from "@dub/utils";
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { useDownloadAnalyticsFiltered } from "./utils";
+import { Button } from "@dub/ui";
 
 export const sortOptions = [
     {
@@ -50,16 +50,7 @@ export default function AnalyticsExport() {
         openPopover={openPopover}
         setOpenPopover={setOpenPopover}
       > 
-        <button
-          onClick={() => setOpenPopover(!openPopover)}
-          className={cn(
-            "group flex h-10 cursor-pointer appearance-none items-center gap-x-2 truncate rounded-md border pl-3 pr-[18px] text-sm outline-none transition-all",
-            "border-neutral-200/20 bg-white text-neutral-900 placeholder-neutral-400",
-            "focus-visible:border-neutral-200/40 data-[state=open]:border-neutral-200/40 data-[state=open]:ring-4 data-[state=open]:ring-neutral-200/40",
-          )}
-        >
-          Download data
-        </button>
+        <Button text='Download data' onClick={() => setOpenPopover(!openPopover)} />
       </Popover>
     </div>
   );

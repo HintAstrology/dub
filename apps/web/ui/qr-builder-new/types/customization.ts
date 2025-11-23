@@ -49,6 +49,7 @@ export interface IStyleOption {
   icon: any; // React component or image
   defaultTextColor?: string;
   relevantFor?: string[]; // QR types this logo is most relevant for
+  disableFrameText?: boolean;
   extension?: (
     qr: SVGSVGElement,
     options: {

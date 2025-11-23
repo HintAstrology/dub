@@ -4,6 +4,20 @@ import CardSecondPreview from "@/ui/qr-builder-new/assets/icons/frames/card-2-pr
 import CardSecond from "@/ui/qr-builder-new/assets/icons/frames/card-2.svg";
 import CardThirdPreview from "@/ui/qr-builder-new/assets/icons/frames/card-3-preview.svg";
 import CardThird from "@/ui/qr-builder-new/assets/icons/frames/card-3.svg";
+import CardForthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-4-preview.svg";
+import CardForth from "@/ui/qr-builder-new/assets/icons/frames/card-4-frame.svg";
+import CardFifthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-5-preview.svg";
+import CardFifth from "@/ui/qr-builder-new/assets/icons/frames/card-5-frame.svg";
+import CardSixthVerPreview from "@/ui/qr-builder-new/assets/icons/frames/card-6-ver-preview.svg";
+import CardSixthVer from "@/ui/qr-builder-new/assets/icons/frames/card-6-ver-frame.svg";
+import CardSixthHorPreview from "@/ui/qr-builder-new/assets/icons/frames/card-6-hor-preview.svg";
+import CardSixthHor from "@/ui/qr-builder-new/assets/icons/frames/card-6-hor-frame.svg";
+import CardSeventhPreview from "@/ui/qr-builder-new/assets/icons/frames/card-7-preview.svg";
+import CardSeventh from "@/ui/qr-builder-new/assets/icons/frames/card-7-frame.svg";
+import CardEighthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-8-preview.svg";
+import CardEighth from "@/ui/qr-builder-new/assets/icons/frames/card-8-frame.svg";
+import CardNinthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-9-preview.svg";
+import CardNinth from "@/ui/qr-builder-new/assets/icons/frames/card-9-frame.svg";
 import CardPreview from "@/ui/qr-builder-new/assets/icons/frames/card-preview.svg";
 import Card from "@/ui/qr-builder-new/assets/icons/frames/card.svg";
 import ClipboardFramePreview from "@/ui/qr-builder-new/assets/icons/frames/clipboard-preview.svg";
@@ -48,6 +62,20 @@ export const preloadAllFrames = async () => {
     CardSecondPreview,
     CardThird,
     CardThirdPreview,
+    CardForth,
+    CardForthPreview,
+    CardFifth,
+    CardFifthPreview,
+    CardSixthVer,
+    CardSixthVerPreview,
+    CardSixthHor,
+    CardSixthHorPreview,
+    CardSeventh,
+    CardSeventhPreview,
+    CardEighth,
+    CardEighthPreview,
+    CardNinth,
+    CardNinthPreview,
     Wreath,
     WreathPreview,
     Envelope,

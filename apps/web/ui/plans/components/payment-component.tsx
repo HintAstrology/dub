@@ -60,8 +60,6 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
     currentSubscriptionPlan as TPaymentPlan,
   );
 
-  console.log('renewalAction', renewalAction);
-
   return (
     <Flex
       direction="column"

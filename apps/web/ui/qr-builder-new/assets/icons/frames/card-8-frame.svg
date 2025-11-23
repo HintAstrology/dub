@@ -1,0 +1,11 @@
+<svg width="320" height="418" viewBox="0 0 320 418" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_57_7998)">
+<path d="M296 0C309.255 0 320 10.7452 320 24V394C320 407.255 309.255 418 296 418H24C10.7452 418 0 407.255 0 394V24C0 10.7452 10.7452 0 24 0H296ZM23.7207 14C18.3526 14.0005 14.0004 18.3526 14 23.7207V339.351L49.2627 305.631H295.91C301.279 305.631 305.632 301.279 305.632 295.91V23.7207C305.631 18.3523 301.279 14 295.91 14H23.7207Z" fill="currentColor"/>
+<text id="qr-frame-text" x="160" y="380" font-size="44px" font-weight="600" font-family="Inter, sans-serif" fill="white" text-anchor="middle">Scan Me!</text>
+</g>
+<defs>
+<clipPath id="clip0_57_7998">
+<rect width="320" height="418" fill="white"/>
+</clipPath>
+</defs>
+</svg>
