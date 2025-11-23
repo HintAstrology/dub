@@ -14,7 +14,6 @@ import {
   FC,
   SetStateAction,
   useCallback,
-  useEffect,
   useState,
 } from "react";
 import { toast } from 'sonner';
@@ -26,7 +25,6 @@ import { generateTrackingUpsellEvent } from 'core/services/events/upsell-events.
 import { useCreateUserPaymentMutation } from 'core/api/user/payment/payment.hook';
 import { IGetPrimerClientPaymentInfoRes } from 'core/integration/payment/server';
 import { pollPaymentStatus } from 'core/integration/payment/client/services/payment-status.service';
-import { useSession } from 'next-auth/react';
 
 const SPECIAL_PLAN = "PRICE_RETENTION_OFFER_MONTH";
 
@@ -40,17 +38,10 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSecondStep, setIsSecondStep] = useState(false);
   const router = useRouter();
-  const { update: updateSession } = useSession();
 
   const { trigger: triggerCreateUserPayment } = useCreateUserPaymentMutation();
   const { trigger: triggerUpdateSubscription } =
     useUpdateSubscriptionMutation();
-
-  useEffect(() => {
-    if (showModal) {
-      updateSession();
-    }
-  }, [showModal]);
   
   const handleClose = () => {
     if (!isSecondStep) {

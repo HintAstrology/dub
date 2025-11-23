@@ -9,7 +9,7 @@ import { FC, useState } from "react";
 import { toast } from "sonner";
 import { DiscountModal } from "./components/discount-modal";
 import { ICustomerBody } from 'core/integration/payment/config';
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider, useSession } from 'next-auth/react';
 
 interface ICancellationFlowModuleProps {
   pageName: string;
@@ -17,7 +17,7 @@ interface ICancellationFlowModuleProps {
   user: ICustomerBody;
 }
 
-export const CancellationFlowModule: FC<
+const CancellationFlowModuleContent: FC<
   Readonly<ICancellationFlowModuleProps>
 > = ({ pageName, sessionId, user }) => {
   const router = useRouter();
@@ -25,6 +25,7 @@ export const CancellationFlowModule: FC<
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showDiscountModal, setShowDiscountModal] = useState<boolean>(false);
   const [discountOffered, setDiscountOffered] = useState<boolean>(!!user.discountOffered);
+  const { update: updateSession } = useSession();
 
   const {
     trigger: cancelSubscriptionSchedule,
@@ -43,6 +44,7 @@ export const CancellationFlowModule: FC<
         },
         body: JSON.stringify({ discountOffered: true }),
       });
+      updateSession();
       return;
     }
 
@@ -115,6 +117,16 @@ export const CancellationFlowModule: FC<
           />
         </div>
       </div>
+    </SessionProvider>
+  );
+};
+
+export const CancellationFlowModule: FC<
+  Readonly<ICancellationFlowModuleProps>
+> = ({ pageName, sessionId, user }) => {
+  return (
+    <SessionProvider>
+      <CancellationFlowModuleContent pageName={pageName} sessionId={sessionId} user={user} />
     </SessionProvider>
   );
 };
