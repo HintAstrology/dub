@@ -32,9 +32,10 @@ type Props = {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   user: ICustomerBody;
+  onCancelSubscription: () => void;
 };
 
-export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
+export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user, onCancelSubscription }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSecondStep, setIsSecondStep] = useState(false);
   const router = useRouter();
@@ -49,6 +50,7 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
       return;
     }
     setShowModal(false);
+    onCancelSubscription();
   };
 
   const payAndUpdatePlan = async () => {

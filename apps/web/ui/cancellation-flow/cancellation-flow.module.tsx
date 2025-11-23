@@ -33,7 +33,6 @@ const CancellationFlowModuleContent: FC<
   } = useCancelSubscriptionScheduleMutation();
 
   const handleCancelSubscription = async () => {
-    console.log("user", user);
     if (!discountOffered) {
       setShowDiscountModal(true);
       setDiscountOffered(true);
@@ -93,7 +92,12 @@ const CancellationFlowModuleContent: FC<
   return (
     <SessionProvider>
       <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
-        <DiscountModal showModal={showDiscountModal} setShowModal={setShowDiscountModal} user={user} />
+        <DiscountModal
+          showModal={showDiscountModal}
+          setShowModal={setShowDiscountModal}
+          user={user}
+          onCancelSubscription={handleCancelSubscription}
+        />
         <h1 className="text-center text-2xl font-semibold lg:text-2xl">
           Are you sure you want to cancel your subscription?
         </h1>
