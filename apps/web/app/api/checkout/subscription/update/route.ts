@@ -38,7 +38,7 @@ const titlesByPlans = {
   PRICE_MONTH_PLAN: "Monthly Plan",
   PRICE_QUARTER_PLAN: "3-Month Plan",
   PRICE_YEAR_PLAN: "12-Month Plan",
-  PRICE_RETENTION_OFFER_MONTH: "Discounted Monthly Plan",
+  PRICE_RETENTION_OFFER_MONTH: "50% Discounted Monthly Plan",
 };
 
 const getPlanNameByChargePeriodDays = (chargePeriodDays: number) => {

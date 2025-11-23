@@ -119,10 +119,7 @@ export const DiscountModal: FC<Props> = ({ showModal, setShowModal, user }) => {
           });
 
           toast.success(
-            `You’ve updated to the discounted monthly plan. It will take effect on ${format(
-              new Date(res?.data?.nextBillingDate || ""),
-              "yyyy-MM-dd",
-            )}. No charge today!`,
+            `You’ve successfully activated the Special Plan at 50% off—just $19.99/month. Renews every month. Cancel anytime.`,
           );
 
           const chargePeriodDays = getChargePeriodDaysIdByPlan({
