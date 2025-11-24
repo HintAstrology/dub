@@ -58,11 +58,11 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
                 isActive={isSelected}
                 className="text-primary size-8 shrink-0"
               />
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex min-w-0 flex-1 flex-col">
                 <h3 className="text-base font-semibold text-black">
                   {type.label}
                 </h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">
+                <p className="text-muted-foreground text-xs leading-relaxed -mt-1">
                   {type.info}
                 </p>
               </div>
@@ -70,22 +70,22 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
             </div>
 
             {/* Desktop Layout */}
-            <div className="relative z-10 hidden items-center gap-4 p-8 md:flex">
-              <div className="flex flex-1 flex-col items-start gap-4">
+            <div className="relative z-10 hidden items-center gap-3 p-5 md:flex">
+              <div className="flex flex-1 flex-col items-start gap-2.5">
                 <QrTypeIcon
                   icon={type.icon}
                   idx={idx}
                   isActive={isSelected}
-                  className="text-primary size-7"
+                  className="text-primary size-6"
                 />
-                <h3 className="text-2xl font-semibold text-black">
+                <h3 className="text-lg font-semibold text-black">
                   {type.label}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {type.info}
                 </p>
               </div>
-              <ArrowRight className="text-secondary size-7 shrink-0 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-[1.8]" />
+              <ArrowRight className="text-secondary size-6 shrink-0 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-[1.8]" />
             </div>
           </div>
         );

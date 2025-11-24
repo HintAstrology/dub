@@ -178,20 +178,34 @@ export const QrBuilderProvider = ({
   }, []);
 
   const handleChangeStep = useCallback(
-    (newStep: number) => {
+    async (newStep: number) => {
       if (newStep === 2 && !selectedQrType) {
         setTypeSelectionError("Please select a QR code type to continue");
         return;
       }
 
-      // Prevent going to step 3 if step 2 is not completed with valid data
-      if (newStep === 3) {
-        if (!formData) {
-          toast.error("Please complete the required fields in step 2 first");
+      // Validate form before moving forward from step 2
+      if (builderStep === 2 && newStep > 2 && contentStepRef.current) {
+        const isValid = await contentStepRef.current.validateForm();
+        
+        if (!isValid) {
+          // toast.error("Please fill in all required fields correctly");
           return;
         }
-        if (!isFormValid) {
-          toast.error("Please fix the errors in step 2 before continuing");
+
+        // Save form data before moving to next step
+        const formValues = contentStepRef.current.getValues();
+        setFormData(formValues as any);
+      }
+
+      // Prevent going to step 3 if step 2 is not completed with valid data
+      if (newStep === 3) {
+        if (!formData && builderStep !== 2) {
+          // toast.error("Please complete the required fields in step 2 first");
+          return;
+        }
+        if (!isFormValid && builderStep !== 2) {
+          // toast.error("Please fix the errors in step 2 before continuing");
           return;
         }
       }
@@ -240,7 +254,7 @@ export const QrBuilderProvider = ({
         sessionId: sessionId || user?.id,
       });
     },
-    [selectedQrType, formData, isFormValid, homepageDemo, user, sessionId],
+    [selectedQrType, formData, isFormValid, homepageDemo, user, sessionId, builderStep],
   );
 
   const handleSelectQRType = useCallback(
@@ -306,7 +320,7 @@ export const QrBuilderProvider = ({
       const dataToSave = providedFormData || formData;
 
       if (!selectedQrType || !dataToSave) {
-        toast.error("Please complete all required fields");
+        // toast.error("Please complete all required fields");
         return;
       }
 
@@ -347,7 +361,7 @@ export const QrBuilderProvider = ({
   const handleContinue = useCallback(async () => {
     if (isCustomizationStep) {
       if (!selectedQrType || !formData) {
-        toast.error("Please complete all required fields");
+        // toast.error("Please complete all required fields");
         return;
       }
 

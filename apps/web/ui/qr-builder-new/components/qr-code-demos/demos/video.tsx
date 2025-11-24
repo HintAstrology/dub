@@ -48,7 +48,7 @@ export const QRCodeDemoVideo: FC<QRCodeDemoVideoProps> = ({
       width="270"
       height="352"
       viewBox="0 0 270 352"
-      className={cn("shadow-lg", {
+      className={cn("shadow-lg [&_path.primary-fill]:fill-[#66D4A8] md:[&_path.primary-fill]:fill-[#11AB7C]", {
         "h-[180px] w-[138px] lg:h-[209px] lg:w-[158px]": smallPreview,
       })}
       fill="none"
@@ -60,6 +60,7 @@ export const QRCodeDemoVideo: FC<QRCodeDemoVideoProps> = ({
         fill="white"
       />
       <path
+        className="primary-fill"
         d="M0 21.9718C0 9.83713 9.83712 0 21.9718 0H248.028C260.163 0 270 9.83712 270 21.9718V207H0V21.9718Z"
         fill="#11AB7C"
       />

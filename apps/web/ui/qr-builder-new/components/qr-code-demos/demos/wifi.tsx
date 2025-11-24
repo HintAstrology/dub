@@ -24,7 +24,7 @@ export const QRCodeDemoWifi: FC<QRCodeDemoWifiProps> = ({
       width="270"
       height="352"
       viewBox="0 0 270 352"
-      className={cn("shadow-lg", {
+      className={cn("shadow-lg [&_path.primary-fill]:fill-[#66B2B2] md:[&_path.primary-fill]:fill-[#006666] [&_path.primary-stroke]:stroke-[#66B2B2] md:[&_path.primary-stroke]:stroke-[#006666]", {
         "h-[180px] w-[138px] lg:h-[209px] lg:w-[158px]": smallPreview,
       })}
       fill="none"
@@ -35,6 +35,7 @@ export const QRCodeDemoWifi: FC<QRCodeDemoWifiProps> = ({
         fill="white"
       />
       <path
+        className="primary-fill"
         d="M0 21.9718C0 9.83713 9.83712 0 21.9718 0H258C264.627 0 270 5.37258 270 12V207H0V21.9718Z"
         fill="#006666"
       />
@@ -46,6 +47,7 @@ export const QRCodeDemoWifi: FC<QRCodeDemoWifiProps> = ({
         />
         <rect x="29" y="39" width="212" height="148" rx="6" fill="#D3E1E1" />
         <path
+          className="primary-stroke"
           d="M114.061 126.958C125.228 115.791 144.77 115.791 155.936 126.958M171.29 110.208C150.252 91.5988 121.04 91.5988 98.707 110.208"
           stroke="#006666"
           opacity="0.2"
@@ -54,6 +56,7 @@ export const QRCodeDemoWifi: FC<QRCodeDemoWifiProps> = ({
           strokeLinejoin="round"
         />
         <path
+          className="primary-stroke"
           d="M79.166 93.4581C114.43 63.6822 155.568 63.6822 190.833 93.4581"
           stroke="#006666"
           opacity="0.2"
@@ -62,6 +65,7 @@ export const QRCodeDemoWifi: FC<QRCodeDemoWifiProps> = ({
           strokeLinejoin="round"
         />
         <path
+          className="primary-stroke"
           d="M135 154.875C139.625 154.875 143.375 151.125 143.375 146.5C143.375 141.875 139.625 138.125 135 138.125C130.375 138.125 126.625 141.875 126.625 146.5C126.625 151.125 130.375 154.875 135 154.875Z"
           stroke="#006666"
           opacity="0.2"

@@ -22,7 +22,7 @@ export const PricingSection: FC<IPricingSectionProps> = ({
   handleScrollButtonClick,
 }) => {
   return (
-    <section className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 lg:py-14">
+    <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
       <div className="mb-12 flex flex-col items-center justify-center gap-3">
         <SectionTitle
           titleFirstPart={"Start 7-Day Trial Today, Upgrade when You Need"}
@@ -34,13 +34,13 @@ export const PricingSection: FC<IPricingSectionProps> = ({
         </p>
       </div>
 
-      <div className="relative -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-auto lg:grid lg:grid-cols-3 lg:items-end lg:justify-center lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0 lg:max-w-4xl [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:lg:h-0 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-end">
         {PRICING_PLANS.map((plan, index) => (
-          <div key={index} className="h-full min-w-[85vw] flex-shrink-0 snap-center transition-transform duration-300 hover:-translate-y-2 lg:min-w-0 w-full lg:max-w-[320px] lg:mx-auto">
+          <div key={index} className="h-full w-full transition-transform duration-300 hover:-translate-y-2">
             <Card
               className={cn(
                 "relative h-full w-full overflow-hidden pt-3",
-                plan.withButton
+                plan.title === "7-Day Trial"
                   ? "border-primary border-2 shadow"
                   : "border-none"
               )}
@@ -65,7 +65,7 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                   <Badge 
                   className={cn(
                     "pointer-events-none mt-3 inline-block w-fit rounded-full border px-3 py-1 text-xs font-semibold",
-                    plan.withButton 
+                    plan.title === "7-Day Trial"
                       ? "bg-primary hover:bg-primary/20" 
                       : "bg-white text-primary border-primary hover:bg-white"
                   )}>
@@ -78,9 +78,9 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                     What's included:
                   </h4>
                   {plan.planFeatures.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center gap-3">
-                      <CheckIcon className="text-muted-foreground h-5 w-5 flex-shrink-0" />
-                      <span className="text-card-foreground font-medium">
+                    <div key={featureIndex} className="flex items-center gap-2">
+                      <CheckIcon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                      <span className="text-muted-foreground pb-1 text-lg">
                         {feature}
                       </span>
                     </div>
@@ -94,7 +94,7 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                       size="lg"
                       onClick={() => handleScrollButtonClick("3")}
                     >
-                      Start Trial
+                      {plan.title === "7-Day Trial" ? "Start Trial" : "Get Started"}
                     </Button>
                   ) : (
                     <div className="h-10" />

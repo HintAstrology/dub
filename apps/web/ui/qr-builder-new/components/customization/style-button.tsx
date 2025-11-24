@@ -25,9 +25,9 @@ export const StyleButton: FC<StyleButtonProps> = ({
   return (
     <button
       className={cn(
-        "rounded-md border p-3 transition",
+        "rounded-md border transition",
         selected
-          ? "border-secondary"
+          ? "border-secondary bg-secondary/5"
           : "border-border-300 hover:border-secondary",
         {
           "cursor-not-allowed opacity-50": disabled,
@@ -40,7 +40,10 @@ export const StyleButton: FC<StyleButtonProps> = ({
       <StyleIcon
         src={icon}
         size={iconSize}
-        className={cn({ "brightness-0": applyBlackFilter && !disabled })}
+        className={cn(
+          { "brightness-0": applyBlackFilter && !disabled },
+          selected && "drop-shadow-sm scale-110"
+        )}
       />
     </button>
   );
