@@ -1,7 +1,15 @@
 "use client";
 
 import { useGetUserProfileQuery } from "core/api/user/user.hook.tsx";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { usePathname } from "next/navigation";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { checkFeaturesAccess } from "../actions/check-features-access";
+import { useSession } from "next-auth/react";
+import { TrialExpiredModal } from "@/ui/modals/trial-expired-modal";
+import { 
+  getTrialExpiredModalShown, 
+  setTrialExpiredModalShown 
+} from "../../core/services/cookie/user-session.service.ts";
 
 interface TrialStatusContextType {
   isTrialOver: boolean;
@@ -13,40 +21,67 @@ const TrialStatusContext = createContext<TrialStatusContextType | undefined>(
 );
 
 export function TrialStatusProvider({ children }: { children: ReactNode }) {
-  // const { data: session, status } = useSession() as
-  //   | {
-  //       data: { user: { id: string } };
-  //       status: "authenticated";
-  //     }
-  //   | { data: null; status: "loading" };
+  const { data: session, status } = useSession() as
+    | {
+        data: { user: { id: string } };
+        status: "authenticated";
+      }
+    | { data: null; status: "loading" };
 
   const [isTrialOver, setIsTrialOver] = useState<boolean>(false);
-  // const pathname = usePathname();
+  const [showTrialExpiredModal, setShowTrialExpiredModal] = useState<boolean>(false);
+  const [trialModalShown, setTrialModalShown] = useState<boolean>(false);
+  const previousStatusRef = useRef<string>(status);
+  const pathname = usePathname();
 
   useGetUserProfileQuery();
 
-  // const checkTrialStatus = useCallback(async () => {
-  //   if (!session?.user?.id) return;
+  useEffect(() => {
+    const checkModalShown = async () => {
+      const hasBeenShown = await getTrialExpiredModalShown();
+      setTrialModalShown(hasBeenShown);
+    };
+    checkModalShown();
+  }, []);
 
-  //   try {
-  //     const res = await checkFeaturesAccess();
+  const checkTrialStatus = useCallback(async () => {
+    if (!session?.user?.id) return;
 
-  //     if (!res?.data?.featuresAccess) {
-  //       setIsTrialOver(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking trial status:", error);
-  //   }
-  // }, [session?.user?.id]);
+    try {
+      const res = await checkFeaturesAccess();
 
-  // useEffect(() => {
-  //   if (status === "loading") return;
+      if (!res?.data?.featuresAccess) {
+        setIsTrialOver(true);
+      }
+    } catch (error) {
+      console.error("Error checking trial status:", error);
+    }
+  }, [session?.user?.id]);
 
-  //   checkTrialStatus();
-  // }, [status, checkTrialStatus, pathname]);
+  useEffect(() => {
+    if (status === "loading") return;
+
+    checkTrialStatus();
+  }, [status, checkTrialStatus, pathname]);
+
+  useEffect(() => {
+    const isAuthenticated = 
+      status === "authenticated";
+    if (isAuthenticated && isTrialOver && !trialModalShown) {
+      setShowTrialExpiredModal(true);
+      setTrialModalShown(true);
+      setTrialExpiredModalShown();
+    }
+
+    previousStatusRef.current = status;
+  }, [status, isTrialOver, trialModalShown]);
 
   return (
     <TrialStatusContext.Provider value={{ isTrialOver, setIsTrialOver }}>
+      <TrialExpiredModal
+        showModal={showTrialExpiredModal}
+        setShowModal={setShowTrialExpiredModal}
+      />
       {children}
     </TrialStatusContext.Provider>
   );

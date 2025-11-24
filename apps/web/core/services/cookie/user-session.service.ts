@@ -101,3 +101,21 @@ export const resetUserSessionId = async () => {
 
   cookieStore.delete(ECookieArg.SESSION_ID);
 };
+
+// reset trial expired modal shown status
+export const resetTrialExpiredModalShown = async () => {
+  const cookieStore = cookies();
+  cookieStore.delete(ECookieArg.EXPIRED_MODAL_SHOWN);
+};
+
+// get trial expired modal shown status
+export const getTrialExpiredModalShown = async () => {
+  const cookieStore = cookies();
+  return cookieStore.get(ECookieArg.EXPIRED_MODAL_SHOWN)?.value === "true";
+};
+
+// set trial expired modal shown status
+export const setTrialExpiredModalShown = async () => {
+  const cookieStore = cookies();
+  cookieStore.set(ECookieArg.EXPIRED_MODAL_SHOWN, "true", getCookieSettings);
+};
