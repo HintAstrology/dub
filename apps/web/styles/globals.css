@@ -192,6 +192,11 @@ select:-webkit-autofill:focus {
     @apply bg-background text-foreground;
     overflow-x: hidden;
   }
+  input,
+  textarea,
+  select {
+    @apply bg-white;
+  }
 }
 
 /* Sonner error toast styling */
@@ -225,11 +230,11 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
   box-shadow: 0 0 0 1000px transparent inset !important;
   -webkit-text-fill-color: #000000 !important;
   color: #000000 !important;
-  background-color: transparent !important;
+  background-color: white !important;
   background-clip: content-box !important;
   font-size: inherit !important;
   font-family: inherit !important;

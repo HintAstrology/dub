@@ -187,11 +187,11 @@ export const QrBuilderProvider = ({
       // Prevent going to step 3 if step 2 is not completed with valid data
       if (newStep === 3) {
         if (!formData) {
-          toast.error("Please complete the required fields in step 2 first");
+          // toast.error("Please complete the required fields in step 2 first");
           return;
         }
         if (!isFormValid) {
-          toast.error("Please fix the errors in step 2 before continuing");
+          // toast.error("Please fix the errors in step 2 before continuing");
           return;
         }
       }
@@ -306,7 +306,7 @@ export const QrBuilderProvider = ({
       const dataToSave = providedFormData || formData;
 
       if (!selectedQrType || !dataToSave) {
-        toast.error("Please complete all required fields");
+        // toast.error("Please complete all required fields");
         return;
       }
 
@@ -347,7 +347,7 @@ export const QrBuilderProvider = ({
   const handleContinue = useCallback(async () => {
     if (isCustomizationStep) {
       if (!selectedQrType || !formData) {
-        toast.error("Please complete all required fields");
+        // toast.error("Please complete all required fields");
         return;
       }
 
