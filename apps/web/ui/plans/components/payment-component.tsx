@@ -54,6 +54,8 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
     currentSubscriptionPlan as TPaymentPlan,
   );
 
+  const isCurrentPlan = currentSubscriptionPlan === selectedPlan.paymentPlan;
+
   return (
     <Flex
       direction="column"
@@ -90,7 +92,8 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
         </RadioGroup.Root>
 
         <Text as="p" size="1" className="text-neutral-800 text-center">
-          You'll be charged {totalChargePrice} {renewalAction === "upgrade" ? "today" : "at the start of the new billing period"}.{renewalAction === "upgrade" ? " " : <br />}Renews every{" "}
+          {!isCurrentPlan && `You'll be charged ${totalChargePrice} ${renewalAction === "upgrade" ? "today" : "at the start of the new billing period"}.`}
+          {renewalAction === "upgrade" ? " " : <br />}Renews every{" "}
           {selectedPlan.name.toLowerCase()}. Cancel anytime.
         </Text>
 
