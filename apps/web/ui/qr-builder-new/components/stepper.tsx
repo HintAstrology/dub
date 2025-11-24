@@ -14,7 +14,7 @@ type TStep = {
 interface IStepperProps {
   steps: TStep[];
   currentStep: number;
-  onStepClick?: (step: number) => void;
+  onStepClick?: (step: number) => void | Promise<void>;
   disabled?: boolean;
 }
 
@@ -48,9 +48,9 @@ export default function Stepper({
                     isActive && "cursor-pointer hover:scale-105",
                     !isClickable && "cursor-default",
                   )}
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     if (isClickable) {
-                      onStepClick(step.number);
+                      await onStepClick(step.number);
                     }
                   }}
                   disabled={!isClickable}
@@ -58,8 +58,10 @@ export default function Stepper({
                   <Avatar className="size-10">
                     <AvatarFallback
                       className={cn("transition-colors", {
+                        "!bg-primary !text-white shadow-sm":
+                          isActive && step.number === 3,
                         "bg-white border border-primary/10 text-primary":
-                          (isActive && step.number === 3) || (!isActive && step.number === 3 && isClickable),
+                          !isActive && step.number === 3 && isClickable,
                         "!bg-primary !text-primary-foreground shadow-sm":
                           isActive && step.number !== 3,
                         "bg-muted text-muted-foreground opacity-50":

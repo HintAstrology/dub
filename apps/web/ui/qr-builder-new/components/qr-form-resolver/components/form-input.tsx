@@ -52,7 +52,7 @@ export const FormInput = ({
     return (
       <textarea
         className={cn(
-          "border-border-500 focus:border-secondary h-36 w-full rounded-md border p-3 text-base",
+          "border-border-500 focus:border-secondary h-36 w-full rounded-md border p-3 text-base sm:text-base text-[16px]",
           {
             "border-red-500": error,
           },
@@ -96,7 +96,7 @@ export const FormInput = ({
             {...field}
             type={type}
             className={cn(
-              "border-border-500 focus:border-secondary h-11 w-full max-w-full rounded-md border p-3 text-base",
+              "border-border-500 focus:border-secondary h-12 sm:h-11 w-full max-w-full rounded-md border p-3 text-[16px] sm:text-base",
               {
                 "border-red-500": error,
               },
@@ -120,7 +120,7 @@ export const FormInput = ({
     <Input
       type={type}
       className={cn(
-        "border-border-500 focus:border-secondary h-11 w-full max-w-full rounded-md border p-3 text-base",
+        "border-border-500 focus:border-secondary h-12 sm:h-11 w-full max-w-full rounded-md border p-3 text-[16px] sm:text-base",
         {
           "border-red-500": error,
         },

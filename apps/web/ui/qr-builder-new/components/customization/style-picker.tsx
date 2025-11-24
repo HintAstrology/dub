@@ -15,6 +15,7 @@ interface StylePickerProps {
   styleButtonClassName?: string;
   disabled?: boolean;
   applyBlackFilter?: boolean;
+  gridMinWidth?: number; // Minimum width for grid items in px
 }
 
 export const StylePicker: FC<StylePickerProps> = ({
@@ -28,13 +29,17 @@ export const StylePicker: FC<StylePickerProps> = ({
   styleButtonClassName,
   disabled = false,
   applyBlackFilter = false,
+  gridMinWidth = 78,
 }) => {
   return (
     <div className={cn("flex flex-col gap-2", stylePickerWrapperClassName)}>
       <label className="text-sm font-medium">{label}</label>
-      <div className="dub-scrollbar overflow-x-auto overflow-y-hidden md:max-h-[170px] md:overflow-x-visible md:overflow-y-auto">
+      <div className="dub-scrollbar md:max-h-[170px] md:overflow-y-auto">
         <div
-          className={cn("flex flex-nowrap gap-3 md:flex-wrap", optionsWrapperClassName)}
+          className={cn("grid place-items-center gap-3", optionsWrapperClassName)}
+          style={{
+            gridTemplateColumns: `repeat(auto-fill, minmax(${gridMinWidth}px, 1fr))`,
+          }}
         >
           {styleOptions.map((styleOption) => (
             <StyleButton
