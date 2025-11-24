@@ -2,7 +2,7 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { PanelLeft } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -261,7 +261,7 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-[20px] group-data-[variant=floating]:border group-data-[variant=floating]:shadow"
+            className="bg-sidebar group-data-[variant=floating]:shadow flex h-full w-full flex-col group-data-[variant=floating]:rounded-[20px] border-none"
           >
             {children}
           </div>
@@ -274,8 +274,11 @@ Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
+  React.ComponentProps<typeof Button> & {
+    icon?: LucideIcon;
+    asPageIcon?: boolean;
+  }
+>(({ className, onClick, icon: Icon, asPageIcon = false, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -284,14 +287,18 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("h-7 w-7", asPageIcon && "cursor-default hover:bg-transparent", className)}
       onClick={(event) => {
+        if (asPageIcon) {
+          event.preventDefault();
+          return;
+        }
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <PanelLeft />
+      {Icon && <Icon />}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

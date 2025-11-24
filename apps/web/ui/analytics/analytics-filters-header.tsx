@@ -516,7 +516,7 @@ export function AnalyticsFiltersHeader() {
           }
         />
 
-        <div className="flex items-center gap-2 md:ml-auto">
+        {/* <div className="flex items-center gap-2 md:ml-auto">
           <Switch
             id="unique"
             size="1"
@@ -541,7 +541,7 @@ export function AnalyticsFiltersHeader() {
           >
             Unique Scans
           </label>
-        </div>
+        </div> */}
 
       </div>
       <div className="w-max flex justify-end">

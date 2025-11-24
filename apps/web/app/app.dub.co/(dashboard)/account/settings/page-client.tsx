@@ -115,7 +115,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
   const imageChanged = image !== session?.user?.image;
 
   return (
-    <div className="bg-card border-border mx-auto w-full rounded-lg border shadow-sm">
+    <div className="bg-card mx-auto w-full rounded-[20px]  shadow">
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-1">Profile Settings</h2>
         <p className="text-muted-foreground text-sm mb-6">
@@ -190,7 +190,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
         {/* User ID Section */}
         <div>
           <Label className="mb-2 block">User ID</Label>
-          <div className="bg-muted flex items-center justify-between rounded-md border p-3">
+          <div className="bg-muted flex items-center justify-between rounded-md shadow p-3">
             <code className="text-foreground text-sm font-mono">
               {session?.user?.id || "Loading..."}
             </code>

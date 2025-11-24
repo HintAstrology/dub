@@ -16,6 +16,7 @@ import { useTrialStatus } from "@/lib/contexts/trial-status-context";
 import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal";
 import { useUser } from "@/ui/contexts/user";
 import { QRBuilderNewModal } from "@/ui/modals/qr-builder-new/qr-builder-modal";
+import { Logo } from "@/ui/shared/logo";
 import { cn } from "@dub/utils";
 import { QrCode, Plus, BarChart3, CirclePlus } from "lucide-react";
 import Link from "next/link";
@@ -97,19 +98,18 @@ export function AppSidebar() {
       <Sidebar
         variant="floating"
         collapsible="icon"
-        className="bg-card [&>[data-slot=sidebar-inner]]:bg-card [&>[data-slot=sidebar-inner]]:border-border border-r-0 p-4 pr-0 [&>[data-slot=sidebar-inner]]:border [&>[data-slot=sidebar-inner]]:shadow-sm [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-[20px]"
+        className="bg-card [&>[data-slot=sidebar-inner]]:bg-card [&>[data-slot=sidebar-inner]]:shadow border-r-0 p-4 pr-0 [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-[20px]"
       >
         <SidebarHeader className="bg-white lg:rounded-[20px]">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
-                className="gap-2.5 !bg-transparent hover:bg-transparent [&>svg]:size-8"
+                className="!bg-transparent hover:bg-transparent"
                 asChild
               >
                 <Link href={workspaceSlug ? `/${workspaceSlug}` : '#'}>
-                  <QrCode className="text-primary size-8" />
-                  <span className="text-xl font-semibold">GetQR</span>
+                  <Logo />
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

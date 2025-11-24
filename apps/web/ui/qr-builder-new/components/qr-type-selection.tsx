@@ -93,3 +93,4 @@ export const QrTypeSelection: FC<QrTypeSelectionProps> = ({
     </div>
   );
 };
+

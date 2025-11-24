@@ -431,8 +431,8 @@ export default function Locations({
         )}
       </Modal>
 
-      <Card className="gap-4 overflow-hidden pt-6">
-        <CardContent className="relative overflow-hidden px-6 min-h-[392px]">
+      <Card className="gap-4 overflow-hidden pt-6 h-[450px]">
+        <CardContent className="relative overflow-hidden px-6 h-full">
           {data ? (
             data.length > 0 ? (
               <>
@@ -464,14 +464,7 @@ export default function Locations({
                           <ChartBar className="h-4 w-4" />
                         </button>
                       </div>
-                      {data && data.length > EXPAND_LIMIT && (
-                        <button
-                          onClick={() => setShowModal(true)}
-                          className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
-                        >
-                          View All
-                        </button>
-                      )}
+                    
                     </div>
                     <LocationsBarChart
                       data={getBarListData(tab)}
@@ -492,6 +485,7 @@ export default function Locations({
                     )}
                     limit={EXPAND_LIMIT}
                     showName={false}
+                    onViewAll={() => setShowModal(true)}
                     controls={
                       <div className="flex gap-3">
                         <div className="flex gap-1 rounded-lg border p-1">
@@ -518,14 +512,6 @@ export default function Locations({
                             <ChartBar className="h-4 w-4" />
                           </button>
                         </div>
-                        {data && data.length > EXPAND_LIMIT && (
-                          <button
-                            onClick={() => setShowModal(true)}
-                            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
-                          >
-                            View All
-                          </button>
-                        )}
                       </div>
                     }
                   />

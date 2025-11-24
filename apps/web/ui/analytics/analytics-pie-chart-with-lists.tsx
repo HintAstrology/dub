@@ -48,6 +48,7 @@ export default function AnalyticsPieChartWithLists({
 }: AnalyticsPieChartWithListsProps) {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isContainerHovered, setIsContainerHovered] = useState(false);
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
@@ -120,7 +121,11 @@ export default function AnalyticsPieChartWithLists({
   }, [displayData]);
 
   return (
-    <div className="relative flex flex-col overflow-hidden">
+    <div 
+      className="relative flex flex-col overflow-hidden"
+      onMouseEnter={() => setIsContainerHovered(true)}
+      onMouseLeave={() => setIsContainerHovered(false)}
+    >
       {/* Pie Chart and Controls */}
       <div className="flex items-start justify-between gap-8">
         {/* Pie Chart */}
@@ -197,7 +202,7 @@ export default function AnalyticsPieChartWithLists({
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-1">
           {list1Data.map((item, index) => {
             const formattedValue = formatValue(item.value);
             // Calculate max length based on available space (approximately 20-25 chars)
@@ -209,7 +214,7 @@ export default function AnalyticsPieChartWithLists({
             return (
               <div
                 key={index}
-                className="flex min-w-0 items-center gap-3 group"
+                className="flex hover:bg-neutral-100 p-1 min-w-0 items-center gap-3 group"
                 onMouseEnter={() => showCopy && setHoveredIndex(index)}
                 onMouseLeave={() => showCopy && setHoveredIndex(null)}
               >
@@ -244,6 +249,18 @@ export default function AnalyticsPieChartWithLists({
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-20 bg-gradient-to-t from-white via-white/80 to-transparent" />
         )} */}
       </div>
+
+      {/* View All Button */}
+      {hasMore && isContainerHovered && (
+        <div className="mt-4 flex justify-center transition-opacity duration-200">
+          <button
+            onClick={onViewAll}
+            className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+          >
+            View All
+          </button>
+        </div>
+      )}
     </div>
   );
 }

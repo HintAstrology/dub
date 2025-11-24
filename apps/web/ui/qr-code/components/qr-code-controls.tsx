@@ -227,7 +227,6 @@ export function QrCodeControls({
                     <CirclePause className="size-4" />
                   )
                 }
-                shortcut="A"
                 className="h-9 w-full justify-start px-2 font-medium"
               />
             </div>

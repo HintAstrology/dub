@@ -409,7 +409,7 @@ export default function TopLinks({
         )}
       </Modal>
 
-      <Card className="gap-4 pt-6 overflow-hidden min-h-[392px]">
+      <Card className="gap-4 pt-6 overflow-hidden h-[450px]">
         <CardContent className="relative px-6 overflow-hidden">
           {data ? (
             data.length > 0 ? (
@@ -442,14 +442,7 @@ export default function TopLinks({
                           <ChartBar className="h-4 w-4" />
                         </button>
                       </div>
-                      {data && data.length > EXPAND_LIMIT && (
-                        <button
-                          onClick={() => setShowModal(true)}
-                          className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
-                        >
-                          View All
-                        </button>
-                      )}
+                     
                     </div>
                     <TopLinksBarChart
                       data={getBarListData(tab)}
@@ -466,6 +459,7 @@ export default function TopLinks({
                     limit={EXPAND_LIMIT}
                     showName={false}
                     showCopy={true}
+                    onViewAll={() => setShowModal(true)}
                     controls={
                       <div className="flex gap-3">
                         <div className="flex gap-1 border rounded-lg p-1">
@@ -492,14 +486,6 @@ export default function TopLinks({
                             <ChartBar className="h-4 w-4" />
                           </button>
                         </div>
-                        {data && data.length > EXPAND_LIMIT && (
-                          <button
-                            onClick={() => setShowModal(true)}
-                            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
-                          >
-                            View All
-                          </button>
-                        )}
                       </div>
                     }
                   />

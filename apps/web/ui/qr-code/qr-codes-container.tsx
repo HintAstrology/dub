@@ -93,7 +93,7 @@ export default function QrCodesContainer({
   }, [allQrs, sortBy]);
 
   return (
-    <MaxWidthWrapper className="grid gap-y-2">
+    <div className="grid w-full gap-y-2">
       <QrCodesList
         CreateQrCodeButton={CreateQrCodeButton}
         qrCodes={qrs}
@@ -102,7 +102,7 @@ export default function QrCodesContainer({
         featuresAccess={featuresAccess}
         user={user}
       />
-    </MaxWidthWrapper>
+    </div>
   );
 }
 

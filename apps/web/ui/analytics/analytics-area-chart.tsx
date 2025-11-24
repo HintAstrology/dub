@@ -4,6 +4,7 @@ import { formatDateTooltip } from "@/lib/analytics/format-date-tooltip";
 import { EventType } from "@/lib/analytics/types";
 import { editQueryString } from "@/lib/analytics/utils";
 import useWorkspace from "@/lib/swr/use-workspace";
+import { Tooltip } from "@dub/ui";
 import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
 import {
@@ -24,7 +25,6 @@ import useSWR from "swr";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
 import {
-  getChartColor,
   getDataKey,
   getYAxisConfig,
   transformToRechartsData,
@@ -141,7 +141,6 @@ export default function AnalyticsAreaChart({
   );
 
   const dataKey = getDataKey(resource);
-  const chartColor = getChartColor(resource);
   const yAxisConfig = getYAxisConfig(rechartsData, dataKey);
 
   const statsData = useMemo(() => {
@@ -221,7 +220,7 @@ export default function AnalyticsAreaChart({
     <Card className={cn("flex flex-col gap-4 border-none p-3 sm:p-4 md:p-4")}>
       <div className="flex flex-col gap-4">
         <CardContent className="grow p-0">
-          <div className="flex gap-4 pb-2 overflow-x-auto">
+          <div className="grid lg:grid-cols-8 grid-cols-4 md:grid-cols-2 gap-4 overflow-x-auto px-1 pb-2">
             {statsData.map((stat, index) => {
               const isNumeric =
                 stat.isNumeric &&
@@ -237,7 +236,7 @@ export default function AnalyticsAreaChart({
               return (
                 <div
                   key={index}
-                  className="bg-muted min-w-[180px] flex flex-col gap-2 rounded-lg p-2"
+                  className="flex min-w-[160px]  flex-col gap-2 rounded-lg bg-white p-2 shadow"
                 >
                   <span className="text-muted-foreground text-xs font-medium">
                     {stat.title}
@@ -249,9 +248,11 @@ export default function AnalyticsAreaChart({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold">
-                        {stat.value}
-                      </span>
+                      <Tooltip content={stat.value}>
+                        <span className="w-full max-w-[100px] truncate text-sm font-semibold">
+                          {stat.value}
+                        </span>
+                      </Tooltip>
                       {!isNumeric && (
                         <span className="text-muted-foreground text-xs">
                           {changeValue}

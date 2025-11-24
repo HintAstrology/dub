@@ -38,8 +38,8 @@ export default async function Layout({ children }: { children: ReactNode }) {
               <AppSidebar />
               <div className="z-1 mx-auto flex size-full flex-1 flex-col px-4 py-6 sm:px-4">
                 <ConditionalDashboardHeader user={user} />
-                <main className="mb-6 size-full flex-1">{children}</main>
-              <footer className="bg-card border-border rounded-[20px] border p-3 shadow-sm">
+                <main className="size-full">{children}</main>
+              <footer className="bg-card shadow rounded-[20px]  p-3 ">
                 <div className="text-muted-foreground flex items-center justify-center text-sm">
                   © 2024 GetQR. All rights reserved.
                 </div>

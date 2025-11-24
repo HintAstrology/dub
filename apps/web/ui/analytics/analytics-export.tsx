@@ -52,7 +52,7 @@ export default function AnalyticsExport() {
         <Button
           variant="default"
           size="default"
-          className="bg-secondary hover:bg-secondary/90"
+          className="bg-chart-1 hover:bg-chart-1/90 text-white"
           onClick={() => setOpenPopover(!openPopover)}
         >
           Export data
