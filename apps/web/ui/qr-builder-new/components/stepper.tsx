@@ -14,7 +14,7 @@ type TStep = {
 interface IStepperProps {
   steps: TStep[];
   currentStep: number;
-  onStepClick?: (step: number) => void;
+  onStepClick?: (step: number) => void | Promise<void>;
   disabled?: boolean;
 }
 
@@ -48,9 +48,9 @@ export default function Stepper({
                     isActive && "cursor-pointer hover:scale-105",
                     !isClickable && "cursor-default",
                   )}
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     if (isClickable) {
-                      onStepClick(step.number);
+                      await onStepClick(step.number);
                     }
                   }}
                   disabled={!isClickable}

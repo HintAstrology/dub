@@ -178,19 +178,33 @@ export const QrBuilderProvider = ({
   }, []);
 
   const handleChangeStep = useCallback(
-    (newStep: number) => {
+    async (newStep: number) => {
       if (newStep === 2 && !selectedQrType) {
         setTypeSelectionError("Please select a QR code type to continue");
         return;
       }
 
+      // Validate form before moving forward from step 2
+      if (builderStep === 2 && newStep > 2 && contentStepRef.current) {
+        const isValid = await contentStepRef.current.validateForm();
+        
+        if (!isValid) {
+          // toast.error("Please fill in all required fields correctly");
+          return;
+        }
+
+        // Save form data before moving to next step
+        const formValues = contentStepRef.current.getValues();
+        setFormData(formValues as any);
+      }
+
       // Prevent going to step 3 if step 2 is not completed with valid data
       if (newStep === 3) {
-        if (!formData) {
+        if (!formData && builderStep !== 2) {
           // toast.error("Please complete the required fields in step 2 first");
           return;
         }
-        if (!isFormValid) {
+        if (!isFormValid && builderStep !== 2) {
           // toast.error("Please fix the errors in step 2 before continuing");
           return;
         }
@@ -240,7 +254,7 @@ export const QrBuilderProvider = ({
         sessionId: sessionId || user?.id,
       });
     },
-    [selectedQrType, formData, isFormValid, homepageDemo, user, sessionId],
+    [selectedQrType, formData, isFormValid, homepageDemo, user, sessionId, builderStep],
   );
 
   const handleSelectQRType = useCallback(
