@@ -1,5 +1,5 @@
 import { QrCodesDisplayContext } from "@/ui/qr-code/qr-codes-display-provider.tsx";
-import { IconMenu, Popover, Tick, useRouterStuff } from "@dub/ui";
+import { Popover, Tick, useRouterStuff } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { ChevronDown, SortDesc } from "lucide-react";
 import { useContext, useState } from "react";
@@ -31,12 +31,9 @@ export default function QrCodeSort() {
                 });
                 setOpenPopover(false);
               }}
-              className="hover:bg-border-100 active:bg-secondary-100 flex w-full items-center justify-between space-x-2 rounded-md px-1 py-2"
+              className="hover:bg-border-100 active:bg-secondary-100 flex w-full items-center justify-between rounded-md px-3 py-2"
             >
-              <IconMenu
-                text={display}
-                icon={<SortDesc className="h-4 w-4" />}
-              />
+              <span className="text-sm text-neutral-700">{display}</span>
               {sortBy === slug && (
                 <Tick className="text-secondary h-4 w-4" aria-hidden="true" />
               )}

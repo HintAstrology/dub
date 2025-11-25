@@ -34,7 +34,7 @@ export const StylePicker: FC<StylePickerProps> = ({
   return (
     <div className={cn("flex flex-col gap-2", stylePickerWrapperClassName)}>
       <label className="text-sm font-medium">{label}</label>
-      <div className="dub-scrollbar md:max-h-[170px] md:overflow-y-auto">
+      <div className="dub-scrollbar md:max-h-[180px] md:overflow-y-auto">
         <div
           className={cn("grid place-items-center gap-3", optionsWrapperClassName)}
           style={{

@@ -33,10 +33,10 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
   if (isAccountSettings || isAccountPlans || isAccountBilling) {
     return (
       <header className={cn(
-        "bg-card rounded-[20px] px-4 shadow sm:px-6 mb-4",
+        "bg-card rounded-[20px",
         "[&_*]:no-underline"
       )}>
-        <div className="flex w-full min-h-16 items-center gap-3 md:h-16">
+        <div className="flex w-full items-center gap-3 pb-4">
           <SidebarTrigger 
             icon={getAccountIcon()}
             asPageIcon={true}

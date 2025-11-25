@@ -17,7 +17,7 @@ import {
 import { useContext } from "react";
 import { AnalyticsContext } from "./analytics-provider";
 
-export default function Toggle({
+export default function   Toggle({
   page = "analytics",
 }: {
   page?: "analytics" | "events";
@@ -36,20 +36,13 @@ export default function Toggle({
   return (
     <>
       <div
-        className={cn("py-2", {
+        className={cn({
           "sticky top-14 z-10 bg-neutral-50": dashboardProps,
           "sticky top-16 z-10 bg-neutral-50": adminPage || demoPage,
           "shadow-md": scrolled && dashboardProps,
         })}
       >
-        <div
-          className={cn(
-            "mx-auto flex w-full max-w-screen-xl flex-col gap-2 px-3 lg:px-10",
-            {
-              "md:h-10": key,
-            },
-          )}
-        >
+        <div>
           <div
             className={cn(
               "flex w-full flex-col items-center justify-between gap-2 flex-nowrap md:flex-row",

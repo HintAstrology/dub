@@ -135,7 +135,6 @@ export default function UserDropdown() {
               />
             )}
             href="/help"
-            target="_blank"
             onClick={() => {
               handleUserOptionClick("help_center");
               setOpenPopover(false);

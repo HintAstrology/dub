@@ -57,10 +57,12 @@ interface TopLinksBarChartProps {
   maxValue: number;
   unit: string;
   limit?: number;
+  onViewAll?: () => void;
 }
 
-function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartProps) {
+function TopLinksBarChart({ data, maxValue, unit, limit = 6, onViewAll }: TopLinksBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
+  const [isContainerHovered, setIsContainerHovered] = useState(false);
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
@@ -99,6 +101,7 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartP
           icon: item.icon,
           title: item.title,
           value: item.value,
+          copyValue: item.copyValue,
         };
       });
   }, [visibleBarsData, displayTotalValue]);
@@ -109,10 +112,17 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartP
     },
   } satisfies ChartConfig;
 
+  const hasMore = data.length > MAX_VISIBLE_BARS;
+
   return (
+    <div
+      className="relative"
+      onMouseEnter={() => setIsContainerHovered(true)}
+      onMouseLeave={() => setIsContainerHovered(false)}
+    >
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr] -mt-2 overflow-hidden items-start">
       <div className="pl-2 pr-6 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
-        <ChartContainer config={chartConfig} className="h-[240px] w-[320px]">
+        <ChartContainer config={chartConfig} className="h-[300px] w-[320px]">
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -155,7 +165,7 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartP
                       name={data.title}
                       value={formatValue(data.value)}
                       percentage={data.sales}
-                      copyValue={data.title}
+                      copyValue={data.copyValue || data.title}
                       showCopy={true}
                       active={active}
                     />
@@ -173,20 +183,17 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartP
               ))}
               <LabelList
                 dataKey="title"
-                position="bottom"
+                position="top"
                 fill="hsl(var(--muted-foreground))"
                 className="text-xs"
                 offset={5}
                 content={(props: any) => {
                   if (!props) return null;
-                  const { x, y, width, height, value, payload } = props;
-                  
-                  // For vertical bar chart, position="bottom" means below the bar
-                  // y is the top of the bar, so we add bar height + offset to place text below
-                  // x is the left edge of the bar, so we use it for left alignment
-                  const barHeight = height || 24;
-                  const labelY = y + barHeight + 15; // 15px offset below the bar
-                  
+                  const { x, y, value } = props;
+
+                  // Position label above the bar
+                  const labelY = y - 8; // 8px offset above the bar
+
                   return (
                     <text
                       x={x}
@@ -230,6 +237,18 @@ function TopLinksBarChart({ data, maxValue, unit, limit = 6 }: TopLinksBarChartP
           })}
         </div>
       </div>
+    </div>
+      {/* View All Button */}
+      {hasMore && isContainerHovered && (
+        <div className="mt-4 flex justify-center transition-opacity duration-200">
+          <button
+            onClick={onViewAll}
+            className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+          >
+            View All
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -277,7 +296,6 @@ export default function TopLinks({
   const data = tab === "links" ? linksData : tab === "urls" ? urlsData : qrTypeData;
   
   const selectedTabData = tabs.find(t => t.value === tab) || tabs[0];
-  const hasMore = (data?.length ?? 0) > EXPAND_LIMIT;
 
   const getBarListData = (tabValue: string) => {
     // Use the correct data source based on tabValue
@@ -318,6 +336,7 @@ export default function TopLinks({
           tabValue === "links"
             ? (d["qr"]?.title || d["shortLink"] || "Unknown")
             : d.url ?? "Unknown",
+        copyValue: tabValue === "links" ? d["shortLink"] : d.url,
         href: queryParams({
           ...((tabValue === "links" &&
             searchParams.has("domain") &&
@@ -409,7 +428,7 @@ export default function TopLinks({
         )}
       </Modal>
 
-      <Card className="gap-4 pt-6 overflow-hidden h-[450px]">
+      <Card className="h-[442px] gap-4 overflow-hidden pt-6">
         <CardContent className="relative px-6 overflow-hidden">
           {data ? (
             data.length > 0 ? (
@@ -423,6 +442,7 @@ export default function TopLinks({
                           onClick={() => onViewChange("pie")}
                           className={cn(
                             "p-2 rounded transition-colors",
+                            // @ts-ignore
                             view === "pie" 
                               ? "bg-secondary text-white" 
                               : "hover:bg-gray-100"
@@ -449,6 +469,7 @@ export default function TopLinks({
                       unit={selectedTab}
                       maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
                       limit={EXPAND_LIMIT}
+                      onViewAll={() => setShowModal(true)}
                     />
                   </>
                 ) : (
@@ -478,6 +499,7 @@ export default function TopLinks({
                             onClick={() => onViewChange("list")}
                             className={cn(
                               "p-2 rounded transition-colors",
+                              // @ts-ignore
                               view === "list" 
                                 ? "bg-secondary text-white" 
                                 : "hover:bg-gray-100"

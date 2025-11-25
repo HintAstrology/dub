@@ -311,7 +311,7 @@ export function FilterSelect({
           {children ?? "Filter"}
         </span>
         {activeFilters?.length && !hideIcons ? (
-          <div className="bg-neutral flex size-4 shrink-0 items-center justify-center rounded-full text-[0.625rem] text-white">
+          <div className="bg-secondary flex size-4 shrink-0 items-center justify-center rounded-full text-[0.625rem] text-white">
             {activeFilters.length}
           </div>
         ) : !hideIcons ? (

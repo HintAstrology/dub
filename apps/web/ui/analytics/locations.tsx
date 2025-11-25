@@ -7,13 +7,8 @@ import {
 import { SINGULAR_ANALYTICS_ENDPOINTS } from "@/lib/analytics/constants";
 import { X } from "@/ui/shared/icons";
 import { Modal, useRouterStuff } from "@dub/ui";
-import {
-  FlagWavy,
-  LocationPin,
-  MapPosition,
-  OfficeBuilding,
-} from "@dub/ui/icons";
-import { CONTINENTS, COUNTRIES, REGIONS, cn, nFormatter } from "@dub/utils";
+import { FlagWavy, MapPosition, OfficeBuilding } from "@dub/ui/icons";
+import { CONTINENTS, COUNTRIES, cn, nFormatter } from "@dub/utils";
 import { ChartBar, PieChartIcon, Search } from "lucide-react";
 import React, { useContext, useMemo, useState } from "react";
 import {
@@ -35,7 +30,7 @@ import { useAnalyticsFilterOption } from "./utils";
 const tabs = [
   { name: "Countries", value: "countries" as const, icon: FlagWavy },
   { name: "Cities", value: "cities" as const, icon: OfficeBuilding },
-  { name: "Regions", value: "regions" as const, icon: LocationPin },
+  // { name: "Regions", value: "regions" as const, icon: LocationPin },
   { name: "Continents", value: "continents" as const, icon: MapPosition },
 ];
 
@@ -61,6 +56,7 @@ interface LocationsBarChartProps {
   unit: string;
   limit?: number;
   tab?: string;
+  onViewAll?: () => void;
 }
 
 function LocationsBarChart({
@@ -69,8 +65,10 @@ function LocationsBarChart({
   unit,
   limit = 6,
   tab,
+  onViewAll,
 }: LocationsBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
+  const [isContainerHovered, setIsContainerHovered] = useState(false);
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
@@ -123,163 +121,196 @@ function LocationsBarChart({
   } satisfies ChartConfig;
 
   const needsFade = displayData.length > MAX_VISIBLE_BARS;
+  const hasMore = data.length > MAX_VISIBLE_BARS;
 
   return (
-    <div className="grid grid-cols-1 items-start gap-6 overflow-hidden lg:grid-cols-[320px_1fr]">
-      <div className="relative flex h-fit min-w-0 items-center justify-center overflow-hidden pl-2 pr-6">
-        <ChartContainer
-          config={chartConfig}
-          className={
-            needsFade
-              ? "h-[300px] min-h-[300px] w-[320px]"
-              : "h-[240px] w-[320px]"
-          }
-        >
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            layout="vertical"
-            barSize={24}
-            barCategoryGap={4}
-            margin={{
-              top: 0,
-              bottom: needsFade ? 20 : 0,
-            }}
+    <div
+      className="relative"
+      onMouseEnter={() => setIsContainerHovered(true)}
+      onMouseLeave={() => setIsContainerHovered(false)}
+    >
+      <div className="grid grid-cols-1 items-start gap-6 overflow-hidden lg:grid-cols-[320px_1fr]">
+        <div className="relative flex mt-2 h-fit min-w-0 items-center justify-center overflow-hidden pl-2 pr-6">
+          <ChartContainer
+            config={chartConfig}
+            className={"h-[300px] min-h-[300px] w-[320px]"}
           >
-            <CartesianGrid
-              horizontal={true}
-              vertical={false}
-              strokeDasharray="3 3"
-              stroke="hsl(var(--border))"
-            />
-            <XAxis
-              type="number"
-              dataKey="sales"
-              domain={[0, 100]}
-              tickFormatter={(value) => `${value}%`}
-              axisLine={false}
-              tickLine={false}
-              tickMargin={8}
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-            />
-            <YAxis
-              dataKey="sr"
-              type="category"
-              tickLine={false}
-              tickMargin={8}
-              axisLine={false}
-              width={30}
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <ChartTooltipWithCopy
-                      color={data.fill}
-                      name={data.title}
-                      value={formatValue(data.value)}
-                      percentage={data.sales}
-                      copyValue={data.title}
-                      showCopy={false}
-                      active={active}
-                    />
-                  );
-                }
-                return null;
+            <BarChart
+              accessibilityLayer
+              data={chartData}
+              layout="vertical"
+              barSize={24}
+              barCategoryGap={4}
+              margin={{
+                // top: 2,
+                // bottom: needsFade ? 20 : 0,
               }}
-            />
-            <Bar dataKey="sales" radius={[0, 10, 10, 0]}>
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.fill}
-                />
-              ))}
-              <LabelList
-                dataKey="title"
-                position="bottom"
-                fill="hsl(var(--muted-foreground))"
-                className="text-xs"
-                offset={5}
-                content={(props: any) => {
-                  if (!props) return null;
-                  const { x, y, width, height, value, payload } = props;
-                  // Use payload.sr to find the correct entry (most reliable)
-                  const dataEntry = chartData.find((d) => d.sr === payload?.sr || d.title === (value || payload?.title));
-                  const isTransparent = dataEntry?.isTransparent;
-                  const displayTitle = value || payload?.title || dataEntry?.title || "";
-
-                  const barHeight = height || 24;
-                  const labelY = y + barHeight + 8; // offset below the bar
-
-                  const iconElement = dataEntry?.icon;
-                  let iconToRender: React.ReactNode = null;
-
-                  if (iconElement && typeof iconElement === 'object' && 'props' in iconElement) {
-                    const iconProps = (iconElement as any).props;
-                    if (iconProps?.display) {
-                      iconToRender = <ContinentIcon display={iconProps.display} className="size-2" />;
-                    } else if (iconProps?.src) {
-                      iconToRender = <img alt={iconProps.alt || displayTitle} src={iconProps.src} className="h-3" />;
-                    }
+            >
+              <CartesianGrid
+                horizontal={true}
+                vertical={false}
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
+              <XAxis
+                type="number"
+                dataKey="sales"
+                domain={[0, 100]}
+                tickFormatter={(value) => `${value}%`}
+                axisLine={false}
+                tickLine={false}
+                tickMargin={8}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+              />
+              <YAxis
+                dataKey="sr"
+                type="category"
+                tickLine={false}
+                tickMargin={8}
+                axisLine={false}
+                width={30}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <ChartTooltipWithCopy
+                        color={data.fill}
+                        name={data.title}
+                        value={formatValue(data.value)}
+                        percentage={data.sales}
+                        copyValue={data.title}
+                        showCopy={false}
+                        active={active}
+                      />
+                    );
                   }
-
-                  return (
-                    <foreignObject
-                      x={x}
-                      y={labelY}
-                      width={200}
-                      height={24}
-                      style={{ opacity: isTransparent ? 0.4 : 1 }}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        {iconToRender && (
-                          <div className="shrink-0">{iconToRender}</div>
-                        )}
-                        <span className="text-muted-foreground truncate text-xs">
-                          {displayTitle}
-                        </span>
-                      </div>
-                    </foreignObject>
-                  );
+                  return null;
                 }}
               />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
-      </div>
-      <div className="min-w-0">
-        <div className="mb-3 flex justify-end">
-          <h3 className="text-base font-semibold text-black">Scans</h3>
-        </div>
-        <div className="space-y-3">
-          {visibleBarsData.map((item, index) => {
-            const formattedValue = formatValue(item.value);
-            const dataEntry = chartData.find((d) => d.title === item.title);
-            const color =
-              dataEntry?.fill || chartColors[index % chartColors.length];
-            const isTransparent = dataEntry?.isTransparent || false;
-            return (
-              <div
-                key={index}
-                className="flex items-center justify-end gap-2"
-                style={{ opacity: isTransparent ? 0.4 : 1 }}
-              >
-                <div
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: color }}
+              <Bar dataKey="sales" radius={[0, 10, 10, 0]}>
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+                <LabelList
+                  dataKey="title"
+                  position="top"
+                  fill="hsl(var(--muted-foreground))"
+                  className="text-xs"
+                  offset={5}
+                  content={(props: any) => {
+                    if (!props) return null;
+                    const { x, y, value, payload } = props;
+                    // Use payload.sr to find the correct entry (most reliable)
+                    const dataEntry = chartData.find(
+                      (d) =>
+                        d.sr === payload?.sr ||
+                        d.title === (value || payload?.title),
+                    );
+                    // @ts-ignore
+                    const isTransparent = dataEntry?.isTransparent;
+                    const displayTitle =
+                      value || payload?.title || dataEntry?.title || "";
+
+                    // Position label above the bar
+                    const labelY = y - 15; // offset above the bar
+
+                    const iconElement = dataEntry?.icon;
+                    let iconToRender: React.ReactNode = null;
+
+                    if (
+                      iconElement &&
+                      typeof iconElement === "object" &&
+                      "props" in iconElement
+                    ) {
+                      const iconProps = (iconElement as any).props;
+                      if (iconProps?.display) {
+                        iconToRender = (
+                          <ContinentIcon
+                            display={iconProps.display}
+                            className="size-2"
+                          />
+                        );
+                      } else if (iconProps?.src) {
+                        iconToRender = (
+                          <img
+                            alt={iconProps.alt || displayTitle}
+                            src={iconProps.src}
+                            className="h-3"
+                          />
+                        );
+                      }
+                    }
+
+                    return (
+                      <foreignObject
+                        x={x}
+                        y={labelY}
+                        width={200}
+                        height={24}
+                        style={{ opacity: isTransparent ? 0.4 : 1 }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          {iconToRender && (
+                            <div className="shrink-0">{iconToRender}</div>
+                          )}
+                          <span className="text-muted-foreground truncate text-xs">
+                            {displayTitle}
+                          </span>
+                        </div>
+                      </foreignObject>
+                    );
+                  }}
                 />
-                <span className="text-foreground whitespace-nowrap text-sm font-semibold">
-                  {formattedValue}
-                </span>
-              </div>
-            );
-          })}
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        </div>
+        <div className="min-w-0">
+          <div className="mb-3 flex justify-end">
+            <h3 className="text-base font-semibold text-black">Scans</h3>
+          </div>
+          <div className="space-y-3">
+            {visibleBarsData.map((item, index) => {
+              const formattedValue = formatValue(item.value);
+              const dataEntry = chartData.find((d) => d.title === item.title);
+              const color =
+                dataEntry?.fill || chartColors[index % chartColors.length];
+              // @ts-ignore
+              const isTransparent = dataEntry?.isTransparent || false;
+              return (
+                <div
+                  key={index}
+                  className="flex items-center justify-end gap-2"
+                  style={{ opacity: isTransparent ? 0.4 : 1 }}
+                >
+                  <div
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-foreground whitespace-nowrap text-sm font-semibold">
+                    {formattedValue}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
+      {/* View All Button */}
+      {hasMore && isContainerHovered && (
+        <div className="mt-4 flex justify-center transition-opacity duration-200">
+          <button
+            onClick={onViewAll}
+            className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+          >
+            View All
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -303,7 +334,7 @@ export default function Locations({
   // Fetch data for each tab
   const { data: countriesData } = useAnalyticsFilterOption("countries");
   const { data: citiesData } = useAnalyticsFilterOption("cities");
-  const { data: regionsData } = useAnalyticsFilterOption("regions");
+  // const { data: regionsData } = useAnalyticsFilterOption("regions");
   const { data: continentsData } = useAnalyticsFilterOption("continents");
 
   // Get data for current tab
@@ -312,8 +343,8 @@ export default function Locations({
       ? countriesData
       : tab === "cities"
         ? citiesData
-        : tab === "regions"
-          ? regionsData
+        // : tab === "regions"
+        //   ? regionsData
           : continentsData;
 
   const selectedTabData = tabs.find((t) => t.value === tab) || tabs[0];
@@ -324,8 +355,8 @@ export default function Locations({
         ? countriesData
         : tabValue === "cities"
           ? citiesData
-          : tabValue === "regions"
-            ? regionsData
+          // : tabValue === "regions"
+          //   ? regionsData
             : continentsData;
     const singularTabName = SINGULAR_ANALYTICS_ENDPOINTS[tabValue];
 
@@ -347,9 +378,10 @@ export default function Locations({
               tabValue === "continents"
                 ? CONTINENTS[d.continent]
                 : tabValue === "countries"
-                  ? COUNTRIES[d.country]
-                  : tabValue === "regions"
-                    ? REGIONS[d.region] || d.region.split("-")[1] || COUNTRIES[d.country] || d.region
+                  ? COUNTRIES[d.country] ||
+                  // : tabValue === "regions"
+                    // ? REGIONS[d.region] ||
+                      d.region.split("-")[1] || COUNTRIES[d.country] || d.region
                     : d.city,
             href: queryParams({
               ...(searchParams.has(singularTabName)
@@ -431,20 +463,21 @@ export default function Locations({
         )}
       </Modal>
 
-      <Card className="gap-4 overflow-hidden pt-6 h-[450px]">
-        <CardContent className="relative overflow-hidden px-6 h-full">
+      <Card className="h-[442px] gap-4 overflow-hidden pt-6">
+        <CardContent className="relative h-full overflow-hidden px-4">
           {data ? (
             data.length > 0 ? (
               <>
                 {view === "list" ? (
                   <>
                     {/* Controls for Bar Chart - Top */}
-                    <div className="flex gap-3 justify-end mb-4">
+                    <div className="mb-4 flex justify-end gap-3">
                       <div className="flex gap-1 rounded-lg border p-1">
                         <button
                           onClick={() => onViewChange("pie")}
                           className={cn(
                             "rounded p-2 transition-colors",
+                            // @ts-ignore
                             view === "pie"
                               ? "bg-secondary text-white"
                               : "hover:bg-gray-100",
@@ -464,7 +497,6 @@ export default function Locations({
                           <ChartBar className="h-4 w-4" />
                         </button>
                       </div>
-                    
                     </div>
                     <LocationsBarChart
                       data={getBarListData(tab)}
@@ -474,6 +506,7 @@ export default function Locations({
                       )}
                       limit={EXPAND_LIMIT}
                       tab={tab}
+                      onViewAll={() => setShowModal(true)}
                     />
                   </>
                 ) : (
@@ -504,6 +537,7 @@ export default function Locations({
                             onClick={() => onViewChange("list")}
                             className={cn(
                               "rounded p-2 transition-colors",
+                              // @ts-ignore
                               view === "list"
                                 ? "bg-secondary text-white"
                                 : "hover:bg-gray-100",

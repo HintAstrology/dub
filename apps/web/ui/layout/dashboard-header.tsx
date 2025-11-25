@@ -33,7 +33,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   return (
     <>
       {/* Title section - Above header */}
-      <div className="mb-4 flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <SidebarTrigger 
           icon={getPageIcon()}
           asPageIcon={true}
@@ -53,7 +53,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
       {/* Header with controls */}
       <header className={cn(
-        "bg-card rounded-[20px] shadow px-4 sm:px-6",
+        "bg-card rounded-[20px]",
         "[&_*]:no-underline"
       )}>
         <div className="flex w-full min-h-16 flex-col gap-3 py-3 md:h-16 md:flex-row md:items-center md:gap-4 md:py-0">

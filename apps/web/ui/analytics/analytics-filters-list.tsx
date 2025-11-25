@@ -431,16 +431,47 @@ export function AnalyticsFiltersList() {
   }
 
   return (
-    <div className="mx-auto w-full mb-5">
-      <Filter.List
-        filters={filters}
-        activeFilters={activeFilters}
-        onRemove={onRemoveFilter}
-        onRemoveAll={onRemoveAll}
-        onSelect={onFilterSelect}
-        isOptionDropdown={true}
-      />
-    </div>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .analytics-filters-wrapper .border-neutral-200 {
+            border-color: hsl(var(--chart-4)) !important;
+          }
+          .analytics-filters-wrapper button:has(kbd) {
+            display: none;
+            font-size: 0;
+          }
+          .analytics-filters-wrapper button:has(kbd)::before {
+            content: "Reset";
+            margin-right: -0.5rem;
+            font-size: 0.875rem;
+          }
+          .analytics-filters-wrapper button:has(kbd) kbd {
+            display: none;
+          }
+          .analytics-filters-wrapper.show-clear-filters button:has(kbd) {
+            display: flex;
+          }
+        `
+      }} />
+      <div className="mx-auto w-full mb-4">
+        <div className={cn(
+          "analytics-filters-wrapper flex w-full flex-wrap items-start gap-4 sm:flex-nowrap",
+          activeFilters.length >= 2 && "show-clear-filters"
+        )}>
+          <div className="flex grow flex-wrap gap-x-4 gap-y-2">
+            <Filter.List
+              filters={filters}
+              activeFilters={activeFilters}
+              onRemove={onRemoveFilter}
+              onRemoveAll={onRemoveAll}
+              onSelect={onFilterSelect}
+              isOptionDropdown={true}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 

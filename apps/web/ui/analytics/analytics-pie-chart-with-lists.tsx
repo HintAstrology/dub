@@ -23,6 +23,7 @@ interface DataItem {
   href?: string;
   value: number;
   linkId?: string;
+  copyValue?: string;
 }
 
 interface AnalyticsPieChartWithListsProps {
@@ -113,12 +114,6 @@ export default function AnalyticsPieChartWithLists({
     }));
   }, [displayData]);
 
-  const list2Data = useMemo(() => {
-    return displayData.map((item, idx) => ({
-      ...item,
-      color: chartColors[idx % chartColors.length],
-    }));
-  }, [displayData]);
 
   return (
     <div 
@@ -129,7 +124,7 @@ export default function AnalyticsPieChartWithLists({
       {/* Pie Chart and Controls */}
       <div className="flex items-start justify-between gap-8">
         {/* Pie Chart */}
-        <ChartContainer config={chartConfig} className="h-[160px] w-[160px]">
+        <ChartContainer config={chartConfig} className="h-[170px] w-[170px]">
           <PieChart margin={{ top: 0, bottom: 0, left: 0, right: 0 }}>
             <ChartTooltip
               cursor={false}
@@ -155,9 +150,9 @@ export default function AnalyticsPieChartWithLists({
               data={pieChartData}
               dataKey="value"
               nameKey="name"
-              innerRadius={55}
+              innerRadius={60}
               strokeWidth={10}
-              outerRadius={80}
+              outerRadius={85}
               paddingAngle={2}
             >
               <Label
@@ -230,9 +225,9 @@ export default function AnalyticsPieChartWithLists({
                   >
                     {displayTitle}
                   </span>
-                  {showCopy && hoveredIndex === index && (
+                  {showCopy && hoveredIndex === index && (item.copyValue || item.title) && (
                     <CopyButton
-                      value={item.title}
+                      value={item.copyValue || item.title}
                       variant="neutral"
                       className="h-4 w-4 p-0.5"
                     />

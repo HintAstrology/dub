@@ -1,7 +1,6 @@
 "use client";
 
 import { CopyButton } from "@dub/ui";
-import { useState, useEffect, useRef } from "react";
 
 interface ChartTooltipWithCopyProps {
   color: string;

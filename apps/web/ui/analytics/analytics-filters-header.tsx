@@ -41,7 +41,7 @@ import {
   getNextPlan,
   linkConstructor,
   nFormatter,
-  REGIONS,
+  // REGIONS,
 } from "@dub/utils";
 import { Icon } from "@iconify/react";
 import { Switch } from "@radix-ui/themes";
@@ -165,13 +165,13 @@ export function AnalyticsFiltersHeader() {
     queryString,
     selectedTab,
   );
-  const { data: regions } = useStandaloneFilterOption(
-    "regions",
-    { cacheOnly: false, filterKey: "region" },
-    workspaceId,
-    queryString,
-    selectedTab,
-  );
+  // const { data: regions } = useStandaloneFilterOption(
+  //   "regions",
+  //   { cacheOnly: false, filterKey: "region" },
+  //   workspaceId,
+  //   queryString,
+  //   selectedTab,
+  // );
   const { data: cities } = useStandaloneFilterOption(
     "cities",
     { cacheOnly: false, filterKey: "city" },
@@ -301,24 +301,24 @@ export function AnalyticsFiltersHeader() {
             right: nFormatter(count, { full: true }),
           })) ?? null,
       },
-      {
-        key: "region",
-        icon: LocationPin,
-        label: "Region",
-        options:
-          regions?.map(({ region, country, count }) => ({
-            value: region,
-            label: REGIONS[region] || region.split("-")[1],
-            icon: (
-              <img
-                alt={country}
-                src={`https://flag.vercel.app/m/${country}.svg`}
-                className="h-2.5 w-4"
-              />
-            ),
-            right: nFormatter(count, { full: true }),
-          })) ?? null,
-      },
+      // {
+      //   key: "region",
+      //   icon: LocationPin,
+      //   label: "Region",
+      //   options:
+      //     regions?.map(({ region, country, count }) => ({
+      //       value: region,
+      //       label: REGIONS[region] || region.split("-")[1],
+      //       icon: (
+      //         <img
+      //           alt={country}
+      //           src={`https://flag.vercel.app/m/${country}.svg`}
+      //           className="h-2.5 w-4"
+      //         />
+      //       ),
+      //       right: nFormatter(count, { full: true }),
+      //     })) ?? null,
+      // },
       {
         key: "continent",
         icon: MapPosition,
@@ -403,7 +403,7 @@ export function AnalyticsFiltersHeader() {
       links,
       countries,
       cities,
-      regions,
+      // regions,
       continents,
       devices,
       browsers,
@@ -502,7 +502,7 @@ export function AnalyticsFiltersHeader() {
         />
         <Filter.Select
           className={cn(
-            "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[140px]",
+            "text-secondary [&_svg]:text-secondary [&_.bg-neutral]:bg-secondary w-full md:w-auto md:min-w-[140px]",
             hasActiveFilters && "border-secondary",
           )}
           filters={filters}
@@ -515,8 +515,8 @@ export function AnalyticsFiltersHeader() {
             })
           }
         />
-
-        {/* <div className="flex items-center gap-2 md:ml-auto">
+{/* 
+        <div className="flex items-center gap-2 md:ml-auto">
           <Switch
             id="unique"
             size="1"

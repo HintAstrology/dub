@@ -236,55 +236,72 @@ export default function AnalyticsAreaChart({
               return (
                 <div
                   key={index}
-                  className="flex min-w-[160px]  flex-col gap-2 rounded-lg bg-white p-2 shadow"
+                  className="flex min-w-[160px] flex-col gap-2 rounded-lg bg-white p-2 shadow"
                 >
                   <span className="text-muted-foreground text-xs font-medium">
                     {stat.title}
                   </span>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="size-10 rounded-sm">
-                      <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
-                        {stat.icon}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <Tooltip content={stat.value}>
-                        <span className="w-full max-w-[100px] truncate text-sm font-semibold">
-                          {stat.value}
+                  {isNumeric ? (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="size-10 rounded-sm">
+                          <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
+                            {stat.icon}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <Tooltip content={stat.value}>
+                            <span className="w-full max-w-[100px] truncate text-sm font-semibold">
+                              {stat.value}
+                            </span>
+                          </Tooltip>
+                        </div>
+                      </div>
+                      <div className="mt-auto flex items-center gap-1.5">
+                        {isPositive !== undefined &&
+                          (isPositive ? (
+                            <TrendingUp className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <TrendingDown className="h-3 w-3 text-orange-600" />
+                          ))}
+                        <span
+                          className={`text-xs font-medium ${
+                            isPositive === true
+                              ? "text-green-600"
+                              : isPositive === false
+                                ? "text-orange-600"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {changeValue}
                         </span>
-                      </Tooltip>
-                      {!isNumeric && (
+                        {stat.comparisonPeriod && (
+                          <span className="text-muted-foreground text-xs">
+                            {stat.comparisonPeriod}
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="size-10 rounded-sm">
+                          <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
+                            {stat.icon}
+                          </AvatarFallback>
+                        </Avatar>
+                        <Tooltip content={stat.value}>
+                          <span className="w-full max-w-[100px] truncate text-sm font-bold">
+                            {stat.value}
+                          </span>
+                        </Tooltip>
+                      </div>
+                      <div className="mt-auto">
                         <span className="text-muted-foreground text-xs">
                           {changeValue}
                         </span>
-                      )}
-                    </div>
-                  </div>
-                  {isNumeric && (
-                    <div className="mt-auto flex items-center gap-1.5">
-                      {isPositive !== undefined &&
-                        (isPositive ? (
-                          <TrendingUp className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <TrendingDown className="h-3 w-3 text-orange-600" />
-                        ))}
-                      <span
-                        className={`text-xs font-medium ${
-                          isPositive === true
-                            ? "text-green-600"
-                            : isPositive === false
-                              ? "text-orange-600"
-                              : "text-muted-foreground"
-                        }`}
-                      >
-                        {changeValue}
-                      </span>
-                      {stat.comparisonPeriod && (
-                        <span className="text-muted-foreground text-xs">
-                          {stat.comparisonPeriod}
-                        </span>
-                      )}
-                    </div>
+                      </div>
+                    </>
                   )}
                 </div>
               );

@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronRightIcon, CreditCardIcon, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
+import { ChevronRightIcon, CreditCardIcon, HelpCircle, LogOutIcon, UserIcon, WalletIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
@@ -61,7 +61,7 @@ export function SidebarUserDropdown() {
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{userName}</span>
+                <span className="truncate">{userName}</span>
                 {/* <span className="truncate text-xs text-muted-foreground">{userEmail}</span> */}
               </div>
               <ChevronRightIcon className="ml-auto size-4 transition-transform duration-200 max-lg:rotate-270 [[data-state=open]>&]:rotate-90 lg:[[data-state=open]>&]:-rotate-180" />
@@ -100,6 +100,10 @@ export function SidebarUserDropdown() {
               <DropdownMenuItem onClick={() => handleNavigate("/account/billing")}>
                 <CreditCardIcon className="mr-2 size-4" />
                 Billing
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleNavigate("/help")}>
+                <HelpCircle className="mr-2 size-4" />
+                Help Center
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

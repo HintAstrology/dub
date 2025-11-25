@@ -15,7 +15,7 @@ type FilterListProps = {
     value: FilterOption["value"];
   }[];
   onRemove: (key: string, value: FilterOption["value"]) => void;
-  onRemoveAll: () => void;
+  onRemoveAll?: () => void;
   onSelect?: (key: Filter["key"], value: any) => void;
   isOptionDropdown?: boolean;
   className?: string;
@@ -30,7 +30,10 @@ export function FilterList({
   isOptionDropdown,
   className,
 }: FilterListProps) {
-  useKeyboardShortcut("Escape", onRemoveAll, { priority: 1 });
+  useKeyboardShortcut("Escape", onRemoveAll ?? (() => {}), {
+    priority: 1,
+    enabled: !!onRemoveAll,
+  });
 
   return (
     <AnimatedSizeContainer
@@ -149,18 +152,6 @@ export function FilterList({
             })}
           </AnimatePresence>
         </div>
-        {/* {activeFilters?.length !== 0 && (
-          <button
-            type="button"
-            className="group mt-px flex items-center gap-2 whitespace-nowrap rounded-lg border border-transparent px-3 py-2 text-sm text-neutral-500 ring-inset ring-neutral-500 transition-colors hover:border-neutral-200 hover:bg-white hover:text-black focus:outline-none"
-            onClick={onRemoveAll}
-          >
-            Clear Filters
-            <kbd className="rounded-md border border-neutral-200 px-1.5 py-0.5 text-xs text-neutral-950 group-hover:bg-neutral-50">
-              ESC
-            </kbd>
-          </button>
-        )} */}
       </div>
     </AnimatedSizeContainer>
   );

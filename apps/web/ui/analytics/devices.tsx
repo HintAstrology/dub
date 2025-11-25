@@ -48,10 +48,12 @@ interface DevicesBarChartProps {
   maxValue: number;
   unit: string;
   limit?: number;
+  onViewAll?: () => void;
 }
 
-function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartProps) {
+function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: DevicesBarChartProps) {
   const { saleUnit } = useContext(AnalyticsContext);
+  const [isContainerHovered, setIsContainerHovered] = useState(false);
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
@@ -100,10 +102,17 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
     },
   } satisfies ChartConfig;
 
+  const hasMore = data.length > MAX_VISIBLE_BARS;
+
   return (
+    <div
+      className="relative"
+      onMouseEnter={() => setIsContainerHovered(true)}
+      onMouseLeave={() => setIsContainerHovered(false)}
+    >
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr] -mt-2 overflow-hidden items-start">
       <div className="pl-2 pr-6 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
-        <ChartContainer config={chartConfig} className="h-[240px] w-[320px]">
+        <ChartContainer config={chartConfig} className="h-[300px] w-[320px]">
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -164,17 +173,17 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
               ))}
               <LabelList
                 dataKey="title"
-                position="bottom"
+                position="top"
                 fill="hsl(var(--muted-foreground))"
                 className="text-xs"
                 offset={5}
                 content={(props: any) => {
                   if (!props) return null;
-                  const { x, y, width, height, value, payload } = props;
-                  
-                  const barHeight = height || 24;
-                  const labelY = y + barHeight + 15; // 15px offset below the bar
-                  
+                  const { x, y, value } = props;
+
+                  // Position label above the bar
+                  const labelY = y - 8; // 8px offset above the bar
+
                   return (
                     <text
                       x={x}
@@ -220,6 +229,18 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6 }: DevicesBarChartPro
         </div>
       </div>
     </div>
+      {/* View All Button */}
+      {hasMore && isContainerHovered && (
+        <div className="mt-4 flex justify-center transition-opacity duration-200">
+          <button
+            onClick={onViewAll}
+            className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-neutral-950 shadow-sm hover:bg-neutral-50 active:bg-neutral-100"
+          >
+            View All
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -246,17 +267,12 @@ export default function Devices({
   const { data: triggersData, loading: triggersLoading } = useAnalyticsFilterOption("triggers");
   
   // Get data for current tab
-  const data = tab === "devices" ? devicesData 
+  const data = tab === "devices" ? devicesData
     : tab === "browsers" ? browsersData
     : tab === "os" ? osData
     : triggersData;
-  const loading = tab === "devices" ? devicesLoading 
-    : tab === "browsers" ? browsersLoading
-    : tab === "os" ? osLoading
-    : triggersLoading;
-  
+
   const selectedTabData = tabs.find(t => t.value === tab) || tabs[0];
-  const hasMore = (data?.length ?? 0) > EXPAND_LIMIT;
 
   const getBarListData = (tabValue: DeviceTabs) => {
     const tabData = tabValue === "devices" ? devicesData 
@@ -356,7 +372,7 @@ export default function Devices({
         )}
       </Modal>
 
-      <Card className="gap-4 pt-6 overflow-hidden h-[450px]">
+      <Card className="h-[442px] gap-4 overflow-hidden pt-6">
         <CardContent className="relative px-6 overflow-hidden">
           {data ? (
             data.length > 0 ? (
@@ -370,6 +386,7 @@ export default function Devices({
                           onClick={() => onViewChange("pie")}
                           className={cn(
                             "p-2 rounded transition-colors",
+                            // @ts-ignore
                             view === "pie" 
                               ? "bg-secondary text-white" 
                               : "hover:bg-gray-100"
@@ -396,6 +413,7 @@ export default function Devices({
                       unit={selectedTab}
                       maxValue={Math.max(...(data?.map((d) => d[dataKey] ?? 0) ?? [0]))}
                       limit={EXPAND_LIMIT}
+                      onViewAll={() => setShowModal(true)}
                     />
                   </>
                 ) : (
@@ -424,6 +442,7 @@ export default function Devices({
                             onClick={() => onViewChange("list")}
                             className={cn(
                               "p-2 rounded transition-colors",
+                              // @ts-ignore
                               view === "list" 
                                 ? "bg-secondary text-white" 
                                 : "hover:bg-gray-100"
