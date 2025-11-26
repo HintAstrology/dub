@@ -135,10 +135,14 @@ export default function AnalyticsAreaChart({
     [data, demo],
   );
 
-  const rechartsData = useMemo(
-    () => transformToRechartsData(chartData, resource, saleUnit),
-    [chartData, resource, saleUnit],
-  );
+  const rechartsData = useMemo(() => {
+    // Check if we should show hours (24h interval or custom range <= 24 hours)
+    const shouldShowHours = 
+      interval === "24h" || 
+      (start && end && end.getTime() - start.getTime() <= 24 * 60 * 60 * 1000);
+    
+    return transformToRechartsData(chartData, resource, saleUnit, shouldShowHours ? "24h" : interval);
+  }, [chartData, resource, saleUnit, interval, start, end]);
 
   const dataKey = getDataKey(resource);
   const yAxisConfig = getYAxisConfig(rechartsData, dataKey);

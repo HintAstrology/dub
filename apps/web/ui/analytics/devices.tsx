@@ -110,9 +110,9 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: Devices
       onMouseEnter={() => setIsContainerHovered(true)}
       onMouseLeave={() => setIsContainerHovered(false)}
     >
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr] -mt-2 overflow-hidden items-start">
-      <div className="pl-2 pr-6 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
-        <ChartContainer config={chartConfig} className="h-[300px] w-[320px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[350px_1fr] overflow-hidden items-start">
+      <div className="w-full min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
+        <ChartContainer config={chartConfig} className="h-[300px] w-full -ml-10 min-w-[350px]">
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -122,6 +122,7 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: Devices
             margin={{
               top: 0,
               bottom: 0,
+              left: 0,
             }}
           >
             <CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -142,7 +143,7 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: Devices
               tickMargin={8} 
               axisLine={false}
               width={30}
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+              tick={false}
             />
             <ChartTooltip
               cursor={false}
@@ -179,21 +180,34 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: Devices
                 offset={5}
                 content={(props: any) => {
                   if (!props) return null;
-                  const { x, y, value } = props;
+                  const { x, y, value, payload } = props;
+                  const dataEntry = chartData.find(
+                    (d) =>
+                      d.sr === payload?.sr ||
+                      d.title === (value || payload?.title),
+                  );
+                  const displayTitle = value || payload?.title || dataEntry?.title || "";
+                  const iconElement = dataEntry?.icon;
 
                   // Position label above the bar
-                  const labelY = y - 8; // 8px offset above the bar
+                  const labelY = y - 15; // offset above the bar
 
                   return (
-                    <text
+                    <foreignObject
                       x={x}
                       y={labelY}
-                      fill="hsl(var(--muted-foreground))"
-                      textAnchor="start"
-                      fontSize="12"
+                      width={200}
+                      height={24}
                     >
-                      {value}
-                    </text>
+                      <div className="flex items-center gap-1.5">
+                        {iconElement && (
+                          <div className="shrink-0">{iconElement}</div>
+                        )}
+                        <span className="text-muted-foreground truncate text-xs">
+                          {displayTitle}
+                        </span>
+                      </div>
+                    </foreignObject>
                   );
                 }}
               />
@@ -201,12 +215,11 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: Devices
           </BarChart>
         </ChartContainer>
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 h-full -mt-1">
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
-        
-        <div className="space-y-3">
+        <div className={`flex flex-col ${visibleBarsData.length === 1 ? 'justify-center' : 'justify-between'} h-[calc(100%-90px)]`}>
           {visibleBarsData.map((item, index) => {
             const formattedValue = formatValue(item.value);
             const dataEntry = chartData.find((d) => d.title === item.title);
@@ -214,7 +227,7 @@ function DevicesBarChart({ data, maxValue, unit, limit = 6, onViewAll }: Devices
             return (
               <div 
                 key={index} 
-                className="flex items-center justify-end gap-2"
+                className={`flex items-center ${visibleBarsData.length === 1 ? 'justify-center' : 'justify-end'} gap-2`}
               >
                 <div
                   className="h-2.5 w-2.5 rounded-full shrink-0"

@@ -27,7 +27,7 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
   const getAccountTitle = () => {
     if (isAccountPlans) return "Plans & Payments";
     if (isAccountBilling) return "Billing";
-    return "Account Settings";
+    return "My Account";
   };
 
   if (isAccountSettings || isAccountPlans || isAccountBilling) {

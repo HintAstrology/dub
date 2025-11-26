@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CopyButton } from "@dub/ui";
 import { nFormatter } from "@dub/utils";
 import { ReactNode, useContext, useMemo, useState } from "react";
@@ -197,49 +198,71 @@ export default function AnalyticsPieChartWithLists({
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
         </div>
-        <div className="space-y-1">
-          {list1Data.map((item, index) => {
-            const formattedValue = formatValue(item.value);
-            // Calculate max length based on available space (approximately 20-25 chars)
-            const maxLength = 40;
-            const displayTitle =
-              item.title.length > maxLength
-                ? `${item.title.slice(0, maxLength)}...`
-                : item.title;
-            return (
-              <div
-                key={index}
-                className="flex hover:bg-neutral-100 p-1 min-w-0 items-center gap-3 group"
-                onMouseEnter={() => showCopy && setHoveredIndex(index)}
-                onMouseLeave={() => showCopy && setHoveredIndex(null)}
-              >
-                <div className="flex min-w-0 flex-1 items-center gap-2">
-                  <div
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  {item.icon && <div className="shrink-0">{item.icon}</div>}
-                  <span
-                    className="text-foreground truncate text-sm font-medium"
-                    title={item.title}
-                  >
-                    {displayTitle}
-                  </span>
-                  {showCopy && hoveredIndex === index && (item.copyValue || item.title) && (
-                    <CopyButton
-                      value={item.copyValue || item.title}
-                      variant="neutral"
-                      className="h-4 w-4 p-0.5"
+        <TooltipProvider>
+          <div className="space-y-1">
+            {list1Data.map((item, index) => {
+              const formattedValue = formatValue(item.value);
+              // Calculate max length based on available space (approximately 20-25 chars)
+              const maxLength = 40;
+              const displayTitle =
+                item.title.length > maxLength
+                  ? `${item.title.slice(0, maxLength)}...`
+                  : item.title;
+              return (
+                <div
+                  key={index}
+                  className="flex hover:bg-neutral-100 p-1 min-w-0 items-center gap-3 group"
+                  onMouseEnter={() => showCopy && setHoveredIndex(index)}
+                  onMouseLeave={() => showCopy && setHoveredIndex(null)}
+                >
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <div
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: item.color }}
                     />
-                  )}
+                    {item.icon && (() => {
+                      // Don't show continent icons
+                      if (
+                        item.icon &&
+                        typeof item.icon === "object" &&
+                        "props" in item.icon &&
+                        (item.icon as any).props?.display
+                      ) {
+                        return null;
+                      }
+                      return <div className="shrink-0">{item.icon}</div>;
+                    })()}
+                    <span
+                      className="text-foreground truncate text-sm font-medium"
+                      title={item.title}
+                    >
+                      {displayTitle}
+                    </span>
+                    {showCopy && hoveredIndex === index && (item.copyValue || item.title) && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <CopyButton
+                              value={item.copyValue || item.title}
+                              variant="neutral"
+                              className="h-4 w-4 p-0.5"
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Copy QR Link</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                  <span className="text-foreground shrink-0 whitespace-nowrap text-sm font-semibold">
+                    {formattedValue}
+                  </span>
                 </div>
-                <span className="text-foreground shrink-0 whitespace-nowrap text-sm font-semibold">
-                  {formattedValue}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </TooltipProvider>
         {/* {hasMore && (
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-20 bg-gradient-to-t from-white via-white/80 to-transparent" />
         )} */}

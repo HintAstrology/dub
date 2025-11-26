@@ -18,7 +18,7 @@ const topLinksTabs = [
 const locationsTabs = [
   { name: "Countries", value: "countries" as const, icon: FlagWavy },
   { name: "Cities", value: "cities" as const, icon: OfficeBuilding },
-  { name: "Regions", value: "regions" as const, icon: LocationPin },
+//   { name: "Regions", value: "regions" as const, icon: LocationPin },
   { name: "Continents", value: "continents" as const, icon: MapPosition },
 ];
 

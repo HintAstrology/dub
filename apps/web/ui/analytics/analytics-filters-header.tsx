@@ -443,7 +443,6 @@ export function AnalyticsFiltersHeader() {
         <DateRangePicker
           className={cn(
             "text-gray-400 [&_svg]:text-gray-400 w-full md:w-auto md:min-w-[200px]",
-            (start || end || interval) && "border-gray-400",
           )}
           align="end"
           value={
@@ -503,7 +502,6 @@ export function AnalyticsFiltersHeader() {
         <Filter.Select
           className={cn(
             "text-gray-400 [&_svg]:text-gray-400 [&_.bg-neutral]:bg-gray-400 w-full md:w-auto md:min-w-[140px]",
-            hasActiveFilters && "border-gray-400",
           )}
           filters={filters}
           activeFilters={activeFilters}

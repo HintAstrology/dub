@@ -93,7 +93,7 @@ export default function QrCodesContainer({
   }, [allQrs, sortBy]);
 
   return (
-    <div className="grid w-full gap-y-2">
+    <div className="grid w-full gap-y-2 mb-4">
       <QrCodesList
         CreateQrCodeButton={CreateQrCodeButton}
         qrCodes={qrs}

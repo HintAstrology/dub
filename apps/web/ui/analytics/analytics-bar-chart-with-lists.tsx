@@ -98,11 +98,11 @@ export default function AnalyticsBarChartWithLists({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1fr_1fr] -mt-2">
       <div className="relative w-full lg:w-fit">
-        <ChartContainer config={chartConfig} className="min-h-[300px] w-full lg:w-[320px]">
+        <ChartContainer config={chartConfig} className="min-h-[240px] w-full lg:w-[320px]">
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 20, right: 150, left: 40 }}
+            margin={{ top: 20, right: 150, bottom: 5, left: 40 }}
             barCategoryGap="10%"
           >
             <CartesianGrid

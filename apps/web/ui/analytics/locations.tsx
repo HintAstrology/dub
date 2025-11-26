@@ -129,11 +129,11 @@ function LocationsBarChart({
       onMouseEnter={() => setIsContainerHovered(true)}
       onMouseLeave={() => setIsContainerHovered(false)}
     >
-      <div className="grid grid-cols-1 items-start gap-6 overflow-hidden lg:grid-cols-[320px_1fr]">
-        <div className="relative flex mt-2 h-fit min-w-0 items-center justify-center overflow-hidden pl-2 pr-6">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[350px_1fr] overflow-hidden">
+        <div className="relative flex h-fit min-w-0 items-center justify-center overflow-hidden w-full">
           <ChartContainer
             config={chartConfig}
-            className={"h-[300px] min-h-[300px] w-[320px]"}
+            className={"h-[300px] min-h-[300px] w-full -ml-10 min-w-[350px]"}
           >
             <BarChart
               accessibilityLayer
@@ -142,8 +142,9 @@ function LocationsBarChart({
               barSize={24}
               barCategoryGap={4}
               margin={{
-                // top: 2,
-                // bottom: needsFade ? 20 : 0,
+                top: 0,
+                bottom: 0,
+                left: 0,
               }}
             >
               <CartesianGrid
@@ -169,7 +170,7 @@ function LocationsBarChart({
                 tickMargin={8}
                 axisLine={false}
                 width={30}
-                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                tick={false}
               />
               <ChartTooltip
                 cursor={false}
@@ -210,8 +211,6 @@ function LocationsBarChart({
                         d.sr === payload?.sr ||
                         d.title === (value || payload?.title),
                     );
-                    // @ts-ignore
-                    const isTransparent = dataEntry?.isTransparent;
                     const displayTitle =
                       value || payload?.title || dataEntry?.title || "";
 
@@ -221,27 +220,23 @@ function LocationsBarChart({
                     const iconElement = dataEntry?.icon;
                     let iconToRender: React.ReactNode = null;
 
-                    if (
-                      iconElement &&
-                      typeof iconElement === "object" &&
-                      "props" in iconElement
-                    ) {
-                      const iconProps = (iconElement as any).props;
-                      if (iconProps?.display) {
-                        iconToRender = (
-                          <ContinentIcon
-                            display={iconProps.display}
-                            className="size-2"
-                          />
-                        );
-                      } else if (iconProps?.src) {
-                        iconToRender = (
-                          <img
-                            alt={iconProps.alt || displayTitle}
-                            src={iconProps.src}
-                            className="h-3"
-                          />
-                        );
+                    // Don't show icons for continents tab
+                    if (tab !== "continents") {
+                      if (
+                        iconElement &&
+                        typeof iconElement === "object" &&
+                        "props" in iconElement
+                      ) {
+                        const iconProps = (iconElement as any).props;
+                        if (iconProps?.src) {
+                          iconToRender = (
+                            <img
+                              alt={iconProps.alt || displayTitle}
+                              src={iconProps.src}
+                              className="h-3"
+                            />
+                          );
+                        }
                       }
                     }
 
@@ -251,7 +246,6 @@ function LocationsBarChart({
                         y={labelY}
                         width={200}
                         height={24}
-                        style={{ opacity: isTransparent ? 0.4 : 1 }}
                       >
                         <div className="flex items-center gap-1.5">
                           {iconToRender && (
@@ -269,23 +263,20 @@ function LocationsBarChart({
             </BarChart>
           </ChartContainer>
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 h-full -mt-1">
           <div className="mb-3 flex justify-end">
             <h3 className="text-base font-semibold text-black">Scans</h3>
           </div>
-          <div className="space-y-3">
+          <div className={`flex flex-col ${visibleBarsData.length === 1 ? 'justify-center' : 'justify-between'} h-[calc(100%-90px)]`}>
             {visibleBarsData.map((item, index) => {
               const formattedValue = formatValue(item.value);
               const dataEntry = chartData.find((d) => d.title === item.title);
               const color =
                 dataEntry?.fill || chartColors[index % chartColors.length];
-              // @ts-ignore
-              const isTransparent = dataEntry?.isTransparent || false;
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-end gap-2"
-                  style={{ opacity: isTransparent ? 0.4 : 1 }}
+                  className={`flex items-center ${visibleBarsData.length === 1 ? 'justify-center' : 'justify-end'} gap-2`}
                 >
                   <div
                     className="h-2.5 w-2.5 shrink-0 rounded-full"

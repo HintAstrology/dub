@@ -25,13 +25,16 @@ export interface RechartsDataItem {
 export function transformToRechartsData(
   chartData: ChartDataItem[] | null,
   resource: EventType,
-  saleUnit: "sales" | "saleAmount"
+  saleUnit: "sales" | "saleAmount",
+  interval?: string
 ): RechartsDataItem[] {
   if (!chartData) return [];
   
   return chartData.map((item) => ({
     date: item.date,
-    dateLabel: format(item.date, "MMM dd"),
+    dateLabel: interval === "24h" 
+      ? format(item.date, "HH:mm")
+      : format(item.date, "MMM dd"),
     clicks: item.values.clicks,
     leads: item.values.leads,
     sales:

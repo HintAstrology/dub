@@ -437,15 +437,7 @@ export function AnalyticsFiltersList() {
           .analytics-filters-wrapper .border-neutral-200 {
             border-color: hsl(var(--chart-4)) !important;
           }
-          .analytics-filters-wrapper button:has(kbd) {
-            display: none;
-            font-size: 0;
-          }
-          .analytics-filters-wrapper button:has(kbd)::before {
-            content: "Reset";
-            margin-right: -0.5rem;
-            font-size: 0.875rem;
-          }
+      
           .analytics-filters-wrapper button:has(kbd) kbd {
             display: none;
           }
