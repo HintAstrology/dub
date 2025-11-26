@@ -442,8 +442,8 @@ export function AnalyticsFiltersHeader() {
       <div className="flex w-max flex-col gap-3 md:flex-row md:flex-wrap md:items-center lg:flex-nowrap lg:gap-2">
         <DateRangePicker
           className={cn(
-            "text-secondary [&_svg]:text-secondary w-full md:w-auto md:min-w-[200px]",
-            (start || end || interval) && "border-secondary",
+            "text-gray-400 [&_svg]:text-gray-400 w-full md:w-auto md:min-w-[200px]",
+            (start || end || interval) && "border-gray-400",
           )}
           align="end"
           value={
@@ -502,8 +502,8 @@ export function AnalyticsFiltersHeader() {
         />
         <Filter.Select
           className={cn(
-            "text-secondary [&_svg]:text-secondary [&_.bg-neutral]:bg-secondary w-full md:w-auto md:min-w-[140px]",
-            hasActiveFilters && "border-secondary",
+            "text-gray-400 [&_svg]:text-gray-400 [&_.bg-neutral]:bg-gray-400 w-full md:w-auto md:min-w-[140px]",
+            hasActiveFilters && "border-gray-400",
           )}
           filters={filters}
           activeFilters={activeFilters}
