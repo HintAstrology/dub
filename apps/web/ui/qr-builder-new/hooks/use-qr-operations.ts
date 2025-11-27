@@ -22,14 +22,14 @@ import { TQrServerData } from "../types/qr-server-data";
 import { EQRType } from "../types/qr-type";
 
 interface IUseNewQrOperationsProps {
-  user: Session["user"];
-  initialQrData: TQrServerData | null;
+  user?: Session["user"];
+  initialQrData?: TQrServerData | null;
 }
 
 export const useNewQrOperations = ({
   initialQrData,
   user,
-}: IUseNewQrOperationsProps) => {
+}: IUseNewQrOperationsProps = {}) => {
   const { id: workspaceId } = useWorkspace();
   const { setNewQrId } = useNewQrContext();
 
@@ -38,7 +38,7 @@ export const useNewQrOperations = ({
   const selectedQrType = initialQrData?.qrType as EQRType;
 
   const createQr = useCallback(
-    async (builderData: TNewQRBuilderData, projectSlug?: string) => {
+    async (builderData: TNewQRBuilderData, projectSlug?: string, user?: Session["user"]) => {
       try {
         if (!workspaceId && !projectSlug) {
           toast.error("Workspace ID not found");
