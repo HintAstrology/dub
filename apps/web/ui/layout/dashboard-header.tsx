@@ -1,12 +1,12 @@
 "use client";
 
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { AnalyticsFiltersHeader } from "@/ui/analytics/analytics-filters-header";
 import { QRHeaderControls } from "@/ui/layout/qr-header-controls";
 import { usePathname } from "next/navigation";
 import { cn } from "@dub/utils";
 import { Session } from "@/lib/auth/utils";
-import { QrCode, BarChart3, UserIcon, WalletIcon, CreditCardIcon } from "lucide-react";
+import { QrCode, BarChart3, UserIcon, WalletIcon, CreditCardIcon, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 
 interface DashboardHeaderProps {
   user?: Session["user"];
@@ -14,6 +14,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
   const pathname = usePathname();
+  const { state, toggleSidebar } = useSidebar();
   const isAnalyticsPage = pathname?.endsWith("/analytics");
   const isQRCodesPage = pathname?.match(/\/[^/]+$/) && !pathname?.includes("/analytics") && !pathname?.includes("/settings") && !pathname?.includes("/account");
   const isAccountSettingsPage = pathname?.includes("/account/settings");
@@ -30,15 +31,26 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     return QrCode; // Default icon
   };
 
+  const PageIcon = getPageIcon();
+
   return (
     <>
       {/* Title section - Above header */}
       <div className="flex items-center gap-3">
-        <SidebarTrigger 
-          icon={getPageIcon()}
-          asPageIcon={true}
-          className="text-secondary [&_svg]:!size-5" 
-        />
+        {/* Mobile: Toggle button | Desktop: Page icon */}
+        <button
+          onClick={toggleSidebar}
+          className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors text-secondary"
+        >
+          {state === "expanded" ? (
+            <PanelLeftClose className="h-4 w-4" />
+          ) : (
+            <PanelLeftOpen className="h-4 w-4" />
+          )}
+        </button>
+        <div className="hidden md:flex p-2 text-secondary">
+          <PageIcon className="h-5 w-5" />
+        </div>
         {isAnalyticsPage && (
           <h1 className="text-lg font-semibold text-neutral-900">
             Statistics

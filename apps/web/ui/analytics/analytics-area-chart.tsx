@@ -137,11 +137,16 @@ export default function AnalyticsAreaChart({
 
   const rechartsData = useMemo(() => {
     // Check if we should show hours (24h interval or custom range <= 24 hours)
-    const shouldShowHours = 
-      interval === "24h" || 
+    const shouldShowHours =
+      interval === "24h" ||
       (start && end && end.getTime() - start.getTime() <= 24 * 60 * 60 * 1000);
-    
-    return transformToRechartsData(chartData, resource, saleUnit, shouldShowHours ? "24h" : interval);
+
+    return transformToRechartsData(
+      chartData,
+      resource,
+      saleUnit,
+      shouldShowHours ? "24h" : interval,
+    );
   }, [chartData, resource, saleUnit, interval, start, end]);
 
   const dataKey = getDataKey(resource);
@@ -224,7 +229,7 @@ export default function AnalyticsAreaChart({
     <Card className={cn("flex flex-col gap-4 border-none p-3 sm:p-4 md:p-4")}>
       <div className="flex flex-col gap-4">
         <CardContent className="grow p-0">
-          <div className="grid lg:grid-cols-8 grid-cols-4 md:grid-cols-2 gap-4 overflow-x-auto px-1 pb-2">
+          <div className="grid grid-cols-4 gap-4 overflow-x-auto px-1 pb-2 md:grid-cols-2 lg:grid-cols-8">
             {statsData.map((stat, index) => {
               const isNumeric =
                 stat.isNumeric &&
@@ -302,7 +307,10 @@ export default function AnalyticsAreaChart({
                       </div>
                       <div className="mt-auto">
                         <span className="text-muted-foreground text-xs">
-                          {changeValue}
+                          {changeValue}{" "}
+                          {index !== statsData.length - 1
+                            ? "of all scans"
+                            : null}
                         </span>
                       </div>
                     </>
@@ -374,10 +382,10 @@ export default function AnalyticsAreaChart({
                         ? currencyFormatter(value as number)
                         : nFormatter(value as number, { full: true }),
                       resource === "clicks"
-                        ? "Scans"
+                        ? " Scans"
                         : resource === "leads"
-                          ? "Leads"
-                          : "Sales",
+                          ? " Leads"
+                          : " Sales",
                     ]}
                   />
                 }

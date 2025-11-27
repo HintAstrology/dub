@@ -15,7 +15,7 @@ import {
   linkConstructor,
 } from "@dub/utils";
 import { useContext } from "react";
-import { AnalyticsContext } from "./analytics-provider";
+import { AnalyticsContext } from "../analytics-provider";
 
 export default function   Toggle({
   page = "analytics",

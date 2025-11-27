@@ -20,9 +20,10 @@ import { ChevronRightIcon, CreditCardIcon, HelpCircle, LogOutIcon, UserIcon, Wal
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { cn } from "@/lib/utils";
 
 export function SidebarUserDropdown() {
-  const { isMobile } = useSidebar();
+  const { isMobile, state } = useSidebar();
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -41,30 +42,43 @@ export function SidebarUserDropdown() {
     router.push("/login");
   }, [router]);
 
-  const handleNavigate = useCallback((path: string) => {
-    router.push(path);
+  const handleNavigate = useCallback((path: string, openInNewTab?: boolean) => {
+    if (openInNewTab) {
+      window.open(path, '_blank', 'noopener,noreferrer');
+    } else {
+      router.push(path);
+    }
   }, [router]);
 
+  const isCollapsed = state === "collapsed";
+
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
+    <SidebarMenu className={cn(isCollapsed && "items-center")}>
+      <SidebarMenuItem className={cn(isCollapsed && "flex justify-center")}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className={cn(
+                "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+                isCollapsed && "justify-center w-full !h-auto !p-3"
+              )}
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className={cn("rounded-full h-8 w-8")}>
                 <AvatarImage src={user?.image || undefined} alt={userName} />
-                <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
+                <AvatarFallback className="rounded-full bg-primary/10 text-primary text-base font-medium">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate">{userName}</span>
-                {/* <span className="truncate text-xs text-muted-foreground">{userEmail}</span> */}
-              </div>
-              <ChevronRightIcon className="ml-auto size-4 transition-transform duration-200 max-lg:rotate-270 [[data-state=open]>&]:rotate-90 lg:[[data-state=open]>&]:-rotate-180" />
+              {!isCollapsed && (
+                <>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate">{userName}</span>
+                    {/* <span className="truncate text-xs text-muted-foreground">{userEmail}</span> */}
+                  </div>
+                  <ChevronRightIcon className="ml-auto size-4 transition-transform duration-200 max-lg:rotate-270 [[data-state=open]>&]:rotate-90 lg:[[data-state=open]>&]:-rotate-180" />
+                </>
+              )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -97,11 +111,7 @@ export function SidebarUserDropdown() {
                 <WalletIcon className="mr-2 size-4" />
                 Plans & Payments
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleNavigate("/account/billing")}>
-                <CreditCardIcon className="mr-2 size-4" />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleNavigate("/help")}>
+              <DropdownMenuItem onClick={() => handleNavigate("/help", true)}>
                 <HelpCircle className="mr-2 size-4" />
                 Help Center
               </DropdownMenuItem>

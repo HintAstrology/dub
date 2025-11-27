@@ -1,4 +1,5 @@
 import { FeaturesAccess } from '@/lib/actions/check-features-access-auth-less';
+import { formatPlanName } from '@/lib/utils/plan-name';
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { FC, useMemo } from "react";
 
@@ -17,11 +18,12 @@ export const PlansHeading: FC<IPlansHeading> = ({
       case !featuresAccess.isSubscribed:
         return "Your QR codes are currently disabled. Choose a plan to restore full QR access";
       case featuresAccess.isSubscribed:
-        return "You’re currently on a paid plan. Adjust your preferences anytime — no commitment";
+        const planPeriod = formatPlanName(featuresAccess.planName);
+        return `You're currently on ${planPeriod} plan. Adjust your preferences anytime.`;
       default:
         return null;
     }
-  }, []);
+  }, [featuresAccess]);
 
   return (
     <Flex gap="3" direction="column" className="mt-[14px] lg:mt-[22px]">
@@ -34,9 +36,9 @@ export const PlansHeading: FC<IPlansHeading> = ({
         <Text>
           {featuresAccess.isSubscribed
             ? <>
-                Choose a plan that{" "}
+                Your subscription is{" "}
                 <span className="bg-qr-gradient inline-block bg-clip-text text-transparent">
-                  fits you best
+                  Active
                 </span>
               </>
             : <>

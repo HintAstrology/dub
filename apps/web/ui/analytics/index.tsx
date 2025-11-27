@@ -13,7 +13,7 @@ import AnalyticsProvider, {
 import { AnalyticsFiltersList } from "./analytics-filters-list";
 import Main from "./main";
 import { StatsGrid } from "./stats-grid";
-import Toggle from "./toggle";
+import Toggle from "./components/toggle";
 
 
 export default function Analytics({

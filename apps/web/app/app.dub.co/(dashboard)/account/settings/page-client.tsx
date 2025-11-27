@@ -117,17 +117,13 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
   return (
     <div className="bg-card mx-auto w-full rounded-[20px]  shadow">
       <div className="p-4">
-        <h2 className="text-lg font-semibold mb-1">Profile Settings</h2>
-        <p className="text-muted-foreground text-sm mb-6">
-          Manage your personal information
-        </p>
         {/* Avatar Section */}
         <div className="mb-6 pb-6 border-b">
           <Label className="mb-3 block">Profile Picture</Label>
           <div className="flex items-center gap-4">
             <FileUpload
               accept="images"
-              className="border-border h-20 w-20 rounded-full border"
+              className="border-border h-[120px] w-[120px] rounded-full border"
               iconClassName="w-5 h-5"
               variant="plain"
               imageSrc={image}
@@ -135,11 +131,11 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
               onChange={({ src }) => setImage(src)}
               content={null}
               maxFileSizeMB={2}
-              targetResolution={{ width: 160, height: 160 }}
+              targetResolution={{ width: 240, height: 240 }}
             />
             <div className="flex-1">
               <p className="text-muted-foreground text-sm mb-2">
-                Square image recommended. Max 2MB.
+                Upload PNG or JPG images up to 2MB
               </p>
               {imageChanged && (
                 <Button 
@@ -192,7 +188,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
           <Label className="mb-2 block">User ID</Label>
           <div className="bg-muted flex items-center justify-between rounded-md shadow p-3">
             <code className="text-foreground text-sm font-mono">
-              {session?.user?.id || "Loading..."}
+              {session?.user?.id! || "Loading..."}
             </code>
             {session?.user?.id && (
               <CopyButton 

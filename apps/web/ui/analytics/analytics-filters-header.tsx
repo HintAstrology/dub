@@ -50,8 +50,8 @@ import useSWR from "swr";
 import { LinkIcon } from "../links/link-icon";
 import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
 import AnalyticsExport from "./analytics-export";
-import ContinentIcon from "./continent-icon";
-import DeviceIcon from "./device-icon";
+import DeviceIcon from "./components/device-icon";
+
 
 function useStandaloneFilterOption(
   groupBy: AnalyticsGroupByOptions,
@@ -323,9 +323,7 @@ export function AnalyticsFiltersHeader() {
         key: "continent",
         icon: MapPosition,
         label: "Continent",
-        getOptionIcon: (value) => (
-          <ContinentIcon display={value} className="size-2.5" />
-        ),
+        getOptionIcon: (value) => null,
         getOptionLabel: (value) => CONTINENTS[value],
         options:
           continents?.map(({ continent, count }) => ({

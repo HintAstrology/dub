@@ -2,7 +2,7 @@ import { LinkProps } from "@/lib/types";
 import { CopyButton, LinkLogo } from "@dub/ui";
 import { ArrowTurnRight2 } from "@dub/ui/icons";
 import { getApexDomain, getPrettyUrl, linkConstructor } from "@dub/utils";
-import { CommentsBadge } from "../links/comments-badge";
+import { CommentsBadge } from "../../links/comments-badge";
 
 export default function LinkPreviewTooltip({ data }: { data: LinkProps }) {
   const { domain, key, url, comments } = data;

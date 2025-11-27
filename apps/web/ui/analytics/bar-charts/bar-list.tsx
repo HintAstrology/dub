@@ -19,8 +19,7 @@ import {
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { areEqual, FixedSizeList } from "react-window";
-import { AnalyticsContext } from "./analytics-provider";
-import LinkPreviewTooltip from "./link-preview";
+import { AnalyticsContext } from "../analytics-provider";
 
 const chartColors = [
   "hsl(var(--chart-1))",

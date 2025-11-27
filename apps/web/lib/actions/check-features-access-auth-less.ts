@@ -9,6 +9,7 @@ export type FeaturesAccess = {
   isSubscribed: boolean;
   subscriptionNotPaid: boolean;
   subscriptionId: string | null;
+  planName: string | null;
   status:
     | "active"
     | "inactive"
@@ -37,11 +38,12 @@ export const checkFeaturesAccessAuthLess = async (userId: string) => {
       isSubscribed: false,
       subscriptionNotPaid: false,
       subscriptionId: null,
+      planName: null,
       status: null,
     } as FeaturesAccess;
   }
 
-  const { isSubscribed, subscriptionId, status } =
+  const { isSubscribed, subscriptionId, status, planName } =
     await checkSubscriptionStatusAuthLess(userData.email);
 
   // const totalClicks = userData.totalUserClicks || 0;
@@ -69,6 +71,7 @@ export const checkFeaturesAccessAuthLess = async (userId: string) => {
     isSubscribed,
     subscriptionNotPaid: !!subscriptionId && !isSubscribed,
     subscriptionId,
+    planName,
     status,
   } as FeaturesAccess;
 };

@@ -90,6 +90,6 @@ export function getYAxisConfig(
  * Get the data key for the chart based on resource
  */
 export function getDataKey(resource: EventType): "clicks" | "leads" | "sales" {
-  return resource === "clicks" ? "clicks" : resource;
+  return resource === "clicks" ? "clicks" : 'leads';
 }
 

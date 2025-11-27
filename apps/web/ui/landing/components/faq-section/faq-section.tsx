@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 import { SectionTitle } from "@/ui/landing/components/section-title.tsx";
 import { BlockMarkdown } from "@/ui/partners/lander-blocks/BlockMarkdown.tsx";
 import { FC } from "react";
@@ -36,7 +37,11 @@ export const FAQSection: FC<IFaqSectionProps> = ({ faqItems }) => {
 
       <Accordion type="single" collapsible className="w-full">
         {faqItems.map((item, index) => (
-          <AccordionItem key={index} value={`item-${index}`}>
+          <AccordionItem
+            key={index}
+            value={`item-${index}`}
+            className={cn(index === faqItems.length - 1 && "border-b-0")}
+          >
             <AccordionTrigger className="text-left text-lg">
               {item.title}
             </AccordionTrigger>

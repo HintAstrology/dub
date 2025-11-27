@@ -202,6 +202,7 @@ export const checkSystemSubscriptionStatus = async (
         status: null,
         nextBillingDate: null,
         isDunning: false,
+        planName: null,
       };
     }
 
@@ -211,6 +212,7 @@ export const checkSystemSubscriptionStatus = async (
     const isScheduledForCancellation =
       subscription?.status === "scheduled_for_cancellation";
     const hasAccessToApp = isSubscribed || isScheduledForCancellation;
+    const planName = subscription?.attributes?.plan_name || null;
 
     debugUtil({
       text: "checkSystemSubscriptionStatus",
@@ -230,6 +232,7 @@ export const checkSystemSubscriptionStatus = async (
       status: subscription.status,
       nextBillingDate,
       isDunning: subscription.status === "dunning",
+      planName,
     };
   } catch (error: any) {
     const errorMsg =

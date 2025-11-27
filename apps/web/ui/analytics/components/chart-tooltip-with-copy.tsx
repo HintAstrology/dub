@@ -10,6 +10,7 @@ interface ChartTooltipWithCopyProps {
   copyValue?: string;
   showCopy?: boolean;
   active?: boolean;
+  copyTooltipText?: string;
 }
 
 export function ChartTooltipWithCopy({
@@ -20,6 +21,7 @@ export function ChartTooltipWithCopy({
   copyValue,
   showCopy = false,
   active = true,
+  copyTooltipText,
 }: ChartTooltipWithCopyProps) {
 
   // Truncate name if too long (max 25 characters)
@@ -42,14 +44,12 @@ export function ChartTooltipWithCopy({
           {displayName}
         </span>
         {showCopy && copyValue && (
-          <div
-            className="pointer-events-auto shrink-0"          >
             <CopyButton
               value={copyValue}
               variant="neutral"
-              className="h-5 w-5 p-0.5"
+              className="h-4 w-4 "
+              successMessage={copyTooltipText}
             />
-          </div>
         )}
       </div>
       {(value !== undefined || percentage !== undefined) && (

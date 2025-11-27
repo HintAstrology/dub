@@ -2,22 +2,20 @@
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { PlansFeatures } from "@/ui/plans/components/plans-features.tsx";
-import { QRCodeDemoMap } from "@/ui/qr-builder-new/components/qr-code-demos/qr-code-demo-map";
-import {
-  FILE_QR_TYPES,
-  QR_TYPES,
-} from "@/ui/qr-builder-new/constants/get-qr-config";
-import { parseQRData } from "@/ui/qr-builder-new/helpers/qr-data-handlers";
+import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
+import { QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { extractCustomizationData } from "@/ui/qr-builder-new/helpers/data-converters";
+import { useQRCodeStyling } from "@/ui/qr-builder-new/hooks/use-qr-code-styling";
+import { IQRCustomizationData } from "@/ui/qr-builder-new/types/customization";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
-import { Button } from "@dub/ui";
-import { Flex, Heading, Text } from "@radix-ui/themes";
+import { Heading, Text } from "@radix-ui/themes";
 import { Options } from "qr-code-styling/lib/types";
 import { FC, useMemo } from "react";
 import { QrInfoBadge } from "./qr-info-badge";
 
 interface IPopularQrInfo {
-  mostScannedQR: TQrServerData | null;
+  mostScannedQR: (TQrServerData & { svgString?: string | null }) | null;
   featuresAccess: FeaturesAccess;
   handleScroll: () => void;
 }
@@ -25,131 +23,190 @@ interface IPopularQrInfo {
 export const PopularQrInfo: FC<IPopularQrInfo> = ({
   mostScannedQR,
   featuresAccess,
-  handleScroll,
 }) => {
-  const qrCodeDemo = mostScannedQR?.qrType
-    ? QRCodeDemoMap[mostScannedQR.qrType as EQRType]
-    : QRCodeDemoMap[EQRType.WEBSITE];
+  // Use SVG string from service if available, otherwise fallback to client-side generation
+  const svgStringFromService = mostScannedQR?.svgString;
 
-  const demoProps = useMemo(() => {
-    if (!mostScannedQR || !qrCodeDemo || !mostScannedQR.data) return {};
+  const defaultCustomizationData = useMemo<IQRCustomizationData>(
+    () => ({
+      frame: {
+        id: "frame-none",
+        color: "#000000",
+        textColor: "#000000",
+        text: "SCAN ME",
+      },
+      style: {
+        dotsStyle: "dots-square",
+        foregroundColor: "#000000",
+        backgroundColor: "#ffffff",
+      },
+      shape: {
+        cornerSquareStyle: "corner-square-square",
+        cornerDotStyle: "corner-dot-square",
+      },
+      logo: { type: "none" as const },
+    }),
+    [],
+  );
 
-    const qrType = mostScannedQR.qrType as EQRType;
-    const stylesData = (mostScannedQR.styles as Options)?.data;
+  const customizationData = useMemo(() => {
+    if (!mostScannedQR) return defaultCustomizationData;
+    try {
+      return extractCustomizationData(
+        (mostScannedQR.styles || {}) as Options,
+        mostScannedQR.frameOptions || null,
+        mostScannedQR.logoOptions || undefined,
+      );
+    } catch (error) {
+      console.error("Error extracting customization data:", error);
+      return defaultCustomizationData;
+    }
+  }, [mostScannedQR, defaultCustomizationData]);
 
-    if (FILE_QR_TYPES.includes(qrType)) {
-      return parseQRData(qrType, mostScannedQR.link.url);
+  const qrData = useMemo(() => {
+    if (!mostScannedQR) return "https://getqr.com/qr-complete-setup";
+
+    // For WiFi QR codes, use the data field directly
+    if (mostScannedQR.qrType === EQRType.WIFI) {
+      return mostScannedQR.data;
     }
 
-    return parseQRData(qrType, stylesData || mostScannedQR.data);
-  }, [mostScannedQR, qrCodeDemo]);
+    // For other QR types, use the data field (contains short link like 'https://link-dev.getqr.com/E3FlKdj')
+    return (
+      mostScannedQR.data ||
+      mostScannedQR.link?.shortLink ||
+      (mostScannedQR.link?.domain && mostScannedQR.link?.key
+        ? `https://${mostScannedQR.link.domain}/${mostScannedQR.link.key}`
+        : mostScannedQR.link?.url) ||
+      "https://getqr.com/qr-complete-setup"
+    );
+  }, [mostScannedQR]);
+
+  // Only use client-side generation if SVG from service is not available
+  const { svgString: svgStringFromClient } = useQRCodeStyling({
+    customizationData,
+    defaultData: qrData,
+  });
+
+  // Prefer SVG from service, fallback to client-side generated
+  const svgString = svgStringFromService || svgStringFromClient;
 
   return (
-    <Flex
-      direction="column"
-      className="border-border-500 gap-3 rounded-xl border p-3 lg:flex-1 lg:gap-[18px] lg:px-6 lg:py-4"
-    >
-      <Heading
-        as="h2"
-        align="left"
-        size={{ initial: "2", lg: "4" }}
-        className="text-neutral"
-      >
-        {!featuresAccess.featuresAccess
-          ? "Your most popular QR code is now deactivated"
-          : "Your top performing QR"}
-      </Heading>
-
-      <div className="border-border-200 h-px w-full border-t" />
-
-      <Flex direction="row" align="start" gap={{ initial: "4", lg: "6" }}>
-        <div className="relative flex-shrink-0">
-          <qrCodeDemo.Component {...demoProps} smallPreview />
-
-          <div className="absolute bottom-0 left-1/2 h-[80px] w-[158px] -translate-x-1/2 bg-gradient-to-t from-white via-white/75 to-transparent" />
-        </div>
-
-        <Flex
-          direction="column"
-          gap={{ initial: "2", lg: "3" }}
-          justify="center"
-          className="w-full flex-1"
+    <div className="border-border-500 flex flex-col gap-4 rounded-xl border bg-white px-4 py-3 shadow-sm lg:flex-1 lg:gap-6 lg:h-full lg:p-6">
+      <div>
+        <Heading
+          as="h2"
+          align="left"
+          size={{ initial: "3", lg: "5" }}
+          className="text-foreground font-semibold"
         >
-          <Flex direction="column" gap="1">
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              className="text-neutral-800"
-            >
-              QR Code Name:
-            </Text>
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              weight="bold"
-              className="text-neutral"
-            >
-              {mostScannedQR?.title || mostScannedQR?.title || "web-1"}
-            </Text>
-          </Flex>
+          {!featuresAccess.featuresAccess
+            ? "Your most popular QR code is now deactivated"
+            : "Your Top Performing QR"}
+        </Heading>
+      </div>
 
-          <Flex direction="column" gap="1">
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              className="text-neutral-800"
-            >
-              Type:
-            </Text>
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              weight="bold"
-              className="text-neutral"
-            >
-              {QR_TYPES.find(
-                (item) => (mostScannedQR?.qrType || "website") === item.id,
-              )?.label || "Website"}
-            </Text>
-          </Flex>
+      {mostScannedQR ? (
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+          {/* QR Code Display */}
+          <div className="flex-shrink-0">
+            {svgString ? (
+              <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200">
+                <QRCanvas
+                  svgString={svgString}
+                  width={140}
+                  height={140}
+                  className="p-1"
+                />
+              </div>
+            ) : (
+              <div className="flex h-[140px] w-[140px] items-center justify-center rounded-lg bg-gray-50 ring-1 ring-gray-200">
+                <Text size="2" className="text-muted-foreground">
+                  Loading...
+                </Text>
+              </div>
+            )}
+          </div>
 
-          <Flex direction="column" gap="1">
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              className="text-neutral-800"
-            >
-              Number of scans:
-            </Text>
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              weight="bold"
-              className="text-neutral"
-            >
-              {(mostScannedQR && mostScannedQR.link?.clicks) ?? 231}
-            </Text>
-          </Flex>
+          {/* QR Code Info */}
+          <div className="flex flex-1 flex-col gap-3">
+            <div>
+              <Text
+                as="p"
+                size="1"
+                className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
+              >
+                QR Name
+              </Text>
+              <Text
+                as="p"
+                size={{ initial: "3", lg: "4" }}
+                weight="bold"
+                className="text-foreground"
+              >
+                {mostScannedQR.title || "Untitled QR Code"}
+              </Text>
+            </div>
 
-          <Flex direction="column" gap="1">
-            <Text
-              as="span"
-              size={{ initial: "1", lg: "2" }}
-              className="text-neutral-800"
-            >
-              QR Code Status:
-            </Text>
-            <QrInfoBadge
-              mostScannedQR={mostScannedQR}
-              featuresAccess={featuresAccess}
-            />
-          </Flex>
-        </Flex>
-      </Flex>
+            <div>
+              <Text
+                as="p"
+                size="1"
+                className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
+              >
+                Type
+              </Text>
+              <Text as="p" size="2" weight="medium" className="text-foreground">
+                {QR_TYPES.find(
+                  (item) => (mostScannedQR.qrType || "website") === item.id,
+                )?.label || "Website"}
+              </Text>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <div>
+                <Text
+                  as="p"
+                  size="1"
+                  className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
+                >
+                  Scans
+                </Text>
+                <Text
+                  as="p"
+                  size="2"
+                  weight="medium"
+                  className="text-foreground"
+                >
+                  {(mostScannedQR.link?.clicks ?? 0).toLocaleString()}
+                </Text>
+              </div>
+              <div>
+                <Text
+                  as="p"
+                  size="1"
+                  className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
+                >
+                  Status
+                </Text>
+                <QrInfoBadge
+                  mostScannedQR={mostScannedQR}
+                  featuresAccess={featuresAccess}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex h-[140px] items-center justify-center rounded-lg bg-gray-50">
+          <Text size="2" className="text-muted-foreground">
+            No QR Code available
+          </Text>
+        </div>
+      )}
 
       <div className="hidden lg:block">
         <PlansFeatures />
       </div>
-    </Flex>
+    </div>
   );
 };

@@ -79,7 +79,7 @@ export default function DeviceIcon({
       );
     }
   } else if (tab === "triggers") {
-    if (display === "qr") {
+    if (display === "qr" || display === "link") {
       return <QRCode className={className} />;
     } else {
       return <CursorRays className={className} />;

@@ -144,8 +144,8 @@ const SidebarProvider = React.forwardRef<
           <div
             style={
               {
-                "--sidebar-width": SIDEBAR_WIDTH,
-                "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+                "--sidebar-width": state === "collapsed" ? "75px" : SIDEBAR_WIDTH,
+                "--sidebar-width-icon": state === "collapsed" ? "75px" : SIDEBAR_WIDTH_ICON,
                 ...style,
               } as React.CSSProperties
             }

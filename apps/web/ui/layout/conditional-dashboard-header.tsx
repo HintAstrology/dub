@@ -1,10 +1,10 @@
 "use client";
 
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { DashboardHeader } from "./dashboard-header";
 import { cn } from "@dub/utils";
-import { UserIcon, WalletIcon, CreditCardIcon } from "lucide-react";
+import { UserIcon, WalletIcon, CreditCardIcon, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 
 interface ConditionalDashboardHeaderProps {
   user: any;
@@ -12,6 +12,7 @@ interface ConditionalDashboardHeaderProps {
 
 export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderProps) {
   const pathname = usePathname();
+  const { state, toggleSidebar } = useSidebar();
   const isAccountSettings = pathname?.startsWith("/account/settings");
   const isAccountPlans = pathname?.startsWith("/account/plans");
   const isAccountBilling = pathname?.startsWith("/account/billing");
@@ -31,17 +32,28 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
   };
 
   if (isAccountSettings || isAccountPlans || isAccountBilling) {
+    const AccountIcon = getAccountIcon();
+    
     return (
       <header className={cn(
         "bg-card rounded-[20px",
         "[&_*]:no-underline"
       )}>
         <div className="flex w-full items-center gap-3 pb-4">
-          <SidebarTrigger 
-            icon={getAccountIcon()}
-            asPageIcon={true}
-            className="text-secondary [&_svg]:!size-5" 
-          />
+          {/* Mobile: Toggle button | Desktop: Account icon */}
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors text-secondary"
+          >
+            {state === "expanded" ? (
+              <PanelLeftClose className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" />
+            )}
+          </button>
+          <div className="hidden md:flex p-2 text-secondary">
+            <AccountIcon className="h-5 w-5" />
+          </div>
           <h1 className="text-lg font-semibold text-neutral-900">
             {getAccountTitle()}
           </h1>

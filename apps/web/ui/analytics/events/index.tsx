@@ -5,7 +5,7 @@ import EmptyState from "@/ui/shared/empty-state";
 import { Menu3 } from "@dub/ui/icons";
 import { useContext } from "react";
 import AnalyticsProvider, { AnalyticsContext } from "../analytics-provider";
-import Toggle from "../toggle";
+import Toggle from "../components/toggle";
 import EventsTable from "./events-table";
 import EventsTabs from "./events-tabs";
 

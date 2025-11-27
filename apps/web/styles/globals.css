@@ -267,6 +267,11 @@ select:-webkit-autofill:active {
   z-index: 9999 !important;
 }
 
+/* Hide keyboard shortcuts in date range picker */
+[cmdk-root] kbd {
+  display: none !important;
+}
+
 @theme inline {
   @keyframes marquee {
   from {

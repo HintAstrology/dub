@@ -6,8 +6,8 @@ import { CopyButton } from "@dub/ui";
 import { nFormatter } from "@dub/utils";
 import { ReactNode, useContext, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
-import { AnalyticsContext } from "./analytics-provider";
-import { ChartTooltipWithCopy } from "./chart-tooltip-with-copy";
+import { AnalyticsContext } from "../analytics-provider";
+import { ChartTooltipWithCopy } from "../components/chart-tooltip-with-copy";
 
 const chartColors = [
   "hsl(var(--chart-1))",
@@ -34,6 +34,7 @@ interface AnalyticsPieChartWithListsProps {
   limit?: number;
   showName?: boolean;
   showCopy?: boolean;
+  copyTooltipText?: string;
   onViewAll?: () => void;
   controls?: ReactNode;
 }
@@ -45,6 +46,7 @@ export default function AnalyticsPieChartWithLists({
   limit = 6,
   showName = false,
   showCopy = false,
+  copyTooltipText,
   onViewAll,
   controls,
 }: AnalyticsPieChartWithListsProps) {
@@ -246,11 +248,12 @@ export default function AnalyticsPieChartWithLists({
                               value={item.copyValue || item.title}
                               variant="neutral"
                               className="h-4 w-4 p-0.5"
+                              successMessage={copyTooltipText}
                             />
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Copy QR Link</p>
+                          <p>{copyTooltipText || "Copy QR Link"}</p>
                         </TooltipContent>
                       </Tooltip>
                     )}

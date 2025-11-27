@@ -20,6 +20,7 @@ const PlansPage: NextPage = async () => {
 
   const mostScannedQR = await getMostScannedQr(sessionUser.id);
 
+  console.log(mostScannedQR,'mostScannedQR');
   return (
     <>
       <PageContent>
@@ -28,6 +29,7 @@ const PlansPage: NextPage = async () => {
             mostScannedQR={mostScannedQR as unknown as TQrServerData}
             user={user!}
             featuresAccess={featuresAccess}
+            sessionId={sessionUser.id!}
           />
         </MaxWidthWrapper>
       </PageContent>
