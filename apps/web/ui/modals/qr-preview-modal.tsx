@@ -277,7 +277,7 @@ function QRPreviewModal({
                     </div>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content
-                    className="border-border-100 !z-10 flex w-[94px] flex-col items-center justify-start gap-2 rounded-lg border bg-white p-3 shadow-md"
+                    className="w-[var(--radix-dropdown-menu-trigger-width)] border-border-100 !z-10 flex flex-col items-center justify-start gap-2 rounded-lg border bg-white p-3 shadow-md"
                     sideOffset={5}
                     align="start"
                   >

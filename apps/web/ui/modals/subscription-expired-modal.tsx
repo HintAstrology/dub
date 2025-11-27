@@ -6,7 +6,7 @@ import { Button, Modal } from "@dub/ui";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 
-interface ITrialExpiredModalProps {
+interface ISubscriptionExpiredModalProps {
   showModal?: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
 }
@@ -28,10 +28,10 @@ function FeatureItem({ text }: IFeatureItemProps) {
   );
 }
 
-export function TrialExpiredModal({
+export function SubscriptionExpiredModal({
   showModal = true,
   setShowModal,
-}: ITrialExpiredModalProps) {
+}: ISubscriptionExpiredModalProps) {
   const router = useRouter();
 
   const handleRestoreAccess = () => {
@@ -95,7 +95,7 @@ export function TrialExpiredModal({
           <div className="w-full space-y-3 sm:space-y-4">
             <div className="text-left">
               <p className="text-medium text-sm leading-relaxed text-neutral-800 sm:text-base">
-                Free access has expired because you’ve either reached the{" "}
+                Free access has expired because you've either reached the{" "}
                 {TrialDays}-day usage limit or completed {TrialClicks} scans.
                 <br />
                 <br />
@@ -107,7 +107,7 @@ export function TrialExpiredModal({
 
             <ul className="space-y-2 sm:space-y-3">
               <FeatureItem text="Your dynamic QR codes are no longer scannable." />
-              <FeatureItem text="You can’t create new codes or edit existing ones." />
+              <FeatureItem text="You can't create new codes or edit existing ones." />
               <FeatureItem text="Detailed tracking metrics are inaccessible." />
               <FeatureItem text="Asset downloads are disabled." />
             </ul>
@@ -131,3 +131,4 @@ export function TrialExpiredModal({
     </Modal>
   );
 }
+

@@ -1,4 +1,4 @@
-import { TrialStatusProvider } from "@/lib/contexts/trial-status-context";
+import { SubscriptionExpiredProvider } from "@/lib/contexts/subscription-expired-context";
 import { MainNav } from "@/ui/layout/main-nav";
 import { AppSidebarNav } from "@/ui/layout/sidebar/app-sidebar-nav";
 import { constructMetadata } from "@dub/utils";
@@ -17,7 +17,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   const parsedOauthFlowInfo = JSON.parse(oauthFlowCookie ?? "{}");
 
   return (
-    <TrialStatusProvider>
+    <SubscriptionExpiredProvider>
       <div className="min-h-screen w-full bg-white">
         <MainNav
           sidebar={AppSidebarNav}
@@ -36,6 +36,6 @@ export default async function Layout({ children }: { children: ReactNode }) {
       {oauthFlowCookie && (
         <OauthTrackerComponent oauthData={parsedOauthFlowInfo} />
       )}
-    </TrialStatusProvider>
+    </SubscriptionExpiredProvider>
   );
 }

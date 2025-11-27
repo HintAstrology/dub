@@ -52,6 +52,7 @@ export const ShapeSelector: FC<ShapeSelectorProps> = ({
           iconSize={30}
           styleButtonClassName="[&_img]:h-5 [&_img]:w-5 p-3.5"
           disabled={disabled}
+          gridMinWidth={50}
         />
 
         <StylePicker
@@ -63,6 +64,7 @@ export const ShapeSelector: FC<ShapeSelectorProps> = ({
           iconSize={30}
           styleButtonClassName="[&_img]:h-5 [&_img]:w-5 p-3.5"
           disabled={disabled}
+          gridMinWidth={50}
         />
       </div>
     </div>

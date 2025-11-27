@@ -40,7 +40,7 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
 
   return (
     <section className="py-6 lg:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
         {/* Header with Title */}
         <div className="mb-8 flex items-center justify-center text-center">
           <div className="flex max-w-3xl flex-col items-center justify-center gap-3">
@@ -58,7 +58,7 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
         >
           <ScrollArea.Root className="w-full">
             <ScrollArea.Viewport className="w-full overflow-x-auto pt-3">
-              <TabsList className="mb-4 flex h-auto w-max min-w-full justify-start gap-3 bg-transparent p-0 sm:gap-4">
+              <TabsList className="mb-4 flex h-auto w-max justify-start gap-3 bg-transparent p-0 pr-4 sm:gap-4">
                 {QR_TYPES.map((type) => (
                   <TabsTrigger
                     key={type.id}
@@ -88,7 +88,7 @@ export const QrTabsDetailed: FC<IQrTabsDetailedProps> = ({
             <TabsContent key={type.id} value={type.id}>
               <div className="flex flex-col items-center justify-between gap-8 lg:flex-row lg:gap-12">
                 {/* Left side - Content */}
-                <div className="w-full lg:w-1/2">
+                <div className="w-full lg:w-1/2 mt-4 md:mt-0">
                   <div className="flex flex-col gap-6">
                     <h3 className="text-card-foreground text-2xl font-bold md:text-3xl">
                       {type.label}
