@@ -4,8 +4,8 @@ import { VALID_ANALYTICS_FILTERS } from "@/lib/analytics/constants";
 import { AnalyticsGroupByOptions, EventType } from "@/lib/analytics/types";
 import { editQueryString } from "@/lib/analytics/utils";
 import useWorkspace from "@/lib/swr/use-workspace";
-import { cn, fetcher, linkConstructor, nFormatter } from "@dub/utils";
-import { Filter, useRouterStuff } from "@dub/ui";
+import { LinkProps } from "@/lib/types";
+import { Button, Filter, LinkLogo, useRouterStuff } from "@dub/ui";
 import {
   Cube,
   FlagWavy,
@@ -20,13 +20,15 @@ import {
 } from "@dub/ui/icons";
 import {
   capitalize,
+  cn,
   CONTINENTS,
   COUNTRIES,
+  fetcher,
   getApexDomain,
+  linkConstructor,
+  nFormatter,
   REGIONS,
 } from "@dub/utils";
-import { LinkLogo } from "@dub/ui";
-import { LinkProps } from "@/lib/types";
 import { Icon } from "@iconify/react";
 import { ComponentProps, useContext, useMemo } from "react";
 import useSWR from "swr";
@@ -414,11 +416,31 @@ export function AnalyticsFiltersList() {
   };
 
   const onRemoveAll = () => {
+    // Get all filter keys to delete
     const filtersToDelete = activeFilters
       .map((f) => (f.key === "link" ? ["domain", "key"] : f.key))
       .flat();
+
+    // Also clear date range filters
+    const dateFilters = ["start", "end"];
+
+    // Clear root and folderId if they exist
+    const additionalFilters: string[] = [];
+    if (searchParamsObj.root) additionalFilters.push("root");
+    if (searchParamsObj.folderId) additionalFilters.push("folderId");
+
+    // Combine all filters to delete
+    const allFiltersToDelete = [
+      ...filtersToDelete,
+      ...dateFilters,
+      ...additionalFilters,
+    ];
+
     queryParams({
-      del: filtersToDelete,
+      del: allFiltersToDelete,
+      set: {
+        interval: "30d", // Reset to default interval
+      },
       scroll: false,
     });
   };
@@ -429,18 +451,22 @@ export function AnalyticsFiltersList() {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
           .analytics-filters-wrapper .border-neutral-200 {
             border-color: hsl(var(--chart-4)) !important;
           }
-        `
-      }} />
-      <div className="mx-auto w-full mb-4">
-        <div className={cn(
-          "analytics-filters-wrapper flex w-full show-clear-filters flex-wrap items-start gap-4 sm:flex-nowrap",
-        )}>
-          <div className="flex grow flex-wrap gap-x-4 gap-y-2">
+        `,
+        }}
+      />
+      <div className="mx-auto mb-4 w-full">
+        <div
+          className={cn(
+            "analytics-filters-wrapper show-clear-filters flex w-full flex-wrap items-start gap-4 sm:flex-nowrap",
+          )}
+        >
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
             <Filter.List
               filters={filters}
               activeFilters={activeFilters}
@@ -449,10 +475,15 @@ export function AnalyticsFiltersList() {
               onSelect={onFilterSelect}
               isOptionDropdown={true}
             />
+            <Button
+              variant="outline"
+              text="Reset"
+              onClick={onRemoveAll}
+              className="whitespace-nowrap w-max text-gray-400 hover:bg-gray-50"
+            />
           </div>
         </div>
       </div>
     </>
   );
 }
-
