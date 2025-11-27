@@ -5,22 +5,22 @@ import { usePathname } from "next/navigation";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { checkFeaturesAccess } from "../actions/check-features-access";
 import { useSession } from "next-auth/react";
-import { TrialExpiredModal } from "@/ui/modals/trial-expired-modal";
+import { SubscriptionExpiredModal } from "@/ui/modals/subscription-expired-modal";
 import { 
-  getTrialExpiredModalShown, 
-  setTrialExpiredModalShown 
+  getSubscriptionExpiredModalShown, 
+  setSubscriptionExpiredModalShown 
 } from "../../core/services/cookie/user-session.service.ts";
 
-interface TrialStatusContextType {
+interface SubscriptionExpiredContextType {
   isTrialOver: boolean;
   setIsTrialOver: (value: boolean) => void; // TODO: remove it, still used for testing
 }
 
-const TrialStatusContext = createContext<TrialStatusContextType | undefined>(
+const SubscriptionExpiredContext = createContext<SubscriptionExpiredContextType | undefined>(
   undefined,
 );
 
-export function TrialStatusProvider({ children }: { children: ReactNode }) {
+export function SubscriptionExpiredProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession() as
     | {
         data: { user: { id: string } };
@@ -29,8 +29,8 @@ export function TrialStatusProvider({ children }: { children: ReactNode }) {
     | { data: null; status: "loading" };
 
   const [isTrialOver, setIsTrialOver] = useState<boolean>(false);
-  const [showTrialExpiredModal, setShowTrialExpiredModal] = useState<boolean>(false);
-  const [trialModalShown, setTrialModalShown] = useState<boolean>(false);
+  const [showSubscriptionExpiredModal, setShowSubscriptionExpiredModal] = useState<boolean>(false);
+  const [subscriptionModalShown, setSubscriptionModalShown] = useState<boolean>(false);
   const previousStatusRef = useRef<string>(status);
   const pathname = usePathname();
 
@@ -38,8 +38,8 @@ export function TrialStatusProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkModalShown = async () => {
-      const hasBeenShown = await getTrialExpiredModalShown();
-      setTrialModalShown(hasBeenShown);
+      const hasBeenShown = await getSubscriptionExpiredModalShown();
+      setSubscriptionModalShown(hasBeenShown);
     };
     checkModalShown();
   }, []);
@@ -67,30 +67,31 @@ export function TrialStatusProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const isAuthenticated = 
       status === "authenticated";
-    if (isAuthenticated && isTrialOver && !trialModalShown) {
-      setShowTrialExpiredModal(true);
-      setTrialModalShown(true);
-      setTrialExpiredModalShown();
+    if (isAuthenticated && isTrialOver && !subscriptionModalShown) {
+      setShowSubscriptionExpiredModal(true);
+      setSubscriptionModalShown(true);
+      setSubscriptionExpiredModalShown();
     }
 
     previousStatusRef.current = status;
-  }, [status, isTrialOver, trialModalShown]);
+  }, [status, isTrialOver, subscriptionModalShown]);
 
   return (
-    <TrialStatusContext.Provider value={{ isTrialOver, setIsTrialOver }}>
-      <TrialExpiredModal
-        showModal={showTrialExpiredModal}
-        setShowModal={setShowTrialExpiredModal}
+    <SubscriptionExpiredContext.Provider value={{ isTrialOver, setIsTrialOver }}>
+      <SubscriptionExpiredModal
+        showModal={showSubscriptionExpiredModal}
+        setShowModal={setShowSubscriptionExpiredModal}
       />
       {children}
-    </TrialStatusContext.Provider>
+    </SubscriptionExpiredContext.Provider>
   );
 }
 
-export function useTrialStatus() {
-  const context = useContext(TrialStatusContext);
+export function useSubscriptionExpired() {
+  const context = useContext(SubscriptionExpiredContext);
   if (context === undefined) {
-    throw new Error("useTrialStatus must be used within a TrialStatusProvider");
+    throw new Error("useSubscriptionExpired must be used within a SubscriptionExpiredProvider");
   }
   return context;
 }
+

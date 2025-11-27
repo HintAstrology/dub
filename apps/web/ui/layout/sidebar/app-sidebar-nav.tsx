@@ -1,7 +1,7 @@
 "use client";
 
-import { useTrialStatus } from "@/lib/contexts/trial-status-context";
-import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal";
+import { useSubscriptionExpired } from "@/lib/contexts/subscription-expired-context";
+import { useSubscriptionExpiredModal } from "@/lib/hooks/use-subscription-expired-modal";
 import { useRouterStuff } from "@dub/ui";
 import { Gear2 } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
@@ -20,7 +20,7 @@ const NAV_AREAS: SidebarNavAreas<{
   programs?: { id: string }[];
   session?: Session | null;
   showNews?: boolean;
-  setShowTrialExpiredModal?: (show: boolean) => void;
+  setShowSubscriptionExpiredModal?: (show: boolean) => void;
   isTrialOver: boolean;
 }> = {
   // Top-level
@@ -29,7 +29,7 @@ const NAV_AREAS: SidebarNavAreas<{
     pathname,
     queryString,
     showNews,
-    setShowTrialExpiredModal,
+    setShowSubscriptionExpiredModal,
     isTrialOver,
   }) => ({
     showSwitcher: false,
@@ -55,7 +55,7 @@ const NAV_AREAS: SidebarNavAreas<{
             onClick: isTrialOver
               ? (e: MouseEvent) => {
                   e.preventDefault();
-                  setShowTrialExpiredModal?.(true);
+                  setShowSubscriptionExpiredModal?.(true);
                 }
               : undefined,
           },
@@ -209,9 +209,9 @@ export function AppSidebarNav({
   const { getQueryString } = useRouterStuff();
   const { data: session } = useSession();
   // const { programs } = usePrograms();
-  const { setShowTrialExpiredModal, TrialExpiredModalCallback } =
-    useTrialExpiredModal();
-  const { isTrialOver } = useTrialStatus();
+  const { setShowSubscriptionExpiredModal, SubscriptionExpiredModalCallback } =
+    useSubscriptionExpiredModal();
+  const { isTrialOver } = useSubscriptionExpired();
 
   const currentArea = useMemo(() => {
     return ["/account/settings", "/account/plans"].some((p) =>
@@ -223,7 +223,7 @@ export function AppSidebarNav({
 
   return (
     <>
-      <TrialExpiredModalCallback />
+      <SubscriptionExpiredModalCallback />
       <SidebarNav
         areas={NAV_AREAS}
         currentArea={currentArea}
@@ -236,7 +236,7 @@ export function AppSidebarNav({
           // programs,
           session: session || undefined,
           showNews: pathname.startsWith(`/${slug}/programs/`) ? false : true,
-          setShowTrialExpiredModal,
+          setShowSubscriptionExpiredModal,
           isTrialOver,
         }}
         toolContent={toolContent}
