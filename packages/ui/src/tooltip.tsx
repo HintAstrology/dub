@@ -5,7 +5,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Linkify from "linkify-react";
 import { HelpCircle } from "lucide-react";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { forwardRef, ReactNode, useImperativeHandle, useState } from "react";
 import { Badge } from "./badge";
 import { Button, ButtonProps, buttonVariants } from "./button";
 
@@ -28,7 +28,12 @@ export interface TooltipProps
   delayDuration?: TooltipPrimitive.TooltipProps["delayDuration"];
 }
 
-export function Tooltip({
+export interface TooltipRef {
+  open: () => void;
+  close: () => void;
+}
+
+export const Tooltip = forwardRef<TooltipRef, TooltipProps>(({
   children,
   content,
   contentClassName,
@@ -36,8 +41,13 @@ export function Tooltip({
   disableHoverableContent,
   delayDuration = 0,
   ...rest
-}: TooltipProps) {
+}, ref) => {
   const [open, setOpen] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    open: () => setOpen(true),
+    close: () => setOpen(false),
+  }));
 
   return (
     <TooltipPrimitive.Root
@@ -57,11 +67,11 @@ export function Tooltip({
       >
         {children}
       </TooltipPrimitive.Trigger>
-      <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Portal container={typeof document !== 'undefined' ? document.body : undefined}>
         <TooltipPrimitive.Content
           sideOffset={8}
           side={side}
-          className="animate-slide-up-fade border-border-500 pointer-events-auto z-[99] items-center overflow-hidden rounded-xl border bg-white shadow-sm"
+          className="animate-slide-up-fade border-border-500 !z-[100] pointer-events-auto items-center overflow-hidden rounded-xl border bg-white shadow-sm"
           collisionPadding={0}
           {...rest}
         >
@@ -83,7 +93,9 @@ export function Tooltip({
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>
   );
-}
+});
+
+Tooltip.displayName = "Tooltip";
 
 export function TooltipContent({
   title,

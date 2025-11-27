@@ -35,10 +35,10 @@ export const ColorPickerInput: FC<ColorPickerInputProps> = ({
       <label className="font-medium">{label}</label>
       <div
         className={cn(
-          "border-border-500 relative flex h-11 w-full cursor-pointer items-center justify-between rounded-md border p-3 md:min-w-[130px]",
+          "bg-white border-border-500 relative flex h-11 w-full cursor-pointer items-center justify-between rounded-md border p-3 md:min-w-[130px]",
           {
             "border-red-600": !isValid,
-            "bg-border-200 cursor-not-allowed": disabled,
+            "!bg-border-200 cursor-not-allowed": disabled,
           },
         )}
       >

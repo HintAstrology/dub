@@ -2,6 +2,7 @@ import { CUSTOMER_IO_TEMPLATES, sendEmail } from "@dub/email";
 import { prisma } from "@dub/prisma";
 import { format } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
+import { addMixpanelPropertyApiService } from 'core/integration/analytic/services/add-mixpanel-property-api.service';
 
 interface IDataRes {
   success: boolean;
@@ -43,6 +44,13 @@ export async function POST(req: NextRequest): Promise<NextResponse<IDataRes>> {
         { status: 404 },
       );
     }
+
+    await addMixpanelPropertyApiService({
+      userId: user.id,
+      values: {
+        scheduled_for_cancellation: true,
+      },
+    });
 
     await sendEmail({
       email: user.email,

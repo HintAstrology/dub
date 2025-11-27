@@ -6,11 +6,11 @@ import {
   InputGroupInput,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { Tooltip } from "@dub/ui";
+import { Tooltip, TooltipRef } from "@dub/ui";
 import { cn } from "@dub/utils";
 import Cookies from "js-cookie";
 import { Info } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Country } from "react-phone-number-input/input";
 import "react-phone-number-input/style.css";
@@ -43,7 +43,7 @@ export const BaseFormField = ({
     formState: { errors },
   } = useFormContext();
   const [defaultCountry, setDefaultCountry] = useState<Country>("US");
-
+  const tooltipRef = useRef<TooltipRef>(null);
   const error = errors[name]?.message as string;
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export const BaseFormField = ({
       </label>
       <InputGroup
         className={cn(
-          "has-[[data-slot=input-group-control]:focus-visible]:!border-secondary has-[[data-slot=input-group-control]:focus-visible]:ring-0",
+          "bg-white has-[[data-slot=input-group-control]:focus-visible]:!border-secondary has-[[data-slot=input-group-control]:focus-visible]:ring-0",
           {
             "border-red-500": error,
           },
@@ -168,8 +168,12 @@ export const BaseFormField = ({
         )}
         {tooltip && (
           <InputGroupAddon align="inline-end">
-            <Tooltip content={tooltip} delayDuration={150}>
+            <Tooltip ref={tooltipRef} content={tooltip} delayDuration={150}>
               <button
+                onClick={() => {
+                  tooltipRef.current?.open();
+                  console.log("tooltip opened", tooltipRef.current);
+                }}
                 type="button"
                 className="flex size-6 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
               >

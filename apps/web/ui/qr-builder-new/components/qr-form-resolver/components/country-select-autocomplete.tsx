@@ -120,7 +120,7 @@ export const CountrySelectAutocompleteComponent = ({
       <button
         type="button"
         className={cn(
-          "border-input shadow-xs flex h-9 w-full max-w-36 basis-1/3 items-center justify-between gap-2 rounded-md rounded-l-md rounded-r-none border border-r-0 bg-white px-3 text-sm",
+          "border-input shadow-xs flex h-12 sm:h-9 w-full max-w-36 basis-1/3 items-center justify-between gap-2 rounded-md rounded-l-md rounded-r-none border border-r-0 bg-white px-3 text-[16px] sm:text-sm",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}
@@ -136,7 +136,7 @@ export const CountrySelectAutocompleteComponent = ({
               height={24}
               className="shrink-0"
             />
-            <span className="text-neutral truncate text-sm">
+            <span className="text-neutral truncate text-[16px] sm:text-sm">
               {selectedValue}
             </span>
           </Flex>

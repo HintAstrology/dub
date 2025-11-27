@@ -37,6 +37,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Advanced analytics",
       "Full customization",
     ],
+    withButton: true,
   },
   {
     badge: "Save 50%",
@@ -47,5 +48,6 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Advanced analytics",
       "Full customization",
     ],
+    withButton: true,
   },
 ];

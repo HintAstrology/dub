@@ -24,7 +24,7 @@ interface IQrCodeTitleColumnProps {
   svgString: string;
   currentQrTypeInfo: QRType;
   featuresAccess?: boolean;
-  setShowTrialExpiredModal?: (show: boolean) => void;
+  setShowSubscriptionExpiredModal?: (show: boolean) => void;
 }
 
 export function QrCodeTitleColumn({
@@ -34,7 +34,7 @@ export function QrCodeTitleColumn({
   svgString,
   currentQrTypeInfo,
   featuresAccess,
-  setShowTrialExpiredModal,
+  setShowSubscriptionExpiredModal,
 }: IQrCodeTitleColumnProps) {
   const { createdAt } = qrCode ?? {};
 
@@ -120,7 +120,7 @@ export function QrCodeTitleColumn({
               user={user}
               qrCode={qrCode}
               featuresAccess={featuresAccess}
-              setShowTrialExpiredModal={setShowTrialExpiredModal}
+              setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
             />
           </div>
 
@@ -137,7 +137,7 @@ export function QrCodeTitleColumn({
               user={user}
               qrCode={qrCode}
               featuresAccess={featuresAccess}
-              setShowTrialExpiredModal={setShowTrialExpiredModal}
+              setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
             />
           </div>
 

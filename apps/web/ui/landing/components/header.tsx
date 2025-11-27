@@ -9,7 +9,7 @@ import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FC, useCallback, useEffect } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { scrollToBuilder } from '../helpers/scrollToBuilder.tsx';
 
 interface IHeaderProps {
@@ -22,6 +22,7 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
   const searchParams = useSearchParams();
   const router = useRouter();
   const { queryParams } = useRouterStuff();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const openLogin = searchParams.get("login");
   const isFromPaywall = searchParams.get("source") === "paywall";
@@ -79,14 +80,14 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
             <Logo />
           </Link>
 
-          <div className="flex items-center gap-4 md:gap-6">
+          {/* Desktop buttons */}
+          <div className="hidden md:flex items-center gap-4 md:gap-6">
             {!authSession?.user ? (
               <>
                 {!isFromPaywall && (
                   <Button
-                    variant="outline"
                     onClick={handleOpenLogin}
-                    className="border-secondary text-secondary hover:bg-secondary hover:text-white text-base font-medium transition-all duration-200"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-900 text-base font-medium transition-all shadow-none duration-200 border-0"
                     size="lg"
                   >
                     Log In
@@ -101,6 +102,69 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
               >
                 My QR Codes
               </Button>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle menu"
+            >
+              <div className="relative w-6 h-6">
+                {/* Top line */}
+                <span
+                  className={`absolute left-0 h-0.5 w-6 bg-gray-700 transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen
+                      ? "top-1/2 -translate-y-1/2 rotate-45"
+                      : "top-[6px] rotate-0"
+                  }`}
+                />
+                {/* Bottom line */}
+                <span
+                  className={`absolute left-0 h-0.5 w-6 bg-gray-700 transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen
+                      ? "top-1/2 -translate-y-1/2 -rotate-45"
+                      : "top-[14px] rotate-0"
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div 
+          className={`md:hidden border-t border-border bg-white overflow-hidden transition-all duration-300 ease-in-out ${
+            mobileMenuOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="px-4 py-3 space-y-2">
+            {!authSession?.user ? (
+              <>
+                {!isFromPaywall && (
+                  <button
+                    onClick={() => {
+                      handleOpenLogin();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    Login
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  handleOpenMyQRCodes();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 text-base font-medium text-secondary hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                My QR Codes
+              </button>
             )}
           </div>
         </div>

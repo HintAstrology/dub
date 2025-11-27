@@ -1,7 +1,7 @@
 "use client";
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
-import { useTrialStatus } from "@/lib/contexts/trial-status-context.tsx";
+import { useSubscriptionExpired } from "@/lib/contexts/subscription-expired-context.tsx";
 import { IPricingPlan } from "@/ui/plans/constants";
 import { Button } from "@dub/ui";
 import { useCreateUserPaymentMutation } from "core/api/user/payment/payment.hook";
@@ -49,7 +49,7 @@ export const UpdateSubscriptionFlow: FC<Readonly<IUpdateSubscriptionProps>> = ({
 }) => {
   const router = useRouter();
 
-  const { setIsTrialOver } = useTrialStatus();
+  const { setIsTrialOver } = useSubscriptionExpired();
   const { update: updateSession } = useSession();
 
   const { trigger: triggerCreateUserPayment } = useCreateUserPaymentMutation();
