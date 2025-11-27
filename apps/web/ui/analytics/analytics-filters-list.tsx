@@ -434,16 +434,11 @@ export function AnalyticsFiltersList() {
           .analytics-filters-wrapper .border-neutral-200 {
             border-color: hsl(var(--chart-4)) !important;
           }
-          .analytics-filters-wrapper button kbd {
-            display: none;
-          }
-      
         `
       }} />
       <div className="mx-auto w-full mb-4">
         <div className={cn(
-          "analytics-filters-wrapper flex w-full flex-wrap items-start gap-4 sm:flex-nowrap",
-          activeFilters.length >= 2 && "show-clear-filters"
+          "analytics-filters-wrapper flex w-full show-clear-filters flex-wrap items-start gap-4 sm:flex-nowrap",
         )}>
           <div className="flex grow flex-wrap gap-x-4 gap-y-2">
             <Filter.List
