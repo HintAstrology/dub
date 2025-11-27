@@ -10,13 +10,13 @@ interface IQRCardTitle {
   qrCode: TQrServerData;
   user: Session["user"];
   featuresAccess?: boolean;
-  setShowTrialExpiredModal?: (show: boolean) => void;
+  setShowSubscriptionExpiredModal?: (show: boolean) => void;
 }
 
 export const QRCardTitle: FC<IQRCardTitle> = ({
   qrCode,
   featuresAccess,
-  setShowTrialExpiredModal,
+  setShowSubscriptionExpiredModal,
   user,
 }) => {
   const { QRRenameModal, setShowQRRenameModal } = useQRRenameModal({
@@ -27,7 +27,7 @@ export const QRCardTitle: FC<IQRCardTitle> = ({
   const onEditClick = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
     if (!featuresAccess) {
-      setShowTrialExpiredModal?.(true);
+      setShowSubscriptionExpiredModal?.(true);
       return;
     }
     setShowQRRenameModal(true);

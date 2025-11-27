@@ -13,12 +13,12 @@ export const QRCardDetails = memo(
   ({
     qrCode,
     featuresAccess,
-    setShowTrialExpiredModal,
+    setShowSubscriptionExpiredModal,
     user,
   }: {
     qrCode: TQrServerData;
     featuresAccess?: boolean;
-    setShowTrialExpiredModal?: (show: boolean) => void;
+    setShowSubscriptionExpiredModal?: (show: boolean) => void;
     user: Session["user"];
   }) => {
     const displayContent = getDisplayContent(qrCode);
@@ -30,7 +30,7 @@ export const QRCardDetails = memo(
     const onEditClick = (e: React.MouseEvent<SVGSVGElement>) => {
       e.stopPropagation();
       if (!featuresAccess) {
-        setShowTrialExpiredModal?.(true);
+        setShowSubscriptionExpiredModal?.(true);
         return;
       }
       setShowQRContentEditorModal(true);
