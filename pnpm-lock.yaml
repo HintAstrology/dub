@@ -69,6 +69,9 @@ importers:
       '@floating-ui/react':
         specifier: ^0.26.20
         version: 0.26.20(react-dom@18.2.0)(react@18.2.0)
+      '@growthbook/growthbook':
+        specifier: ^1.6.2
+        version: 1.6.2
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.9.0(react-hook-form@7.52.1)
@@ -3838,6 +3841,13 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 16.11.0
+    dev: false
+
+  /@growthbook/growthbook@1.6.2:
+    resolution: {integrity: sha512-x3sK6Lff4BVusIzcdBeHZqA3B4kLs3kM/pJ7vvLTJwb6N/+Yn99EF1yc0XU6cfDVqFq6uFkvIFhMwDWUaKD73g==}
+    engines: {node: '>=10'}
+    dependencies:
+      dom-mutator: 0.6.0
     dev: false
 
   /@grpc/grpc-js@1.13.4:
@@ -14413,6 +14423,11 @@ packages:
 
   /dom-confetti@0.2.2:
     resolution: {integrity: sha512-+UVH9Y85qmpTnbmFURwLWjqLIykyIrsNSRkPX/eFlBuOURz9RDX8JoZHnajZHyFuCV0w/K3+tZK0ztfoTw6ejg==}
+    dev: false
+
+  /dom-mutator@0.6.0:
+    resolution: {integrity: sha512-iCt9o0aYfXMUkz/43ZOAUFQYotjGB+GNbYJiJdz4TgXkyToXbbRy5S6FbTp72lRBtfpUMwEc1KmpFEU4CZeoNg==}
+    engines: {node: '>=10'}
     dev: false
 
   /dom-serializer@2.0.0:

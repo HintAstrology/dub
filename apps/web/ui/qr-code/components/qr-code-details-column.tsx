@@ -12,7 +12,7 @@ interface IQrCodeDetailsColumnProps {
   svgString: string;
   currentQrTypeInfo: QRType;
   featuresAccess?: boolean;
-  setShowTrialExpiredModal?: (show: boolean) => void;
+  setShowSubscriptionExpiredModal?: (show: boolean) => void;
   user: Session["user"];
 }
 
@@ -23,7 +23,7 @@ export function QrCodeDetailsColumn({
   svgString,
   currentQrTypeInfo,
   featuresAccess,
-  setShowTrialExpiredModal,
+  setShowSubscriptionExpiredModal,
 }: IQrCodeDetailsColumnProps) {
   return (
     <div className="flex h-full flex-col items-start justify-start gap-6 lg:flex-row lg:items-center lg:justify-end">
@@ -38,7 +38,7 @@ export function QrCodeDetailsColumn({
         qrCodeStylingInstance={qrCodeStylingInstance}
         svgString={svgString}
         featuresAccess={featuresAccess}
-        setShowTrialExpiredModal={setShowTrialExpiredModal}
+        setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
       />
     </div>
   );

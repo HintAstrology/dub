@@ -27,6 +27,7 @@
     "@dub/ui": "workspace:*",
     "@dub/utils": "workspace:*",
     "@floating-ui/react": "^0.26.20",
+    "@growthbook/growthbook": "^1.6.2",
     "@hookform/resolvers": "^3.9.0",
     "@iconify/react": "^5.2.0",
     "@next-auth/prisma-adapter": "^1.0.5",

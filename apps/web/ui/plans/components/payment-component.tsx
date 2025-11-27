@@ -9,9 +9,11 @@ import {
   getCalculatePriceForView,
   getPaymentPlanPrice,
   ICustomerBody,
+  TPaymentPlan,
 } from "core/integration/payment/config";
 import { FC, useState } from "react";
 import { UpdateSubscriptionFlow } from "./update-subscription-flow.tsx";
+import { getSubscriptionRenewalAction } from 'core/constants/subscription-plans-weight.ts';
 
 interface IPaymentComponentProps {
   user: ICustomerBody;
@@ -46,6 +48,14 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
       setSelectedPlan(plan);
     }
   };
+
+  const renewalAction = getSubscriptionRenewalAction(
+    selectedPlan.paymentPlan,
+    currentSubscriptionPlan as TPaymentPlan,
+  );
+
+  const isCurrentPlan = currentSubscriptionPlan === selectedPlan.paymentPlan;
+  const isCancelled = featuresAccess.status === "cancelled";
 
   return (
     <Flex
@@ -82,8 +92,9 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
           ))}
         </RadioGroup.Root>
 
-        <Text as="p" size="1" className="text-neutral-800">
-          You'll be charged {totalChargePrice} today. Renews every{" "}
+        <Text as="p" size="1" className="text-neutral-800 text-center">
+          {(!isCurrentPlan || isCancelled) && `You'll be charged ${totalChargePrice} ${renewalAction === "upgrade" || isCancelled ? "today" : "at the start of the new billing period"}.`}
+          {renewalAction === "upgrade" || isCancelled ? " " : <br />}Renews every{" "}
           {selectedPlan.name.toLowerCase()}. Cancel anytime.
         </Text>
 

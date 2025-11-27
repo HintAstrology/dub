@@ -23,8 +23,6 @@ import CardForthPreview from '../../assets/icons/frames/card-4-preview.svg'
 import CardForth from '../../assets/icons/frames/card-4-frame.svg'
 import CardFifthPreview from '../../assets/icons/frames/card-5-preview.svg'
 import CardFifth from '../../assets/icons/frames/card-5-frame.svg'
-import CardSixthVerPreview from '../../assets/icons/frames/card-6-ver-preview.svg'
-import CardSixthVer from '../../assets/icons/frames/card-6-ver-frame.svg'
 import CardSixthHorPreview from '../../assets/icons/frames/card-6-hor-preview.svg'
 import CardSixthHor from '../../assets/icons/frames/card-6-hor-frame.svg'
 import CardSeventhPreview from "../../assets/icons/frames/card-7-preview.svg";
@@ -200,17 +198,6 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardFifthPreview,
     defaultTextColor: BLACK_COLOR,
-    preset:'darkTextPreset'
-  },
-  {
-    id: "frame-card-6-ver",
-    type: "card-6-ver",
-    extension: async (qr, options) => {
-      await embedQRIntoFrame(qr, options, CardSixthVer, 0.39, 105, 234);
-    },
-    icon: CardSixthVerPreview,
-    disableFrameText: true,
-    preset: 'ligthTextPreset'
   },
   {
     id: "frame-card-6-hor",

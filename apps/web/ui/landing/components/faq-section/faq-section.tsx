@@ -21,46 +21,41 @@ interface IFaqSectionProps {
 
 export const FAQSection: FC<IFaqSectionProps> = ({ faqItems }) => {
   return (
-    <section className="py-6 lg:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* FAQ Header */}
-        <div className="mb-12 flex flex-col items-center justify-center gap-3">
-          <SectionTitle
-            titleFirstPart="Frequently Asked Questions"
-            // highlightedTitlePart="Asked"
-            // titleSecondPart="Questions"
-          />
-          <p className="text-muted-foreground text-center max-w-4xl text-base md:text-lg">
-            Get answers for your full QR-code journey
-          </p>
-        </div>
-
-        <Accordion type="single" collapsible className="w-full">
-          {faqItems.map((item, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left text-lg">
-                {item.title}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                {Array.isArray(item.content) ? (
-                  item.content.map((content, idx) => (
-                    <BlockMarkdown
-                      key={idx}
-                      className="py-2 text-left text-base"
-                    >
-                      {content}
-                    </BlockMarkdown>
-                  ))
-                ) : (
-                  <BlockMarkdown className="py-2 text-left text-base">
-                    {item.content}
-                  </BlockMarkdown>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+    <footer className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+      {/* FAQ Header */}
+      <div className="mb-8 lg:mb-12 flex flex-col items-center justify-center gap-3">
+        <SectionTitle
+          titleFirstPart="Frequently Asked Questions"
+          // highlightedTitlePart="Asked"
+          // titleSecondPart="Questions"
+        />
+        <p className="text-muted-foreground max-w-4xl text-center text-base md:text-lg">
+          Get answers for your full QR-code journey
+        </p>
       </div>
-    </section>
+
+      <Accordion type="single" collapsible className="w-full">
+        {faqItems.map((item, index) => (
+          <AccordionItem key={index} value={`item-${index}`}>
+            <AccordionTrigger className="text-left text-lg">
+              {item.title}
+            </AccordionTrigger>
+            <AccordionContent className="text-muted-foreground">
+              {Array.isArray(item.content) ? (
+                item.content.map((content, idx) => (
+                  <BlockMarkdown key={idx} className="py-2 text-left text-base">
+                    {content}
+                  </BlockMarkdown>
+                ))
+              ) : (
+                <BlockMarkdown className="py-2 text-left text-base">
+                  {item.content}
+                </BlockMarkdown>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </footer>
   );
 };

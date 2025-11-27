@@ -268,18 +268,6 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
       layout
       className="flex w-full max-w-[788px] flex-col gap-4 pb-6"
     >
-      <StylePicker
-        label="Select a logo"
-        styleOptions={sortedLogos}
-        value={selectedStyle}
-        onSelect={handleSuggestedLogoSelect}
-        optionsWrapperClassName={`${isMobile ? "pb-2" : "pb-0"} ${
-          disabled ? "pointer-events-none cursor-not-allowed" : ""
-        }`}
-        styleButtonClassName="[&_img]:h-10 [&_img]:w-10 p-2"
-        disabled={disabled}
-      />
-
       <AnimatePresence>
         <FormProvider {...methods}>
           <form>
@@ -370,7 +358,8 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
                           </div>
                           <div className="flex flex-col gap-1">
                             <p className="text-neutral text-base font-medium">
-                              Click to upload or drag & drop your logo
+                              <span className="md:hidden">Upload from device</span>
+                              <span className="hidden md:inline">Click to upload or drag & drop your logo</span>
                             </p>
                             <p className="text-muted-foreground text-xs">
                               Max size: {formatFileSize(MAX_LOGO_FILE_SIZE)} •
@@ -424,6 +413,19 @@ export const LogoSelector: FC<LogoSelectorProps> = ({
           </form>
         </FormProvider>
       </AnimatePresence>
+
+      <StylePicker
+        label="Select a logo"
+        styleOptions={sortedLogos}
+        value={selectedStyle}
+        onSelect={handleSuggestedLogoSelect}
+        optionsWrapperClassName={`${isMobile ? "pb-2" : "pb-0"} ${
+          disabled ? "pointer-events-none cursor-not-allowed" : ""
+        }`}
+        styleButtonClassName="[&_img]:h-10 [&_img]:w-10 p-2"
+        disabled={disabled}
+        gridMinWidth={60}
+      />
     </motion.div>
   );
 };

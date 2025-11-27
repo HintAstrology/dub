@@ -8,14 +8,14 @@ interface IQrCodeCardProps {
   qrCode: TQrServerData;
   featuresAccess: boolean;
   user: Session["user"];
-  setShowTrialExpiredModal: (show: boolean) => void;
+  setShowSubscriptionExpiredModal: (show: boolean) => void;
 }
 
 export const QrCodeCard: FC<Readonly<IQrCodeCardProps>> = ({
   qrCode,
   featuresAccess,
   user,
-  setShowTrialExpiredModal,
+  setShowSubscriptionExpiredModal,
 }) => {
   return (
     <>
@@ -27,7 +27,7 @@ export const QrCodeCard: FC<Readonly<IQrCodeCardProps>> = ({
           user={user}
           qrCode={qrCode}
           featuresAccess={featuresAccess}
-          setShowTrialExpiredModal={setShowTrialExpiredModal}
+          setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
         />
       </CardList.Card>
     </>

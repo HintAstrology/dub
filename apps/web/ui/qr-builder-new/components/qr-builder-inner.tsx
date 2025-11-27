@@ -272,7 +272,7 @@ export const QRBuilderInner = () => {
                 style={{ minHeight: "100dvh" }}
               >
                 {/* Header with close button and stepper */}
-                <div className="flex-shrink-0 border-b bg-white p-3">
+                <div className="flex-shrink-0 border-b border-gray-100 bg-white px-8 py-3 md:p-3">
                   <QRBuilderSteps />
                 </div>
 

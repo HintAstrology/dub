@@ -17,7 +17,7 @@ export const QRCodeDemoWebsite: FC<QRCodeDemoWebsiteProps> = ({
       width="270"
       height="352"
       viewBox="0 0 270 352"
-      className={cn("shadow-lg", {
+      className={cn("shadow-lg [&_path.primary-fill]:fill-[#66B2B2] md:[&_path.primary-fill]:fill-[#006666]", {
         "h-[180px] w-[138px] lg:h-[209px] lg:w-[158px]": smallPreview,
       })}
       fill="none"
@@ -28,6 +28,7 @@ export const QRCodeDemoWebsite: FC<QRCodeDemoWebsiteProps> = ({
         fill="white"
       />
       <path
+        className="primary-fill"
         d="M0 20.0001C0 8.95443 8.95431 0.00012207 20 0.00012207H250C261.046 0.00012207 270 8.95443 270 20.0001V207H0V20.0001Z"
         fill="#006666"
       />
