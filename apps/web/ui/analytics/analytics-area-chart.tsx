@@ -229,7 +229,7 @@ export default function AnalyticsAreaChart({
     <Card className={cn("flex flex-col gap-4 border-none p-3 sm:p-4 md:p-4")}>
       <div className="flex flex-col gap-4">
         <CardContent className="grow p-0">
-          <div className="grid grid-cols-4 gap-4 overflow-x-auto px-1 pb-2 md:grid-cols-2 lg:grid-cols-8">
+          <div className="dub-scrollbar px-1 -mx-1 flex w-full gap-4 overflow-x-auto py-1">
             {statsData.map((stat, index) => {
               const isNumeric =
                 stat.isNumeric &&
@@ -245,7 +245,7 @@ export default function AnalyticsAreaChart({
               return (
                 <div
                   key={index}
-                  className="flex min-w-[160px] flex-col gap-2 rounded-lg bg-white p-2 shadow"
+                  className="flex flex-1 min-w-[160px] flex-col gap-2 rounded-lg bg-white p-2 shadow"
                 >
                   <span className="text-muted-foreground text-xs font-medium">
                     {stat.title}

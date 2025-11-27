@@ -103,16 +103,7 @@ export function AppSidebar() {
         onClose={() => setShowQRBuilderModal(false)}
         user={user!}
       />
-      <div
-        style={
-          state === "collapsed"
-            ? ({
-                "--sidebar-width-icon": "75px",
-              } as React.CSSProperties)
-            : undefined
-        }
-      >
-        <Sidebar
+      <Sidebar
           variant="floating"
           collapsible="icon"
           className={cn(
@@ -274,7 +265,6 @@ export function AppSidebar() {
           <SidebarUserDropdown />
         </SidebarFooter>
       </Sidebar>
-      </div>
     </>
   );
 }

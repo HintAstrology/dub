@@ -32,9 +32,8 @@ import { ComponentProps, useContext, useMemo } from "react";
 import useSWR from "swr";
 import { LinkIcon } from "../links/link-icon";
 import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
-import ContinentIcon from "./components/continent-icon";
-import DeviceIcon from "./components/device-icon";
 import { AnalyticsContext } from "./analytics-provider";
+import DeviceIcon from "./components/device-icon";
 
 function useStandaloneFilterOption(
   groupBy: AnalyticsGroupByOptions,
@@ -297,9 +296,7 @@ export function AnalyticsFiltersList() {
         key: "continent",
         icon: MapPosition,
         label: "Continent",
-        getOptionIcon: (value) => (
-          <ContinentIcon display={value} className="size-2.5" />
-        ),
+        getOptionIcon: (value) => null,
         getOptionLabel: (value) => CONTINENTS[value],
         options:
           continents?.map(({ continent, count }) => ({
@@ -437,13 +434,10 @@ export function AnalyticsFiltersList() {
           .analytics-filters-wrapper .border-neutral-200 {
             border-color: hsl(var(--chart-4)) !important;
           }
-      
-          .analytics-filters-wrapper button:has(kbd) kbd {
+          .analytics-filters-wrapper button kbd {
             display: none;
           }
-          .analytics-filters-wrapper.show-clear-filters button:has(kbd) {
-            display: flex;
-          }
+      
         `
       }} />
       <div className="mx-auto w-full mb-4">

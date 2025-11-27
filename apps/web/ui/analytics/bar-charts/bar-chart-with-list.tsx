@@ -101,9 +101,9 @@ export function BarChartWithList({
       onMouseEnter={() => setIsContainerHovered(true)}
       onMouseLeave={() => setIsContainerHovered(false)}
     >
-      <div className={containerClassName || "grid grid-cols-[250px_1fr] lg:grid-cols-[380px_1fr] overflow-hidden items-start"}>
+      <div className={containerClassName || "grid grid-cols-[min(400px,90%)_1fr] overflow-hidden items-start"}>
         <div className="w-full mt-4 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
-          <ChartContainer config={chartConfig} className={`${chartHeight} w-full -ml-10 max-w-[380px]`}>
+          <ChartContainer config={chartConfig} className={`${chartHeight} w-full -ml-10`} style={{ maxWidth: 'min(100%, 80vw)' }}>
             <BarChart
               accessibilityLayer
               data={chartData}
