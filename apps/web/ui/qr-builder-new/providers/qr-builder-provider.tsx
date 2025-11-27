@@ -456,14 +456,37 @@ export const QrBuilderProvider = ({
   // Handle typeToScrollTo from landing page buttons
   useEffect(() => {
     if (typeToScrollTo && homepageDemo) {
-      handleSelectQRType(typeToScrollTo);
+      // Set the QR type first
+      setSelectedQrType(typeToScrollTo);
+      // Clear any type selection errors
+      setTypeSelectionError("");
+      // Set step directly to 2, bypassing validation since we're setting the type
+      setBuilderStep(2);
       handleResetTypeToScrollTo?.();
+
+      // Track QR type selection
+      trackClientEvents({
+        event: EAnalyticEvents.PAGE_CLICKED,
+        params: {
+          page_name: homepageDemo ? "landing" : "dashboard",
+          content_group: "choose_type",
+          content_value: typeToScrollTo,
+          email: user?.email,
+          event_category: homepageDemo ? "nonAuthorized" : "Authorized",
+        },
+        sessionId: sessionId || user?.id,
+      });
+
+      // Scroll on mobile
+      handleScroll();
     }
   }, [
     typeToScrollTo,
     homepageDemo,
-    handleSelectQRType,
     handleResetTypeToScrollTo,
+    handleScroll,
+    user,
+    sessionId,
   ]);
 
   // Open dialog when on steps 2 or 3 in mobile homepage demo
