@@ -186,7 +186,6 @@ export const FRAMES: IStyleOption[] = [
     },
     icon: CardFifthPreview,
     defaultTextColor: BLACK_COLOR,
-    preset:'darkTextPreset'
   },
   {
     id: "frame-card-6-hor",
