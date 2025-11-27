@@ -38,7 +38,10 @@ export const LandingSectionsClient: FC<
 
     setTypeToScrollTo(scrollTo || null);
 
-    setTimeout(scrollToBuilder);
+    // If scrolling to a specific QR type, wait longer to allow the builder to open the type first
+    // Otherwise, scroll immediately
+    const delay = scrollTo ? 500 : 0;
+    setTimeout(scrollToBuilder, delay);
   };
 
   const handleFeatureClick = useCallback((feature: string) => {

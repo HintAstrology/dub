@@ -32,7 +32,7 @@ const FEATURES_LINKS = [
 ];
 
 const COMPANY_LINKS = [
-  { href: "/pricing", text: "Pricing", page_name_code: "pricing" },
+  { href: "#pricing", text: "Pricing", page_name_code: "pricing" },
   { href: "#reviews", text: "Reviews", page_name_code: "reviews" },
   { href: "/help", text: "Help Center", page_name_code: "help" },
   {
