@@ -5,68 +5,10 @@ import {
   FRAMES,
   FRAME_TEXT,
 } from "../../constants/customization/frames";
+import { presets } from "../../constants/customization/palettes";
 import { IFrameData, IQRCustomizationData, IQrPalette, IStyleData } from "../../types/customization";
 import { StylePalettePicker } from "./style-palette-picker";
 import { StylePicker } from "./style-picker";
-
-const darkTextPreset: IQrPalette[] = [
-  {
-    id: 1,
-    qrColor: BLACK_COLOR,
-    frameColor: BLACK_COLOR,
-    textColor: BLACK_COLOR,
-  },
-  {
-    id: 2,
-    qrColor: "#003323",
-    frameColor: "#006768",
-    textColor: "#006768",
-  },
-  {
-    id: 3,
-    qrColor: "#331C00",
-    frameColor: "#B73302",
-    textColor: "#B73302",
-  },
-  {
-    id: 4,
-    qrColor: "#000633",
-    frameColor: "#0036CC",
-    textColor: "#0036CC",
-  },
-];
-
-const ligthTextPreset: IQrPalette[] = [
-  {
-    id: 5,
-    qrColor: BLACK_COLOR,
-    frameColor: BLACK_COLOR,
-    textColor: WHITE_COLOR,
-  },
-  {
-    id: 6,
-    qrColor: "#003323",
-    frameColor: "#006768",
-    textColor: "#D3E1E1",
-  },
-  {
-    id: 7,
-    qrColor: "#331C00",
-    frameColor: "#B73302",
-    textColor: "#F1D6CB",
-  },
-  {
-    id: 8,
-    qrColor: "#000633",
-    frameColor: "#0036CC",
-    textColor: "#CDD5FA",
-  },
-]
-
-const presets = {
-  darkTextPreset,
-  ligthTextPreset,
-}
 
 interface FrameSelectorProps {
   frameData: IFrameData;
