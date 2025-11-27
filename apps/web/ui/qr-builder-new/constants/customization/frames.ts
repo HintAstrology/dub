@@ -188,16 +188,6 @@ export const FRAMES: IStyleOption[] = [
     defaultTextColor: BLACK_COLOR,
   },
   {
-    id: "frame-card-6-ver",
-    type: "card-6-ver",
-    extension: async (qr, options) => {
-      await embedQRIntoFrame(qr, options, CardSixthVer, 0.39, 105, 234);
-    },
-    icon: CardSixthVerPreview,
-    disableFrameText: true,
-    preset: 'ligthTextPreset'
-  },
-  {
     id: "frame-card-6-hor",
     type: "card-hor",
     extension: async (qr, options) => {
