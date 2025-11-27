@@ -10,6 +10,7 @@ import Color from "color";
 import { Pipette } from "lucide-react";
 import { FC, useEffect, useRef, useState } from "react";
 import { isValidHex, isWhiteHex } from "../../helpers/color-validation";
+import { paletteColors } from "../../constants/customization/palettes";
 
 interface ColorPickerInputProps {
   label: string;
@@ -17,68 +18,6 @@ interface ColorPickerInputProps {
   onChange: (value: string) => void;
   disabled?: boolean;
 }
-
-interface IPaletteColor {
-  id: number;
-  color: string;
-}
-
-const paletteColors: IPaletteColor[] = [
-  { id: 1, color: "#000000" },
-  { id: 2, color: "#5f5f5f" },
-  { id: 3, color: "#9a9a9a" },
-  { id: 4, color: "#cbcbcb" },
-  { id: 5, color: "#e1e1e1" },
-  { id: 6, color: "#ffffff" },
-  { id: 7, color: "#ff0c0b" },
-  { id: 8, color: "#ff8a1d" },
-  { id: 9, color: "#2ca676" },
-  { id: 10, color: "#006ef9" },
-  { id: 11, color: "#7f25ff" },
-  { id: 12, color: "#ff21a0" },
-  { id: 13, color: "#ff5f5f" },
-  { id: 14, color: "#ffb56e" },
-  { id: 15, color: "#4fd2a0" },
-  { id: 16, color: "#4c9bff" },
-  { id: 17, color: "#b078ff" },
-  { id: 18, color: "#ff73c2" },
-  { id: 19, color: "#ffb1b1" },
-  { id: 20, color: "#ffdfc0" },
-  { id: 21, color: "#92e3c3" },
-  { id: 22, color: "#9dc8ff" },
-  { id: 23, color: "#decaff" },
-  { id: 24, color: "#fec5e6" },
-  { id: 25, color: "#ffd8d9" },
-  { id: 26, color: "#fff2e9" },
-  { id: 27, color: "#b1ebd5" },
-  { id: 28, color: "#c5dffe" },
-  { id: 29, color: "#f8f2ff" },
-  { id: 30, color: "#ffeef8" },
-  { id: 31, color: "#ff9fa0" },
-  { id: 32, color: "#9a6464" },
-  { id: 33, color: "#583c3b" },
-  { id: 34, color: "#931c1d" },
-  { id: 35, color: "#1d4743" },
-  { id: 36, color: "#e2fea2" },
-  { id: 37, color: "#fedab8" },
-  { id: 38, color: "#416456" },
-  { id: 39, color: "#57c2fe" },
-  { id: 40, color: "#bf91fe" },
-  { id: 41, color: "#41cb8b" },
-  { id: 42, color: "#d66566" },
-  { id: 43, color: "#903fb8" },
-  { id: 44, color: "#ff8e56" },
-  { id: 45, color: "#b8edfe" },
-  { id: 46, color: "#9d837a" },
-  { id: 47, color: "#6d7d86" },
-  { id: 48, color: "#edbdbd" },
-  { id: 49, color: "#e76eb3" },
-  { id: 50, color: "#5e9be8" },
-  { id: 51, color: "#ffbd9c" },
-  { id: 52, color: "#4f6474" },
-  { id: 53, color: "#8798a5" },
-  { id: 54, color: "#c1d0db" },
-];
 
 export const ColorPickerInput: FC<ColorPickerInputProps> = ({
   label,
