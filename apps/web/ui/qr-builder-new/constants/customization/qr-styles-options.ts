@@ -9,8 +9,8 @@ export const QR_STYLES_OPTIONS = [
   },
   {
     id: "style-shape",
-    label: "Style & Shape",
-    description: "Customize colors, shapes and patterns for your QR code",
+    label: "Customization",
+    description: "Add unique shapes, colors & texts to your QR'",
     icon: Palette,
   },
   {
