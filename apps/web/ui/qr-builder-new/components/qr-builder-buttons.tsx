@@ -53,8 +53,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
   const getButtonText = useCallback(() => {
     if (isFileUploading) return "Uploading...";
     if (isFileProcessing) return "Processing...";
-    if (isEdit) return "Save Changes";
-    if (homepageDemo || isContentStep) return "Customize QR";
+    if (homepageDemo || isContentStep || isEdit) return "Customize QR";
 
     return "Create QR Code";
   }, [

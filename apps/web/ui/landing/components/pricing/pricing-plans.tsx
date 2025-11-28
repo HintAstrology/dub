@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SectionTitle } from "@/ui/landing/components/section-title.tsx";
 import { cn } from "@dub/utils";
 import { CheckIcon } from "lucide-react";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { PRICING_PLANS } from "./config.ts";
 
 interface IPricingSectionProps {
@@ -21,8 +21,10 @@ const extractPrice = (planText: string): string => {
 export const PricingSection: FC<IPricingSectionProps> = ({
   handleScrollButtonClick,
 }) => {
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(0);
+
   return (
-    <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
+    <section id="pricing" className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
       <div className="mb-12 flex flex-col items-center justify-center gap-3">
         <SectionTitle
           titleFirstPart={"Start 7-Day Trial Today, Upgrade when You Need"}
@@ -36,14 +38,16 @@ export const PricingSection: FC<IPricingSectionProps> = ({
 
       <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-end">
         {PRICING_PLANS.map((plan, index) => (
-          <div key={index} className="h-full w-full transition-transform duration-300 hover:-translate-y-2">
+          <div key={index} className="h-full w-full transition-transform duration-300">
             <Card
               className={cn(
-                "relative h-full w-full overflow-hidden pt-3",
-                plan.title === "7-Day Trial"
-                  ? "border-primary border-2 shadow"
-                  : "border-none"
+                "relative h-full w-full overflow-hidden pt-3 cursor-pointer transition-all duration-300",
+                "border-0 ring-2 ring-transparent",
+                selectedCardIndex === index
+                  ? "ring-primary shadow-lg -translate-y-2"
+                  : "hover:ring-primary/30"
               )}
+              onClick={() => setSelectedCardIndex(index)}
             >
               <CardContent className="flex h-full flex-col gap-6">
                 <div>

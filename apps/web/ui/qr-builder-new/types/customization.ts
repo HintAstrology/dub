@@ -21,7 +21,6 @@ export interface IFrameData {
   color?: string;
   textColor?: string;
   text?: string;
-  presetId?: string;
 }
 
 export interface IStyleData {
@@ -50,8 +49,6 @@ export interface IStyleOption {
   icon: any; // React component or image
   defaultTextColor?: string;
   relevantFor?: string[]; // QR types this logo is most relevant for
-  disableFrameText?: boolean;
-  preset?: string;
   extension?: (
     qr: SVGSVGElement,
     options: {
@@ -62,11 +59,4 @@ export interface IStyleOption {
       frameText: string;
     },
   ) => Promise<void>;
-}
-
-export interface IQrPalette {
-  id: number,
-  qrColor: string,
-  frameColor: string,
-  textColor: string,
 }
