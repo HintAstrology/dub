@@ -8,6 +8,8 @@ import CardForthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-4-pre
 import CardForth from "@/ui/qr-builder-new/assets/icons/frames/card-4-frame.svg";
 import CardFifthPreview from "@/ui/qr-builder-new/assets/icons/frames/card-5-preview.svg";
 import CardFifth from "@/ui/qr-builder-new/assets/icons/frames/card-5-frame.svg";
+import CardSixthVerPreview from "@/ui/qr-builder-new/assets/icons/frames/card-6-ver-preview.svg";
+import CardSixthVer from "@/ui/qr-builder-new/assets/icons/frames/card-6-ver-frame.svg";
 import CardSixthHorPreview from "@/ui/qr-builder-new/assets/icons/frames/card-6-hor-preview.svg";
 import CardSixthHor from "@/ui/qr-builder-new/assets/icons/frames/card-6-hor-frame.svg";
 import CardSeventhPreview from "@/ui/qr-builder-new/assets/icons/frames/card-7-preview.svg";
@@ -64,6 +66,8 @@ export const preloadAllFrames = async () => {
     CardForthPreview,
     CardFifth,
     CardFifthPreview,
+    CardSixthVer,
+    CardSixthVerPreview,
     CardSixthHor,
     CardSixthHorPreview,
     CardSeventh,
