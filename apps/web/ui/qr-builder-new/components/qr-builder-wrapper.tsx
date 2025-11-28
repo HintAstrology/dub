@@ -6,7 +6,11 @@ import { motion } from "framer-motion";
 import { useQRCodeStyling } from "../hooks/use-qr-code-styling";
 import { QrBuilderButtons } from "./qr-builder-buttons";
 
-export const QRBuilderWrapper = () => {
+interface QRBuilderWrapperProps {
+  modalHeader?: React.ReactNode;
+}
+
+export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
   const {
     builderStep,
     isTypeStep,
@@ -37,6 +41,84 @@ export const QRBuilderWrapper = () => {
     defaultData: "https://getqr.com/qr-complete-setup",
   });
 
+  // For modal mode (homepageDemo = false) and desktop only, use fixed layout
+  // Mobile always uses the original layout below
+  if (!homepageDemo && !isMobile && modalHeader) {
+    return (
+      <div className="flex h-full flex-col overflow-hidden">
+        {/* Fixed header - always visible */}
+        {modalHeader}
+
+        {/* Fixed stepper for steps 2 and 3 */}
+        {!isTypeStep && (
+          <div className="flex-shrink-0 bg-white px-6 py-4">
+            <QRBuilderInner showOnlyStepper />
+          </div>
+        )}
+
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto">
+          <motion.div
+            ref={qrBuilderContentWrapperRef}
+            key={`builder-step-${builderStep}`}
+            initial={
+              isGoingBack
+                ? { opacity: 1, y: 0, scale: 1 }
+                : { opacity: 0, y: 0, scale: 1 }
+            }
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={
+              isGoingBack
+                ? { duration: 0 }
+                : {
+                    duration: 0.3,
+                    ease: [0.4, 0, 0.2, 1],
+                    opacity: { duration: 0.2 },
+                  }
+            }
+            className={cn(
+              "mx-auto flex h-full w-full flex-col justify-center p-4",
+              !isTypeStep && " rounded-[20px] bg-white ",
+              !homepageDemo || isMobile ? "shadow-none" : "shadow",
+            )}
+          >
+            <div className="relative">
+              <div
+                className={cn(
+                  "flex w-full flex-col items-stretch justify-between gap-4 p-6 md:gap-6",
+                  isTypeStep && "p-0",
+                )}
+              >
+                <QRBuilderInner hideStepper={!isTypeStep} />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Fixed buttons for steps 2 and 3 */}
+        {showDecorations && (
+          <div className="flex-shrink-0 bg-white px-6 py-4">
+            <QrBuilderButtons
+              step={builderStep || 1}
+              onBack={handleBack}
+              onContinue={handleContinue}
+              isEdit={isEditMode}
+              isProcessing={isProcessing}
+              isFileUploading={isFileUploading}
+              isFileProcessing={isFileProcessing}
+              homepageDemo={homepageDemo}
+              logoData={customizationData.logo}
+              isFormValid={isFormValid}
+              qrCode={qrCode}
+              isMobile={isMobile}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Original layout for homepage demo
   return (
     <motion.div
       ref={qrBuilderContentWrapperRef}
@@ -58,11 +140,10 @@ export const QRBuilderWrapper = () => {
       }
       className={cn(
         "mx-auto flex h-full w-full flex-col justify-between",
-        !isTypeStep &&
-          " rounded-[20px] bg-white shadow",
+        !isTypeStep && " rounded-[20px] bg-white ",
+        !homepageDemo || isMobile ? "shadow-none" : "",
       )}
     >
-
       <div className="relative">
         <div
           className={cn(
