@@ -316,7 +316,7 @@ export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerP
                         style={{ minWidth: 0 }}
                       >
                         {!isCustomizationStep ? (
-                          <div className="relative inline-block max-h-[200px] overflow-visible">
+                          <div className="relative inline-block max-h-[200px] overflow-hidden">
                             <motion.div
                               key={
                                 currentQRType

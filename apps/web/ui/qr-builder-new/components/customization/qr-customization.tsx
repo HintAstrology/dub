@@ -23,7 +23,6 @@ import { FrameSelector } from "./frame-selector";
 import { LogoSelector } from "./logo-selector";
 import { ShapeSelector } from "./shape-selector";
 import { StyleSelector } from "./style-selector";
-import { StyleColors } from "./style-colors";
 
 interface QRCustomizationProps {
   customizationData: IQRCustomizationData;
@@ -90,16 +89,6 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
     [customizationData, onCustomizationChange],
   );
 
-  const handlePaletteChange = useCallback(
-    (styles: IQRCustomizationData) => {
-      onCustomizationChange({
-        ...customizationData,
-        ...styles
-      });
-    },
-    [customizationData, onCustomizationChange],
-  );
-
   const handleShapeChange = useCallback(
     (shapeData: IShapeData) => {
       onCustomizationChange({
@@ -124,9 +113,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
   const frameSelector = (
     <FrameSelector
       frameData={customizationData.frame}
-      styleData={customizationData.style}
       onFrameChange={handleFrameChange}
-      handlePaletteChange={handlePaletteChange}
       disabled={disabled}
       isMobile={isMobile}
     />
@@ -137,6 +124,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
       <StyleSelector
         styleData={customizationData.style}
         onStyleChange={handleStyleChange}
+        frameSelected={isFrameSelected}
         disabled={disabled}
         isMobile={isMobile}
       />
@@ -145,14 +133,6 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
         onShapeChange={handleShapeChange}
         disabled={disabled}
         isMobile={isMobile}
-      />
-      <StyleColors 
-        frameData={customizationData.frame}
-        styleData={customizationData.style}
-        onFrameChange={handleFrameChange}
-        disabled={disabled}
-        onStyleChange={handleStyleChange}
-        frameSelected={isFrameSelected}
       />
     </div>
   );
@@ -197,7 +177,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
             tab.id === "logo" ? logoSelector : null;
 
           return (
-            <TabsContent key={tab.id} value={tab.label} className="mt-4 !overflow-visible">
+            <TabsContent key={tab.id} value={tab.label} className="mt-4">
               {selectorContent}
             </TabsContent>
           );
@@ -252,7 +232,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="pt-2">
+            <AccordionContent className="pt-2 ">
               {selectorContent}
             </AccordionContent>
           </AccordionItem>
