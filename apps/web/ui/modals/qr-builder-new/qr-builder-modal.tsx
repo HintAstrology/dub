@@ -1,7 +1,6 @@
 "use client";
 
 import { useKeyboardShortcut, useMediaQuery } from "@dub/ui";
-import { Theme } from "@radix-ui/themes";
 import { useCallback, useEffect, useState } from "react";
 import { Drawer } from "vaul";
 
@@ -14,6 +13,7 @@ import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr.tsx";
 import { Modal } from "@dub/ui";
+import { cn } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface.ts";
 import { LoaderCircle } from "lucide-react";
@@ -86,38 +86,42 @@ export function QRBuilderNewModal({
     return null;
   }
 
+  const modalHeaderContent = (
+    <div className="flex w-full flex-shrink-0 items-center justify-between gap-2 bg-white px-6 py-4">
+      <div className="flex items-center gap-2">
+        <QRIcon className="text-primary h-5 w-5" />
+        <h3 className="!mt-0 max-w-xs truncate text-lg font-medium">
+          {qrCode ? `Edit QR - ${qrCode.title ?? qrCode.id}` : "New QR"}
+        </h3>
+      </div>
+      <button
+        onClick={onClose}
+        disabled={isProcessing}
+        type="button"
+        className="active:bg-border-500 group relative -right-2 z-10 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
+      >
+        <X className="h-5 w-5" />
+      </button>
+    </div>
+  );
+
   const modalContent = (
-    <div className="flex h-full flex-col gap-2 bg-white md:h-fit md:overflow-y-auto">
+    <div className="flex w-full h-full flex-col bg-white">
       {isProcessing && (
         <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm">
           <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
         </div>
       )}
-      <div className="flex w-full flex-shrink-0 items-center justify-between gap-2 px-6 py-4">
-        <div className="flex items-center gap-2">
-          <QRIcon className="text-primary h-5 w-5" />
-          <h3 className="!mt-0 max-w-xs truncate text-lg font-medium">
-            {qrCode ? `Edit QR - ${qrCode.title ?? qrCode.id}` : "New QR"}
-          </h3>
-        </div>
-        <button
-          onClick={onClose}
-          disabled={isProcessing}
-          type="button"
-          className="active:bg-border-500 group relative -right-2 z-10 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none md:right-0 md:block"
-        >
-          <X className="h-5 w-5" />
-        </button>
+      {/* On mobile, render header directly; on desktop, pass as prop for fixed layout */}
+      {isMobile && modalHeaderContent}
+      <div className={cn(isMobile ? "p-4 flex-1 min-h-0" : "h-full flex flex-col min-h-0")}>
+        <QRBuilderNew
+          initialStep={initialStep}
+          initialQrData={qrCode}
+          onSave={handleSaveQR}
+          modalHeader={!isMobile ? modalHeaderContent : undefined}
+        />
       </div>
-      <Theme>
-        <div className="p-4 pt-0">
-          <QRBuilderNew
-            initialStep={initialStep}
-            initialQrData={qrCode}
-            onSave={handleSaveQR}
-          />
-        </div>
-      </Theme>
     </div>
   );
 
@@ -146,7 +150,7 @@ export function QRBuilderNewModal({
       showModal={showModal}
       setShowModal={onClose}
       desktopOnly
-      className="border-border-500 w-full max-w-6xl overflow-hidden"
+      className="border-border-500 !h-[100vh] !max-h-[100vh] w-full max-w-6xl overflow-hidden"
     >
       {modalContent}
     </Modal>

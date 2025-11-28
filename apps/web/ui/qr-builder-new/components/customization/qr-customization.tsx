@@ -169,7 +169,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
   // Mobile: Tabs
   if (isMobile) {
     return (
-      <Tabs value={activeTab} onValueChange={handleAccordionChange} className="w-full !overflow-visible">
+      <Tabs value={activeTab} onValueChange={handleAccordionChange} className="w-full !overflow-visible mt-4 md:mt-0">
         <TabsList className="w-full grid grid-cols-3 gap-2 bg-transparent h-auto p-0">
           {QR_STYLES_OPTIONS.map((tab) => {
             return (

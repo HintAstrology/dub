@@ -18,7 +18,12 @@ import { QRCodeDemoMap } from "./qr-code-demos/qr-code-demo-map";
 import { QrContentStep } from "./qr-content-step.tsx";
 import { QrTypeSelection } from "./qr-type-selection";
 
-export const QRBuilderInner = () => {
+interface QRBuilderInnerProps {
+  showOnlyStepper?: boolean;
+  hideStepper?: boolean;
+}
+
+export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerProps = {}) => {
   const {
     isTypeStep,
     isContentStep,
@@ -118,7 +123,7 @@ export const QRBuilderInner = () => {
 
   // Hide constructor content while initializing files in edit mode
   // This prevents form handlers from firing incorrectly during initialization
-  if (isInitializing && isEditMode) {
+  if (isInitializing && isEditMode && !showOnlyStepper) {
     return (
       <div className="flex w-full items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
@@ -129,6 +134,11 @@ export const QRBuilderInner = () => {
         </div>
       </div>
     );
+  }
+
+  // If only showing stepper, return just that
+  if (showOnlyStepper) {
+    return <QRBuilderSteps />;
   }
 
   return (
@@ -147,7 +157,7 @@ export const QRBuilderInner = () => {
       >
         <div className="flex w-full flex-col justify-between gap-4">
           <div className="flex w-full flex-col items-start justify-start gap-4">
-            {!isTypeStep && !isMobile && (
+            {!isTypeStep && !isMobile && !hideStepper && (
               <div className="w-full">
                 <QRBuilderSteps />
               </div>
@@ -177,7 +187,7 @@ export const QRBuilderInner = () => {
             {!shouldUseDialog && stepContent}
           </div>
 
-          {!isTypeStep && !isMobile && (
+          {!isTypeStep && !isMobile && homepageDemo && (
             <div className="w-full">
               <QrBuilderButtons
                 step={builderStep || 1}
