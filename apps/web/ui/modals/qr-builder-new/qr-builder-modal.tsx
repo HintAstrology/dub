@@ -40,6 +40,14 @@ export function QRBuilderNewModal({
   const { isMobile } = useMediaQuery();
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentStep, setCurrentStep] = useState<TStepState>(initialStep || 1);
+
+  // Reset step when modal opens or initialStep changes
+  useEffect(() => {
+    if (showModal) {
+      setCurrentStep(initialStep || 1);
+    }
+  }, [showModal, initialStep]);
 
   useEffect(() => {
     if (showModal) {
@@ -105,8 +113,10 @@ export function QRBuilderNewModal({
     </div>
   );
 
+  const isStep1 = currentStep === 1;
+
   const modalContent = (
-    <div className="flex w-full h-full flex-col bg-white">
+    <div className={cn("flex w-full flex-col bg-white", !isStep1 && "h-full")}>
       {isProcessing && (
         <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/50 backdrop-blur-sm">
           <LoaderCircle className="text-secondary h-8 w-8 animate-spin" />
@@ -114,12 +124,16 @@ export function QRBuilderNewModal({
       )}
       {/* On mobile, render header directly; on desktop, pass as prop for fixed layout */}
       {isMobile && modalHeaderContent}
-      <div className={cn(isMobile ? "p-4 flex-1 min-h-0" : "h-full flex flex-col min-h-0")}>
+      <div className={cn(
+        isMobile ? "p-4 flex-1 min-h-0" : "",
+        !isMobile && isStep1 ? "flex flex-col" : !isMobile ? "h-full flex flex-col min-h-0" : ""
+      )}>
         <QRBuilderNew
           initialStep={initialStep}
           initialQrData={qrCode}
           onSave={handleSaveQR}
           modalHeader={!isMobile ? modalHeaderContent : undefined}
+          onStepChange={setCurrentStep}
         />
       </div>
     </div>
@@ -145,12 +159,16 @@ export function QRBuilderNewModal({
     );
   }
 
+  const modalClassName = isStep1
+    ? "border-border-500 w-full max-w-6xl overflow-hidden"
+    : "border-border-500 !h-[100vh] !max-h-[100vh] w-full max-w-6xl overflow-hidden";
+
   return (
     <Modal
       showModal={showModal}
       setShowModal={onClose}
       desktopOnly
-      className="border-border-500 !h-[100vh] !max-h-[100vh] w-full max-w-6xl overflow-hidden"
+      className={modalClassName}
     >
       {modalContent}
     </Modal>
