@@ -37,6 +37,7 @@ interface QrBuilderProviderProps {
   typeToScrollTo?: EQRType | null;
   handleResetTypeToScrollTo?: () => void;
   initialStep?: TStepState;
+  onStepChange?: (step: TStepState) => void;
 }
 
 // Provider component
@@ -49,6 +50,7 @@ export const QrBuilderProvider = ({
   typeToScrollTo,
   handleResetTypeToScrollTo,
   initialStep,
+  onStepChange,
 }: QrBuilderProviderProps) => {
   const user = useUser();
   const { isMobile } = useMediaQuery();
@@ -452,6 +454,11 @@ export const QrBuilderProvider = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQrData, initialize]);
+
+  // Notify parent component when step changes
+  useEffect(() => {
+    onStepChange?.(builderStep);
+  }, [builderStep, onStepChange]);
 
   // Handle typeToScrollTo from landing page buttons
   useEffect(() => {

@@ -97,7 +97,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
 
         {/* Fixed buttons for steps 2 and 3 */}
         {showDecorations && (
-          <div className="flex-shrink-0 bg-white px-6 py-4">
+          <div className="flex-shrink-0 bg-white lg:pl-10 py-4 lg:max-w-[790px] w-full px-10">
             <QrBuilderButtons
               step={builderStep || 1}
               onBack={handleBack}
