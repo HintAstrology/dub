@@ -1,4 +1,3 @@
-# Data Source created from Pipe 'dub_click_events_pipe'
 
 SCHEMA >
     `timestamp` DateTime64(3),

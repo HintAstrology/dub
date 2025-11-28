@@ -22,3 +22,5 @@ SQL >
 
 TYPE materialized
 DATASOURCE dub_lead_events_mv
+
+
