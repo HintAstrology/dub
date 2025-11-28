@@ -9,6 +9,7 @@ import { StylePicker } from "./style-picker";
 interface StyleSelectorProps {
   styleData: IStyleData;
   onStyleChange: (styleData: IStyleData) => void;
+  frameSelected: boolean; // Hide background color when frame is selected
   disabled?: boolean;
   isMobile?: boolean;
 }
@@ -16,6 +17,7 @@ interface StyleSelectorProps {
 export const StyleSelector: FC<StyleSelectorProps> = ({
   styleData,
   onStyleChange,
+  frameSelected,
   disabled = false,
   isMobile = false,
 }) => {
@@ -31,7 +33,7 @@ export const StyleSelector: FC<StyleSelectorProps> = ({
   return (
     <div className="flex w-full flex-col gap-4 pb-6">
       <StylePicker
-        label="QR shape"
+        label="QR code style"
         styleOptions={DOT_STYLES}
         value={styleData.dotsStyle}
         onSelect={handleDotsStyleChange}
@@ -39,6 +41,19 @@ export const StyleSelector: FC<StyleSelectorProps> = ({
         styleButtonClassName="[&_img]:h-12 [&_img]:w-12 p-3.5"
         disabled={disabled}
       />
+
+      <div
+        className={cn("", {
+          "rounded-lg p-3": isMobile,
+        })}
+      >
+        <ColorsSettings
+          styleData={styleData}
+          onStyleChange={onStyleChange}
+          frameSelected={frameSelected}
+          disabled={disabled}
+        />
+      </div>
     </div>
   );
 };

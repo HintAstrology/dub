@@ -13,4 +13,3 @@ export { ColorsSettings } from "./colors-settings";
 export { StyleButton } from "./style-button";
 export { StyleIcon } from "./style-icon";
 export { StylePicker } from "./style-picker";
-export { StylePalettePicker } from './style-palette-picker'
