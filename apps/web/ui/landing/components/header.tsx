@@ -1,15 +1,16 @@
 "use client";
 
-import { Session } from '@/lib/auth';
+import { Button } from "@/components/ui/button";
+import { Session } from "@/lib/auth";
 import { useAuthModal } from "@/ui/modals/auth-modal";
 import { Logo } from "@/ui/shared/logo.tsx";
-import { Button } from "@dub/ui";
+import { useRouterStuff } from "@dub/ui";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
-import { getSession } from 'next-auth/react';
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FC, useCallback, useEffect } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
+import { scrollToBuilder } from '../helpers/scrollToBuilder.tsx';
 
 interface IHeaderProps {
   sessionId: string;
@@ -17,12 +18,13 @@ interface IHeaderProps {
 }
 
 export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) => {
-  const { AuthModal, showModal } = useAuthModal({ sessionId });
+  const { AuthModal, showModal, setShowAuthModal } = useAuthModal({ sessionId });
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { queryParams } = useRouterStuff();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const openLogin = searchParams.get("login");
-  const scrollToBuilder = searchParams.get("start");
   const isFromPaywall = searchParams.get("source") === "paywall";
 
   useEffect(() => {
@@ -46,73 +48,137 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
         sessionId,
       });
 
-      qrGenerationBlock.scrollIntoView({ behavior: "smooth" });
+      scrollToBuilder();
       return;
     }
     router.push("/?start=true");
-  }, [router]);
+  }, [router, sessionId]);
 
   useEffect(() => {
-    if (scrollToBuilder) {
+    if (searchParams.get("start")) {
+      setShowAuthModal(false);
       handleScrollToQRGenerationBlock();
+      queryParams({
+        del: ["start"],
+      });
     }
-  }, [scrollToBuilder, handleScrollToQRGenerationBlock]);
+  }, [searchParams.get("start"), handleScrollToQRGenerationBlock]);
 
-  const handleOpenLogin = useCallback(async () => {
-    const existingSession = await getSession();
-    console.log("existingSession", existingSession);
-    if (existingSession?.user) {
-      router.push('/workspaces');
-      return;
-    }
+  const handleOpenLogin = useCallback(() => {
+    trackClientEvents({
+      event: EAnalyticEvents.PAGE_CLICKED,
+      params: {
+        page_name: "landing",
+        content_value: "login",
+        content_group: null,
+        event_category: "nonAuthorized",
+      },
+      sessionId,
+    });
+
     showModal("login");
-  }, [showModal, router]);
+  }, [showModal]);
 
   const handleOpenMyQRCodes = useCallback(() => {
-    router.push('/workspaces');
+    router.push("/workspaces");
   }, [router]);
 
   return (
     <>
-      <header className="border-border sticky left-0 right-0 top-0 z-50 h-[52px] border-b bg-white backdrop-blur-lg md:h-16">
-        <nav className="mx-auto flex h-full w-full max-w-screen-xl items-center justify-between px-3 md:container lg:px-20">
-          <div className="flex h-[28px] items-center md:h-auto md:gap-6">
-            <Link href="/">
-              <Logo />
-            </Link>
-          </div>
+      <header className="border-border sticky top-0 z-50 border-b bg-white backdrop-blur-lg">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-8 px-4 py-3 sm:px-6">
+          <Link href="/">
+            <Logo />
+          </Link>
 
-          <div className="flex items-center gap-3">
+          {/* Desktop buttons */}
+          <div className="hidden md:flex items-center gap-4 md:gap-6">
             {!authSession?.user ? (
               <>
                 {!isFromPaywall && (
                   <Button
-                    variant="outline"
                     onClick={handleOpenLogin}
-                    text="Log In"
-                    className="text-base font-medium"
-                  />
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-900 text-base font-medium transition-all shadow-none duration-200 border-0"
+                    size="lg"
+                  >
+                    Log In
+                  </Button>
                 )}
-
-                <Button
-                  variant="primary"
-                  color="blue"
-                  onClick={handleScrollToQRGenerationBlock}
-                  text="Create QR code"
-                  className="hidden text-base font-medium sm:block"
-                />
               </>
             ) : (
               <Button
-                variant="primary"
-                color="blue"
                 onClick={handleOpenMyQRCodes}
-                text="My QR Codes"
-                className="text-base font-medium"
-              />
+                className="bg-secondary hover:bg-secondary/90 text-base font-medium text-white"
+                size="lg"
+              >
+                My QR Codes
+              </Button>
             )}
           </div>
-        </nav>
+
+          {/* Mobile menu button */}
+          <div className="flex md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle menu"
+            >
+              <div className="relative w-6 h-6">
+                {/* Top line */}
+                <span
+                  className={`absolute left-0 h-0.5 w-6 bg-gray-700 transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen
+                      ? "top-1/2 -translate-y-1/2 rotate-45"
+                      : "top-[6px] rotate-0"
+                  }`}
+                />
+                {/* Bottom line */}
+                <span
+                  className={`absolute left-0 h-0.5 w-6 bg-gray-700 transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen
+                      ? "top-1/2 -translate-y-1/2 -rotate-45"
+                      : "top-[14px] rotate-0"
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div 
+          className={`md:hidden border-t border-border bg-white overflow-hidden transition-all duration-300 ease-in-out ${
+            mobileMenuOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="px-4 py-3 space-y-2">
+            {!authSession?.user ? (
+              <>
+                {!isFromPaywall && (
+                  <button
+                    onClick={() => {
+                      handleOpenLogin();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    Login
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  handleOpenMyQRCodes();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 text-base font-medium text-secondary hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                My QR Codes
+              </button>
+            )}
+          </div>
+        </div>
       </header>
       <AuthModal />
     </>

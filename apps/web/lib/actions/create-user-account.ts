@@ -1,22 +1,21 @@
 "use server";
 
 import { verifyAndCreateUser } from "@/lib/actions/verify-and-create-user.ts";
-import { createQRTrackingParams } from "@/lib/analytic/create-qr-tracking-data.helper.ts";
-import { WorkspaceProps } from "@/lib/types.ts";
+import { NewQrProps, WorkspaceProps } from "@/lib/types.ts";
 import { ratelimit, redis } from "@/lib/upstash";
-import { convertQrStorageDataToBuilder } from "@/ui/qr-builder/helpers/data-converters.ts";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { R2_URL } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
+import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
+import { trackMixpanelApiService } from "core/integration/analytic/services/track-mixpanel-api.service";
 import { getUserCookieService } from "core/services/cookie/user-session.service.ts";
 import { flattenValidationErrors } from "next-safe-action";
-import { EAnalyticEvents } from "../../core/integration/analytic/interfaces/analytic.interface.ts";
-import { trackMixpanelApiService } from "../../core/integration/analytic/services/track-mixpanel-api.service.ts";
+import { qrActionsTrackingParams } from "../analytic/qr-actions-tracking-data.helper";
 import { createQrWithLinkUniversal } from "../api/qrs/create-qr-with-link-universal";
 import { createId, getIP } from "../api/utils";
-import z from "../zod";
 import { signUpSchema } from "../zod/schemas/auth";
 import { throwIfAuthenticated } from "./auth/throw-if-authenticated";
+import { getQrDataFromRedis } from "./pre-checkout-flow/get-qr-data-from-redis";
 import { actionClient } from "./safe-action";
 
 class AuthError extends Error {
@@ -29,37 +28,9 @@ class AuthError extends Error {
   }
 }
 
-const qrDataToCreateSchema = z.object({
-  title: z.string(),
-  styles: z.object({}).passthrough(),
-  frameOptions: z.object({
-    id: z.string(),
-    color: z.string().optional(),
-    textColor: z.string().optional(),
-    text: z.string().optional(),
-  }),
-  qrType: z.enum([
-    "website",
-    "pdf",
-    "image",
-    "video",
-    "whatsapp",
-    "social",
-    "wifi",
-    "app",
-    "feedback",
-  ]),
-  fileId: z.string().optional().describe("The file the link leads to"),
-});
-
-const schema = signUpSchema.extend({
-  // code: z.string().min(6, "OTP must be 6 characters long."),
-  qrDataToCreate: qrDataToCreateSchema.nullish(),
-});
-
 // Sign up a new user using email and password
 export const createUserAccountAction = actionClient
-  .schema(schema, {
+  .schema(signUpSchema, {
     handleValidationErrorsShape: (ve) =>
       flattenValidationErrors(ve).fieldErrors,
   })
@@ -69,7 +40,6 @@ export const createUserAccountAction = actionClient
       email,
       password,
       // code,
-      qrDataToCreate,
     } = parsedInput;
 
     const { success } = await ratelimit(2, "1 m").limit(`signup:${getIP()}`);
@@ -130,6 +100,10 @@ export const createUserAccountAction = actionClient
       );
     }
 
+    const { qrData } = await getQrDataFromRedis(sessionId!);
+
+    const qrDataToCreate = qrData as NewQrProps;
+
     waitUntil(
       Promise.all([
         ...(qrDataToCreate
@@ -140,18 +114,7 @@ export const createUserAccountAction = actionClient
                   : (qrDataToCreate!.styles!.data! as string);
 
                 const qrCreateResponse = await createQrWithLinkUniversal({
-                  qrData: {
-                    data: qrDataToCreate?.styles?.data as string,
-                    qrType: qrDataToCreate?.qrType as any,
-                    title: qrDataToCreate?.title,
-                    description: undefined,
-                    styles: qrDataToCreate?.styles,
-                    frameOptions: qrDataToCreate?.frameOptions,
-                    fileId: qrDataToCreate?.fileId,
-                    link: {
-                      url: linkUrl,
-                    },
-                  },
+                  qrData: qrDataToCreate,
                   linkData: {
                     url: linkUrl,
                   },
@@ -162,11 +125,8 @@ export const createUserAccountAction = actionClient
                   userId: generatedUserId,
                 });
 
-                const trackingParams = createQRTrackingParams(
-                  convertQrStorageDataToBuilder(
-                    qrCreateResponse.createdQr as QrStorageData,
-                  ),
-                  qrCreateResponse.createdQr.id,
+                const trackingParams = qrActionsTrackingParams(
+                  qrCreateResponse.createdQr as unknown as TQrServerData,
                 );
 
                 await trackMixpanelApiService({
@@ -174,10 +134,8 @@ export const createUserAccountAction = actionClient
                   email,
                   userId: generatedUserId,
                   params: {
+                    event_category: "Authorized",
                     ...trackingParams,
-                    link_url: qrCreateResponse.createdLink?.shortLink,
-                    link_id: qrCreateResponse.createdLink?.id,
-                    target_url: qrCreateResponse.createdLink?.url,
                   },
                 });
               })(),

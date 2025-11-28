@@ -1,8 +1,9 @@
-import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "@dub/prisma";
+import { SignJWT, jwtVerify } from "jose";
+import { encode } from "next-auth/jwt";
 import { cookies } from "next/headers";
 import { Session } from "./utils";
-import { encode } from "next-auth/jwt";
+import { APP_URL } from '@dub/utils';
 
 // JWT secret for server-side authentication
 const JWT_SECRET = process.env.NEXTAUTH_SECRET || "fallback-secret";
@@ -32,7 +33,7 @@ export async function createServerAuthJWT(userId: string): Promise<string> {
       email: user.email,
       name: user.name,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days
+      exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days
       serverAuth: true, // Mark as server-authenticated
     })
       .setProtectedHeader({ alg: "HS256" })
@@ -50,7 +51,9 @@ export async function createServerAuthJWT(userId: string): Promise<string> {
 /**
  * Verify and decode a server-side authentication JWT
  */
-export async function verifyServerAuthJWT(token: string): Promise<Session | null> {
+export async function verifyServerAuthJWT(
+  token: string,
+): Promise<Session | null> {
   try {
     const { payload } = await jwtVerify(token, secret);
 
@@ -100,7 +103,7 @@ export async function setServerAuthSession(userId: string): Promise<void> {
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days
       },
-      secret: process.env.NEXTAUTH_SECRET || '',
+      secret: process.env.NEXTAUTH_SECRET || "",
     });
 
     const cookieStore = cookies();
@@ -110,7 +113,7 @@ export async function setServerAuthSession(userId: string): Promise<void> {
     console.log("nextAuthToken", nextAuthToken);
     console.log("user", user);
     console.log("VERCEL_DEPLOYMENT", VERCEL_DEPLOYMENT);
-    
+
     // Set the NextAuth session token cookie with EXACT same settings as NextAuth config
     cookieStore.set(
       `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.session-token`,
@@ -120,9 +123,9 @@ export async function setServerAuthSession(userId: string): Promise<void> {
         sameSite: "lax",
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // Match NextAuth calculation exactly
         path: "/",
-        domain: VERCEL_DEPLOYMENT ? `.getqr.com` : undefined,
+        domain: VERCEL_DEPLOYMENT ? `.${APP_URL}` : undefined,
         secure: VERCEL_DEPLOYMENT, // Add the missing secure flag
-      }
+      },
     );
   } catch (error) {
     console.error("Set server auth session error:", error);
@@ -136,16 +139,16 @@ export async function setServerAuthSession(userId: string): Promise<void> {
  */
 export async function createAutoLoginURL(
   userId: string,
-  redirectUrl: string = "/"
+  redirectUrl: string = "/",
 ): Promise<string> {
   try {
     const token = await createServerAuthJWT(userId);
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:8888";
-    
+    const baseUrl = process.env.NEXTAUTH_URL
+      || (APP_URL ? `https://${APP_URL}` : "http://localhost:3000");
+
     return `${baseUrl}/api/auth/auto-login?token=${encodeURIComponent(token)}&redirect=${encodeURIComponent(redirectUrl)}`;
   } catch (error) {
     console.error("Create auto login URL error:", error);
     throw error;
   }
 }
-

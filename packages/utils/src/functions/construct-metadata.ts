@@ -4,7 +4,7 @@ import { HOME_DOMAIN } from "../constants";
 export function constructMetadata({
   title,
   fullTitle,
-  description = "Design dynamic QR codes with logos, frames, and colors. Track scans, edit content anytime, and download in JPG, PNG, or SVG. Start free—no credit card needed.",
+  description = "Design dynamic QR codes with logos, frames, and colors. Track scans, edit content anytime, and download in JPG, PNG, or SVG",
   image = `${HOME_DOMAIN}/images/thumbnail.jpg`,
   video,
   icons = [
@@ -90,7 +90,8 @@ export function constructMetadata({
       manifest,
     }),
     other: {
-      "ahrefs-site-verification": "e5a6dbdcc10bdcd4b469eb0b9351966a19df09770ab98a83ef5dff85c883160a",
+      "ahrefs-site-verification":
+        "e5a6dbdcc10bdcd4b469eb0b9351966a19df09770ab98a83ef5dff85c883160a",
     },
   };
 }

@@ -23,7 +23,9 @@ export enum EAnalyticEvents {
   PLAN_PICKER_CLICKED = "planPickerClicked",
 
   QR_CREATED = "qrCreated",
+  QR_CREATED_ERROR = "qrCreatedError",
   QR_UPDATED = "qrUpdated",
+  QR_UPDATED_ERROR = "qrUpdatedError",
 
   EXPERIMENT_VIEWED = "experimentViewed",
 

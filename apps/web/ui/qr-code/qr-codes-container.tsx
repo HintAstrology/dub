@@ -1,11 +1,11 @@
 "use client";
 
 import { Session } from "@/lib/auth/utils";
+import { useSubscriptionExpiredModal } from "@/lib/hooks/use-subscription-expired-modal.tsx";
 import useQrs from "@/lib/swr/use-qrs.ts";
-import { QrStorageData } from "@/ui/qr-builder/types/types.ts";
-import QrCodeCardPlaceholder from "@/ui/qr-code/qr-code-card-placeholder.tsx";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
+import QrCodeCardPlaceholder from "@/ui/qr-code/components/qr-code-card-placeholder.tsx";
 import { QrCodesDisplayContext } from "@/ui/qr-code/qr-codes-display-provider.tsx";
-import { compressImagesInBackground } from "@/ui/utils/qr-code-previews.ts";
 import { CardList, MaxWidthWrapper } from "@dub/ui";
 import { CursorRays, QRCode as QRCodeIcon } from "@dub/ui/icons";
 import { useSearchParams } from "next/navigation";
@@ -15,11 +15,10 @@ import {
   SetStateAction,
   createContext,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import { AnimatedEmptyState } from "../shared/animated-empty-state";
-import { QrCodeCard } from "./qr-code-card.tsx";
+import { QrCodeCard } from "./components/qr-code-card.tsx";
 
 export default function QrCodesContainer({
   CreateQrCodeButton,
@@ -29,14 +28,10 @@ export default function QrCodesContainer({
 }: {
   CreateQrCodeButton: () => ReactNode;
   featuresAccess: boolean;
-  initialQrs: QrStorageData[];
+  initialQrs: TQrServerData[];
   user: Session["user"];
 }) {
-  const {
-    viewMode,
-    sortBy,
-    // showArchived
-  } = useContext(QrCodesDisplayContext);
+  const { viewMode, sortBy } = useContext(QrCodesDisplayContext);
 
   const { qrs: clientQrs, isValidating } = useQrs(
     {
@@ -50,29 +45,12 @@ export default function QrCodesContainer({
 
   const qrs = clientQrs || initialQrs;
 
-  // State to hold QRs with preloaded previews
-  const [qrsWithPreviews, setQrsWithPreviews] = useState<
-    QrStorageData[] | undefined
-  >(undefined);
-
-  useEffect(() => {
-    if (!qrs) return;
-    setQrsWithPreviews(qrs);
-
-    const timeoutId = setTimeout(async () => {
-      const updatedQrs = await compressImagesInBackground(qrs);
-      setQrsWithPreviews(updatedQrs);
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [qrs]);
-
   return (
     <MaxWidthWrapper className="grid gap-y-2">
       <QrCodesList
         CreateQrCodeButton={CreateQrCodeButton}
-        qrCodes={qrsWithPreviews || qrs}
-        loading={isValidating || (qrs && !qrsWithPreviews)}
+        qrCodes={qrs}
+        loading={isValidating || !qrs}
         compact={viewMode === "rows"}
         featuresAccess={featuresAccess}
         user={user}
@@ -94,14 +72,13 @@ export const QrCodesListContext = createContext<{
 function QrCodesList({
   CreateQrCodeButton,
   qrCodes,
-  // count,
   loading,
   compact,
   featuresAccess,
   user,
 }: {
   CreateQrCodeButton: () => ReactNode;
-  qrCodes?: QrStorageData[];
+  qrCodes?: TQrServerData[];
   count?: number;
   loading?: boolean;
   compact: boolean;
@@ -111,6 +88,9 @@ function QrCodesList({
   const searchParams = useSearchParams();
 
   const [openMenuQrCodeId, setOpenMenuQrCodeId] = useState<string | null>(null);
+
+  const { setShowSubscriptionExpiredModal, SubscriptionExpiredModalCallback } =
+    useSubscriptionExpiredModal();
 
   const isFiltered = [
     "folderId",
@@ -123,6 +103,8 @@ function QrCodesList({
 
   return (
     <>
+      <SubscriptionExpiredModalCallback />
+
       {!qrCodes || qrCodes.length ? (
         <QrCodesListContext.Provider
           value={{ openMenuQrCodeId, setOpenMenuQrCodeId, featuresAccess }}
@@ -137,6 +119,7 @@ function QrCodesList({
                     qrCode={qrCode}
                     featuresAccess={featuresAccess}
                     user={user}
+                    setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
                   />
                 ))
               : // Loading placeholder cards

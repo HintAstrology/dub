@@ -4,9 +4,8 @@ import { FC } from "react";
 export const QrTabsDetailedTitle: FC = () => {
   return (
     <SectionTitle
-      titleFirstPart={"Generate the"}
-      highlightedTitlePart={"Perfect QR Code"}
-      titleSecondPart={"for Your Needs"}
+      titleFirstPart={"Generate QR code in seconds."}
+      // highlightedTitlePart={"QR code in seconds."}
     />
   );
 };

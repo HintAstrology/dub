@@ -1,11 +1,10 @@
-import { QrStorageData } from "@/ui/qr-builder/types/types";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
+import { APP_DOMAIN } from "@dub/utils";
 
-export const MOCK_QR: QrStorageData = {
+export const MOCK_QR: TQrServerData = {
   id: "demo-qr-id",
   title: "Universal QR Code",
-  data: process.env.NEXT_PUBLIC_APP_DOMAIN
-    ? `${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-    : "http://localhost:8888",
+  data: APP_DOMAIN,
   qrType: "website" as any,
   description: null,
   archived: false,
@@ -13,9 +12,7 @@ export const MOCK_QR: QrStorageData = {
     width: 300,
     height: 300,
     type: "svg",
-    data: process.env.NEXT_PUBLIC_APP_DOMAIN
-      ? `${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : "http://localhost:8888",
+    data: APP_DOMAIN,
     margin: 10,
     qrOptions: { typeNumber: 0, mode: "Byte", errorCorrectionLevel: "Q" },
     dotsOptions: { type: "rounded", color: "#265F31" },
@@ -35,17 +32,15 @@ export const MOCK_QR: QrStorageData = {
     text: "Create Me",
     textColor: "#1CAB7B",
   },
-  fileId: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  // fileId: null,
+  // createdAt: new Date(),
+  // updatedAt: new Date(),
   userId: "demo-user-id",
   linkId: "demo-link-id",
-  workspaceId: "demo-workspace-id",
-  user: {} as any,
+  // workspaceId: "demo-workspace-id",
+  // user: {} as any,
   link: {
     id: "demo-link-id",
-    shortLink: process.env.NEXT_PUBLIC_APP_DOMAIN
-      ? `${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : "http://localhost:8888",
+    shortLink: APP_DOMAIN,
   } as any,
 };

@@ -1,0 +1,106 @@
+import { EQRType } from "./qr-type";
+
+export type TStepState = 1 | 2 | 3 | null;
+
+export type TDestinationData = string | null;
+
+export type TQrType = EQRType | null;
+
+// Import form data types
+import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step.tsx";
+import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
+import { RefObject } from "react";
+import {
+  TAppLinkQRFormData,
+  TFeedbackQRFormData,
+  TImageQRFormData,
+  TPdfQRFormData,
+  TSocialQRFormData,
+  TVideoQRFormData,
+  TWebsiteQRFormData,
+  TWhatsappQRFormData,
+  TWifiQRFormData,
+} from "../validation/schemas";
+import { IQRCustomizationData } from "./customization";
+
+export type TQRFormData =
+  | TWebsiteQRFormData
+  | TWhatsappQRFormData
+  | TWifiQRFormData
+  | TPdfQRFormData
+  | TImageQRFormData
+  | TVideoQRFormData
+  | TSocialQRFormData
+  | TAppLinkQRFormData
+  | TFeedbackQRFormData;
+
+export interface IQrBuilderContextType {
+  // States
+  builderStep: TStepState;
+  destinationData: TDestinationData;
+  selectedQrType: TQrType;
+  hoveredQRType: EQRType | null;
+  currentQRType: EQRType | null;
+  typeSelectionError: string;
+  formData: TQRFormData | null;
+  currentFormValues: Record<string, any>;
+  initialQrData?: TQrServerData | null;
+
+  // Processing states
+  isProcessing: boolean;
+  isFileUploading: boolean;
+  isFileProcessing: boolean;
+  isInitializing: boolean;
+
+  // Form validation state
+  isFormValid: boolean;
+
+  // Customization states
+  customizationData: IQRCustomizationData;
+  customizationActiveTab: string;
+
+  // Computed states
+  isTypeStep: boolean;
+  isContentStep: boolean;
+  isCustomizationStep: boolean;
+  isEditMode: boolean;
+  homepageDemo?: boolean;
+
+  // Dialog state (for mobile homepage demo)
+  isDialogOpen: boolean;
+  setIsDialogOpen: (open: boolean) => void;
+
+  // Methods
+  onSave: (providedFormData?: TQRFormData) => Promise<void>;
+  handleNextStep: () => void;
+  handleChangeStep: (step: number) => Promise<void>;
+  handleSelectQRType: (type: EQRType) => void;
+  handleHoverQRType: (type: EQRType | null) => void;
+  handleFormSubmit: (data: TQRFormData) => void;
+  updateCurrentFormValues: (values: Record<string, any>) => void;
+
+  // Customization methods
+  updateCustomizationData: (data: IQRCustomizationData) => void;
+  setCustomizationActiveTab: (tab: string) => void;
+
+  // State setters
+  setBuilderStep: (state: TStepState) => void;
+  setDestinationData: (data: TDestinationData) => void;
+  setSelectedQrType: (type: TQrType) => void;
+  setFormData: (data: TQRFormData | null) => void;
+  setIsFileUploading: (uploading: boolean) => void;
+  setIsFileProcessing: (processing: boolean) => void;
+  setIsFormValid: (valid: boolean) => void;
+
+  // Buttons
+  handleContinue: () => Promise<void>;
+  handleBack: () => void;
+
+  // Refs
+  contentStepRef: RefObject<QRContentStepRef>;
+  qrBuilderButtonsWrapperRef: RefObject<HTMLDivElement>;
+  qrBuilderContentWrapperRef: RefObject<HTMLDivElement>;
+
+  // Navigation state
+  isGoingBack: boolean;
+}

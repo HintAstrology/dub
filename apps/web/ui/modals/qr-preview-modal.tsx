@@ -1,29 +1,28 @@
 "use client";
 
 import { Session } from "@/lib/auth";
-import { QRCanvas } from "@/ui/qr-builder/qr-canvas";
+import { QRCanvas } from "@/ui/qr-builder-new/components/qr-canvas";
 import {
   TDownloadFormat,
   useQrDownload,
-} from "@/ui/qr-code/use-qr-download.ts";
+} from "@/ui/qr-code/hooks/use-qr-download";
 import { X } from "@/ui/shared/icons";
 import QRIcon from "@/ui/shared/icons/qr";
-import { Button, Modal, useRouterStuff } from "@dub/ui";
+import { Button, Modal, useMediaQuery, useRouterStuff } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { Icon } from "@iconify/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Theme } from "@radix-ui/themes";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
+import { Share2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
 import {
   Dispatch,
-  RefObject,
   SetStateAction,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { toast } from "sonner";
@@ -39,13 +38,10 @@ interface IQRPreviewModalProps {
   setShowQRPreviewModal: Dispatch<SetStateAction<boolean>>;
   setIsNewQr: Dispatch<SetStateAction<boolean>>;
   isNewQr?: boolean;
-  canvasRef: RefObject<HTMLCanvasElement>;
-  qrCode: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   qrCodeId?: string;
-  width?: number;
-  height?: number;
   user: Session["user"];
-  onCanvasReady?: () => void;
 }
 
 function QRPreviewModal({
@@ -53,22 +49,21 @@ function QRPreviewModal({
   setShowQRPreviewModal,
   setIsNewQr,
   isNewQr,
-  canvasRef,
-  qrCode,
+  qrCodeStylingInstance,
+  svgString = "",
   qrCodeId,
-  width = 200,
-  height = 200,
   user,
-  onCanvasReady,
 }: IQRPreviewModalProps) {
+  const { isMobile } = useMediaQuery();
   const { queryParams } = useRouterStuff();
   const searchParams = useSearchParams();
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<TDownloadFormat>("svg");
 
-  const { downloadQrCode } = useQrDownload(qrCode);
+  const { downloadQrCode } = useQrDownload(qrCodeStylingInstance);
 
   const isWelcomeModal = searchParams.has("onboarded") || isNewQr;
+  const [canShare, setCanShare] = useState(false);
 
   const handleClose = () => {
     if (!isDownloading) {
@@ -83,7 +78,7 @@ function QRPreviewModal({
   };
 
   const handleDownload = async () => {
-    if (!qrCode || !canvasRef.current) {
+    if (!qrCodeStylingInstance) {
       toast.error("QR code not found");
       return;
     }
@@ -114,6 +109,61 @@ function QRPreviewModal({
     }
   };
 
+  const onShareClick = async () => {
+    if (!qrCodeStylingInstance) {
+      return;
+    }
+
+    trackClientEvents({
+      event: EAnalyticEvents.ELEMENT_CLICKED,
+      params: {
+        page_name: "dashboard",
+        element_name: "qr_preview",
+        content_group: "my_qr_codes",
+        content_value: "share",
+        email: user?.email,
+        qrId: qrCodeId,
+        event_category: "Authorized",
+      },
+      sessionId: user?.id,
+    });
+
+    try {
+      setIsDownloading(true);
+      const blob = await qrCodeStylingInstance.getRawData(
+        selectedFormat === "jpg" ? "jpeg" : selectedFormat,
+      );
+
+      if (!blob) {
+        toast.error("Failed to generate QR data");
+        return;
+      }
+
+      const file = new File([blob as BlobPart], `qr-code.${selectedFormat}`, {
+        type:
+          selectedFormat === "svg"
+            ? "image/svg+xml"
+            : selectedFormat === "png"
+              ? "image/png"
+              : "image/jpeg",
+      });
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+        });
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      console.error("Failed to share QR code:", error);
+      toast.error("Failed to share QR code");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   useEffect(() => {
     if (showQRPreviewModal) {
       trackClientEvents({
@@ -130,6 +180,14 @@ function QRPreviewModal({
       });
     }
   }, [showQRPreviewModal]);
+
+  useEffect(() => {
+    setCanShare(
+      typeof navigator !== "undefined" &&
+        !!navigator.share &&
+        !!navigator.canShare,
+    );
+  }, []);
 
   return (
     <Modal
@@ -190,21 +248,19 @@ function QRPreviewModal({
             <div className="flex flex-col items-center gap-6">
               <div className="flex justify-center">
                 <QRCanvas
-                  ref={canvasRef}
-                  qrCode={qrCode}
-                  qrCodeId={qrCodeId}
-                  width={width}
-                  height={height}
-                  onCanvasReady={onCanvasReady}
+                  svgString={svgString}
+                  width={isMobile ? 300 : 200}
+                  height={isMobile ? 300 : 200}
+                  className="p-1"
                 />
               </div>
 
-              <div className="flex w-full items-center gap-2">
+              <div className="flex w-full flex-col items-center gap-2">
                 <DropdownMenu.Root>
-                  <DropdownMenu.Trigger>
+                  <DropdownMenu.Trigger className="w-full">
                     <div
                       className={cn(
-                        "border-border-300 flex h-10 w-[94px] cursor-pointer items-center justify-between gap-3.5 rounded-md border bg-white px-3 text-sm text-neutral-200 transition-colors",
+                        "border-border-300 flex h-10 w-full cursor-pointer items-center justify-between gap-3.5 rounded-md border bg-white px-3 text-sm text-neutral-200 transition-colors",
                         "focus-within:border-secondary",
                       )}
                     >
@@ -220,9 +276,8 @@ function QRPreviewModal({
                       />
                     </div>
                   </DropdownMenu.Trigger>
-
                   <DropdownMenu.Content
-                    className="border-border-100 !z-10 flex w-[94px] flex-col items-center justify-start gap-2 rounded-lg border bg-white p-3 shadow-md"
+                    className="w-[var(--radix-dropdown-menu-trigger-width)] border-border-100 !z-10 flex flex-col items-center justify-start gap-2 rounded-lg border bg-white p-3 shadow-md"
                     sideOffset={5}
                     align="start"
                   >
@@ -250,12 +305,23 @@ function QRPreviewModal({
                     ))}
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
-                <Button
-                  text="Download QR"
-                  variant="primary"
-                  onClick={handleDownload}
-                  className="flex-1"
-                />
+                <div className="flex w-full gap-2">
+                  <Button
+                    text="Download QR"
+                    variant="primary"
+                    onClick={handleDownload}
+                    className="flex-1"
+                  />
+                  {canShare && (
+                    <Button
+                      icon={<Share2 className="size-6" />}
+                      variant="primary"
+                      disabled={isDownloading}
+                      className="flex w-fit items-center justify-center gap-2"
+                      onClick={onShareClick}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -266,15 +332,12 @@ function QRPreviewModal({
 }
 
 export function useQRPreviewModal(data: {
-  canvasRef: RefObject<HTMLCanvasElement>;
-  qrCode: QRCodeStyling | null;
+  qrCodeStylingInstance: QRCodeStyling | null;
+  svgString: string;
   qrCodeId?: string;
-  width?: number;
-  height?: number;
   user: Session["user"];
-  onCanvasReady?: () => void;
 }) {
-  const { canvasRef, qrCode, qrCodeId, width = 200, height = 200, user, onCanvasReady } = data;
+  const { qrCodeStylingInstance, svgString = "", qrCodeId, user } = data;
   const [showQRPreviewModal, setShowQRPreviewModal] = useState(false);
   const [isNewQr, setIsNewQr] = useState(false);
 
@@ -286,20 +349,24 @@ export function useQRPreviewModal(data: {
   const QRPreviewModalCallback = useCallback(() => {
     return (
       <QRPreviewModal
-        canvasRef={canvasRef}
-        qrCode={qrCode}
+        qrCodeStylingInstance={qrCodeStylingInstance}
+        svgString={svgString}
         qrCodeId={qrCodeId}
-        width={width}
-        height={height}
         showQRPreviewModal={showQRPreviewModal}
         setShowQRPreviewModal={setShowQRPreviewModal}
         setIsNewQr={setIsNewQr}
         isNewQr={isNewQr}
         user={user}
-        onCanvasReady={onCanvasReady}
       />
     );
-  }, [width, height, showQRPreviewModal, qrCodeId]);
+  }, [
+    showQRPreviewModal,
+    qrCodeId,
+    qrCodeStylingInstance,
+    svgString,
+    user,
+    isNewQr,
+  ]);
 
   return {
     QRPreviewModal: QRPreviewModalCallback,

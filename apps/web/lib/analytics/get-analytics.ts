@@ -150,7 +150,7 @@ export const getAnalytics = async (params: AnalyticsFilters) => {
         if (!link) {
           return null;
         }
-        console.log('link', link);
+        console.log("link", link);
         return analyticsResponse[groupBy].parse({
           id: link.id,
           domain: link.domain,
@@ -167,6 +167,32 @@ export const getAnalytics = async (params: AnalyticsFilters) => {
         });
       })
       .filter((d) => d !== null);
+
+  } else  if (groupBy === "download") {
+    const downloadData = response.data as { link_id: string }[];
+
+    const links = await prismaEdge.link.findMany({
+      where: {
+        projectId: workspaceId,
+        id: { in: downloadData.map((item) => item.link_id) },
+      },
+      select: {
+        id: true,
+        qrs: { select: { title: true, qrType: true } },
+      },
+    });
+
+    const mappedDownload = downloadData.map((item) => {
+      const link = links.find((l) => l.id === item.link_id);
+      if (!link) return null;
+      return {
+        ...item,
+        'qr_name': link?.qrs[0]?.title || '',
+        'qr_type': link?.qrs[0]?.qrType || '',
+      };
+    }).filter(Boolean);
+
+    return mappedDownload;
 
     // special case for utm tags
   } else if (UTM_TAGS_PLURAL_LIST.includes(groupBy)) {

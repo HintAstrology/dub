@@ -1,6 +1,7 @@
 import { NewQrProps } from "@/lib/types";
+import { FILE_QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { prisma } from "@dub/prisma";
-import { getQr } from './get-qr';
+import { getQr } from "./get-qr";
 
 export async function updateQr(
   id: string,
@@ -11,6 +12,7 @@ export async function updateQr(
     description,
     styles,
     frameOptions,
+    logoOptions,
     archived,
     fileId,
   }: Partial<NewQrProps>,
@@ -18,6 +20,12 @@ export async function updateQr(
   const qr = await getQr({
     qrId: id,
   });
+
+  const shouldClearFileId =
+    qrType &&
+    qr.qrType &&
+    FILE_QR_TYPES.includes(qr.qrType as any) &&
+    !FILE_QR_TYPES.includes(qrType as any);
 
   const updatedQr = await prisma.qr.update({
     where: {
@@ -30,8 +38,9 @@ export async function updateQr(
       description,
       styles,
       frameOptions,
+      logoOptions,
       archived: archived || false,
-      fileId,
+      fileId: shouldClearFileId ? null : fileId,
     },
     include: {
       link: true,

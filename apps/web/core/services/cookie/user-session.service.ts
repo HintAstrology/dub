@@ -101,3 +101,21 @@ export const resetUserSessionId = async () => {
 
   cookieStore.delete(ECookieArg.SESSION_ID);
 };
+
+// reset subscription expired modal shown status
+export const resetSubscriptionExpiredModalShown = async () => {
+  const cookieStore = cookies();
+  cookieStore.delete(ECookieArg.EXPIRED_MODAL_SHOWN);
+};
+
+// get subscription expired modal shown status
+export const getSubscriptionExpiredModalShown = async () => {
+  const cookieStore = cookies();
+  return cookieStore.get(ECookieArg.EXPIRED_MODAL_SHOWN)?.value === "true";
+};
+
+// set subscription expired modal shown status
+export const setSubscriptionExpiredModalShown = async () => {
+  const cookieStore = cookies();
+  cookieStore.set(ECookieArg.EXPIRED_MODAL_SHOWN, "true", getCookieSettings);
+};

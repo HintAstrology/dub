@@ -4,4 +4,5 @@ export enum ECookieArg {
   OAUTH_FLOW = "oauth-flow",
   SOURCE = "source",
   CONFIRM_CODE = "confirm-code",
+  EXPIRED_MODAL_SHOWN = "subscription-expired-modal-shown",
 }
