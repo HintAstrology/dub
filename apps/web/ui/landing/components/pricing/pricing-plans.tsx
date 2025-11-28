@@ -8,9 +8,11 @@ import { cn } from "@dub/utils";
 import { CheckIcon } from "lucide-react";
 import { FC, useState } from "react";
 import { PRICING_PLANS } from "./config.ts";
+import { EQRType } from '@/ui/qr-builder-new/types/qr-type.ts';
+import { TPaymentPlan } from 'core/integration/payment/config/payment-config.interface.ts';
 
 interface IPricingSectionProps {
-  handleScrollButtonClick: (type: "1" | "2" | "3") => void;
+  handleScrollButtonClick: (type: "1" | "2" | "3", scrollTo?: EQRType, selectedPlan?: TPaymentPlan) => void;
 }
 
 const extractPrice = (planText: string): string => {
@@ -96,7 +98,7 @@ export const PricingSection: FC<IPricingSectionProps> = ({
                     <Button
                       className="bg-secondary hover:bg-secondary/90 w-full text-white"
                       size="lg"
-                      onClick={() => handleScrollButtonClick("3")}
+                      onClick={() => handleScrollButtonClick("3", undefined, plan.paymentPlan)}
                     >
                       {plan.title === "7-Day Trial" ? "Start Trial" : "Get Started"}
                     </Button>

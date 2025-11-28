@@ -8,6 +8,7 @@ import { trackClientEvents } from "../../core/integration/analytic";
 import { EAnalyticEvents } from "../../core/integration/analytic/interfaces/analytic.interface.ts";
 import { EQRType } from "../qr-builder-new/types/qr-type.ts";
 import { scrollToBuilder } from "./helpers/scrollToBuilder.tsx";
+import { TPaymentPlan } from 'core/integration/payment/config/payment-config.interface.ts';
 
 interface ILandingSectionsClientProps {
   user: Session["user"] | null;
@@ -23,13 +24,14 @@ export const LandingSectionsClient: FC<
   const handleScrollButtonClick = (
     type: "1" | "2" | "3",
     scrollTo?: EQRType,
+    selectedPlan?: TPaymentPlan,
   ) => {
     trackClientEvents({
       event: EAnalyticEvents.PAGE_CLICKED,
       params: {
         page_name: "landing",
         content_value: "create_qr",
-        content_group: scrollTo ? scrollTo : null,
+        content_group: selectedPlan ? selectedPlan : (scrollTo || null),
         element_no: type,
         event_category: "nonAuthorized",
       },
