@@ -1,5 +1,6 @@
 'use client';
 
+import { FeaturesAccess } from '@/lib/actions/check-features-access-auth-less';
 import { LoadingSpinner } from '@dub/ui';
 import { Payment } from '@primer-io/checkout-web';
 import { useCreateUserSessionMutation } from 'core/api/user/payment/payment.hook';
@@ -10,14 +11,19 @@ import { CheckoutFormComponent, ICheckoutFormSuccess, IPrimerClientError } from 
 import { getPaymentPlanPrice, ICustomerBody, TPaymentPlan } from 'core/integration/payment/config';
 import { getCurrenciesData } from 'core/services/currencies/currencies.service';
 import { generateCheckoutFormPaymentEvents } from 'core/services/events/checkout-form-events.service';
-import { FC, useEffect, useRef, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
   user: ICustomerBody;
+  featuresAccess: FeaturesAccess;
+  setShowForm: Dispatch<SetStateAction<boolean>>;
 }
 
 export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
   user,
+  featuresAccess,
+  setShowForm,
 }) => {
   const paymentTypeRef = useRef<string | null>(null);
 
@@ -176,7 +182,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       stage: 'error',
       toxic: user?.toxic,
       paymentType: paymentTypeRef.current!,
-      // subscriptionId: user?.external_subscription_id,
+      subscriptionId: featuresAccess.subscriptionId,
       additionalParams: { event_category: 'AppPurchase', event_type: null },
     });
   };
@@ -210,9 +216,12 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
         amount: minimalPriceForUpdate,
         stage: 'success',
         toxic: user?.toxic,
-        // subscriptionId: user?.external_subscription_id,
+        subscriptionId: featuresAccess.subscriptionId,
         additionalParams: { event_category: 'AppPurchase', event_type: null },
       });
+
+      setShowForm(false);
+      toast.success('Your payment details were updated successfully.', { duration: 10000 });
 
       return;
     }
@@ -226,7 +235,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       stage: 'success',
       paymentType: data.paymentType,
       toxic: res?.data?.toxic,
-      // subscriptionId: user?.external_subscription_id,
+      subscriptionId: featuresAccess.subscriptionId,
       additionalParams: { event_category: 'AppPurchase', event_type: null },
     });
 
@@ -242,7 +251,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       planCode: paymentPlanForUpdate,
       paymentType: paymentTypeRef.current!,
       toxic: user?.toxic,
-      // subscriptionId: user?.external_subscription_id,
+      subscriptionId: featuresAccess.subscriptionId,
       additionalParams: { event_category: 'AppPurchase', event_type: null },
     });
   };

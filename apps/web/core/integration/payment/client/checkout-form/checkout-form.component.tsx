@@ -183,7 +183,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
           isActive: true,
         };
 
-        if (!isCheckedRef.current) {
+        if (termsAndConditionsText && !isCheckedRef.current) {
           errorMessage.message = "You must agree to the terms and conditions.";
           handleError(errorMessage);
 
@@ -535,7 +535,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
         )}
       </div>
 
-      {checkoutInstance && !isPaidTraffic && (
+      {termsAndConditionsText && checkoutInstance && !isPaidTraffic && (
         <div className="group flex gap-2">
           <Checkbox
             id="terms-and-conditions"
@@ -552,7 +552,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
         </div>
       )}
 
-      {checkoutInstance && isPaidTraffic ? termsAndConditionsText : null}
+      {termsAndConditionsText && checkoutInstance && isPaidTraffic ? termsAndConditionsText : null}
     </>
   );
 };

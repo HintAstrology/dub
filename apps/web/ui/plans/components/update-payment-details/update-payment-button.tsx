@@ -39,7 +39,11 @@ export const UpdatePaymentButton: FC<Readonly<Props>> = ({
         onClick={() => setShowForm(value => !value)}
       />
       {showForm && (
-        <UpdatePaymentDetails user={user} />
+        <UpdatePaymentDetails
+          user={user}
+          featuresAccess={featuresAccess}
+          setShowForm={setShowForm}
+        />
       )}
     </div>
   );
