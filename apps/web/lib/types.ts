@@ -178,6 +178,7 @@ export interface UserProps {
   provider: string | null;
   paymentData?: any;
   nps: NPS;
+  discountOffered?: boolean;
 }
 
 export interface WorkspaceUserProps extends UserProps {

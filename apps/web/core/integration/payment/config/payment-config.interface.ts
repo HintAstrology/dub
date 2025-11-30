@@ -6,6 +6,7 @@ export interface ICustomerBody {
   toxic?: boolean;
   isPaidUser?: boolean;
   emailMarketing?: boolean;
+  discountOffered?: boolean;
   currency?: {
     countryCode?: string;
     currencyCode?: string;
@@ -46,7 +47,8 @@ export type TPaymentPlan =
   | "PRICE_QUARTER_PLAN"
   | "PRICE_QUARTER_PLAN_PREV"
   | "PRICE_YEAR_PLAN"
-  | "PRICE_YEAR_PLAN_PREV";
+  | "PRICE_YEAR_PLAN_PREV"
+  | "PRICE_RETENTION_OFFER_MONTH";
 
 export interface IPaymentPlanPrice {
   paymentPlan: TPaymentPlan;

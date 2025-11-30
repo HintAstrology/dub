@@ -24,6 +24,7 @@ const allowedPaymentPlans: Partial<TPaymentPlan>[] = [
   "PRICE_MONTH_PLAN",
   "PRICE_QUARTER_PLAN",
   "PRICE_YEAR_PLAN",
+  "PRICE_RETENTION_OFFER_MONTH",
 ];
 
 // create one time payment
