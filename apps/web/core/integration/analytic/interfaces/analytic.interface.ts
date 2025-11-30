@@ -12,6 +12,11 @@ export enum EAnalyticEvents {
 
   GET_USER_TOKEN = "getUserToken",
 
+  PRIMER_SESSION_ATTEMPT = 'primerClientSessionAttempt',
+  PRIMER_SESSION_CREATED = 'primerClientSessionCreated',
+  PRIMER_SESSION_UPDATED = 'primerClientSessionUpdated',
+  PRIMER_SESSION_ERROR = 'primerClientSessionError',
+
   PURCHASE_ATTEMPT = "purchaseAttempt",
   PURCHASE_SUCCESS = "purchaseSuccess",
   PURCHASE_ERROR = "purchaseError",

@@ -14,6 +14,7 @@ import {
 import { FC, useState } from "react";
 import { UpdateSubscriptionFlow } from "./update-subscription-flow.tsx";
 import { getSubscriptionRenewalAction } from 'core/constants/subscription-plans-weight.ts';
+import { UpdatePaymentButton } from './update-payment-details/update-payment-button.tsx';
 
 interface IPaymentComponentProps {
   user: ICustomerBody;
@@ -112,8 +113,16 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
           {selectedPlan.name.toLowerCase()}. Cancel anytime.
         </Text>
 
-        <div>
+        <div className="flex flex-col gap-2">
           <UpdateSubscriptionFlow
+            user={user}
+            currentSubscriptionPlan={currentSubscriptionPlan}
+            selectedPlan={selectedPlan}
+            isProcessing={isProcessing}
+            setIsProcessing={setIsProcessing}
+            featuresAccess={featuresAccess}
+          />
+          <UpdatePaymentButton
             user={user}
             currentSubscriptionPlan={currentSubscriptionPlan}
             selectedPlan={selectedPlan}

@@ -56,6 +56,8 @@ interface ICheckoutFormComponentProps {
   handleOpenCardDetailsForm?: () => void;
   onBeforePaymentCreate?: (paymentMethodType: string) => void;
   onPaymentAttempt?: () => void;
+  onSessionUpdate?: () => void;
+  onSessionUpdateError?: (error: IPrimerClientError) => void;
   cardPreferredFlow?: CardPreferredFlow;
   termsAndConditionsText?: ReactNode;
   isPaidTraffic?: boolean;
@@ -79,6 +81,8 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
     handleOpenCardDetailsForm,
     onBeforePaymentCreate,
     onPaymentAttempt,
+    onSessionUpdate,
+    onSessionUpdateError,
     cardPreferredFlow = "DEDICATED_SCENE",
     termsAndConditionsText,
     isPaidTraffic,
@@ -216,24 +220,27 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
               },
             });
 
-            await apiInstance.patch("checkout/session", {
-              json: {
-                clientToken,
-                paymentPlan,
-                currencyCode: user?.currency?.currencyCard,
-                amount: priceForPay,
-                order: {
-                  lineItems: [
-                    {
-                      itemId: uuidV4(),
-                      amount: priceForPay,
-                      quantity: 1,
-                    },
-                  ],
-                  countryCode: user?.currency?.countryCode || "",
+            await apiInstance
+              .patch("checkout/session", {
+                json: {
+                  clientToken,
+                  paymentPlan,
+                  currencyCode: user?.currency?.currencyCard,
+                  amount: priceForPay,
+                  order: {
+                    lineItems: [
+                      {
+                        itemId: uuidV4(),
+                        amount: priceForPay,
+                        quantity: 1,
+                      },
+                    ],
+                    countryCode: user?.currency?.countryCode || "",
+                  },
                 },
-              },
-            });
+              })
+              .then(() => onSessionUpdate?.())
+              .catch((error) => onSessionUpdateError?.(error));
           }
 
           if (
@@ -251,24 +258,27 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
               },
             });
 
-            await apiInstance.patch("checkout/session", {
-              json: {
-                clientToken,
-                paymentPlan,
-                currencyCode: user?.currency?.currencyPaypal,
-                amount: priceForPay,
-                order: {
-                  lineItems: [
-                    {
-                      itemId: uuidV4(),
-                      amount: priceForPay,
-                      quantity: 1,
-                    },
-                  ],
-                  countryCode: user?.currency?.countryCode || "",
+            await apiInstance
+              .patch("checkout/session", {
+                json: {
+                  clientToken,
+                  paymentPlan,
+                  currencyCode: user?.currency?.currencyPaypal,
+                  amount: priceForPay,
+                  order: {
+                    lineItems: [
+                      {
+                        itemId: uuidV4(),
+                        amount: priceForPay,
+                        quantity: 1,
+                      },
+                    ],
+                    countryCode: user?.currency?.countryCode || "",
+                  },
                 },
-              },
-            });
+              })
+              .then(() => onSessionUpdate?.())
+              .catch((error) => onSessionUpdateError?.(error));
           }
 
           if (
@@ -287,24 +297,27 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
               },
             });
 
-            await apiInstance.patch("checkout/session", {
-              json: {
-                clientToken,
-                paymentPlan,
-                currencyCode: user?.currency?.currencyWallet,
-                amount: priceForPay,
-                order: {
-                  lineItems: [
-                    {
-                      itemId: uuidV4(),
-                      amount: priceForPay,
-                      quantity: 1,
-                    },
-                  ],
-                  countryCode: user?.currency?.countryCode || "",
+            await apiInstance
+              .patch("checkout/session", {
+                json: {
+                  clientToken,
+                  paymentPlan,
+                  currencyCode: user?.currency?.currencyWallet,
+                  amount: priceForPay,
+                  order: {
+                    lineItems: [
+                      {
+                        itemId: uuidV4(),
+                        amount: priceForPay,
+                        quantity: 1,
+                      },
+                    ],
+                    countryCode: user?.currency?.countryCode || "",
+                  },
                 },
-              },
-            });
+              })
+              .then(() => onSessionUpdate?.())
+              .catch((error) => onSessionUpdateError?.(error));
           }
 
           debugUtil({

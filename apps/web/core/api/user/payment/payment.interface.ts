@@ -3,6 +3,7 @@ import { ICreatePrimerClientPaymentRes } from "core/integration/payment/server";
 import { IDataRes } from "core/interfaces/common.interface.ts";
 
 export interface ICreateSessionBody {
+  payMethodUpdateSession?: boolean;
   email?: string;
   metadata?: { [key: string]: string | number | boolean | undefined };
 }

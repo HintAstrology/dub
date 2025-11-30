@@ -20,6 +20,7 @@ interface ICheckoutFormEventProps {
   user: ICustomerBody;
   data?: ICheckoutFormSuccess | TPrimerClientErrorData;
   amount: number;
+  flowType?: 'card_update' | 'web_onboarding';
   planCode: TPaymentPlan;
   stage: "attempt" | "success" | "error";
   subscriptionId?: string | null;
@@ -35,6 +36,7 @@ export const generateCheckoutFormPaymentEvents = ({
   data,
   planCode,
   amount,
+  flowType = 'web_onboarding',
   stage,
   subscriptionId = null,
   toxic = false,
@@ -60,7 +62,7 @@ export const generateCheckoutFormPaymentEvents = ({
     customer_id: user.id,
     mixpanel_user_id: user.id,
     country: user.currency?.countryCode,
-    flow_type: "web_onboarding",
+    flow_type: flowType,
     payment_subtype: "FIRST_PAYMENT",
     plan_name: planCode,
     plan_price: priceForPay,
