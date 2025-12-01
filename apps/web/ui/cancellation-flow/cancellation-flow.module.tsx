@@ -7,18 +7,25 @@ import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.i
 import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
 import { toast } from "sonner";
+import { DiscountModal } from "./components/discount-modal";
+import { ICustomerBody } from 'core/integration/payment/config';
+import { SessionProvider, useSession } from 'next-auth/react';
 
 interface ICancellationFlowModuleProps {
   pageName: string;
   sessionId: string;
+  user: ICustomerBody;
 }
 
-export const CancellationFlowModule: FC<
+const CancellationFlowModuleContent: FC<
   Readonly<ICancellationFlowModuleProps>
-> = ({ pageName, sessionId }) => {
+> = ({ pageName, sessionId, user }) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showDiscountModal, setShowDiscountModal] = useState<boolean>(false);
+  const [discountOffered, setDiscountOffered] = useState<boolean>(!!user.discountOffered);
+  const { update: updateSession } = useSession();
 
   const {
     trigger: cancelSubscriptionSchedule,
@@ -26,6 +33,20 @@ export const CancellationFlowModule: FC<
   } = useCancelSubscriptionScheduleMutation();
 
   const handleCancelSubscription = async () => {
+    if (!discountOffered) {
+      setShowDiscountModal(true);
+      setDiscountOffered(true);
+      await fetch("/api/user", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ discountOffered: true }),
+      });
+      updateSession();
+      return;
+    }
+
     setIsLoading(true);
 
     trackClientEvents({
@@ -69,29 +90,47 @@ export const CancellationFlowModule: FC<
   };
 
   return (
-    <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
-      <h1 className="text-center text-2xl font-semibold lg:text-2xl">
-        Are you sure you want to cancel your subscription?
-      </h1>
-      <p className="text-default-700 text-center text-sm">
-        After you cancel, you’ll still have access until the end of your current
-        billing period. But once it ends, everything you've unlocked will
-        disappear.
-      </p>
-      <div className="flex w-full flex-col gap-2">
-        <Button
-          loading={isCancellingSchedule}
-          disabled={isLoading || isCancellingSchedule}
-          className="border-none bg-red-500 font-semibold text-white"
-          onClick={handleCancelSubscription}
-          text="Cancel Subscription"
+    <SessionProvider>
+      <div className="md:py-18 mx-auto mt-4 flex w-full max-w-[470px] flex-col items-center justify-center gap-6 px-4 py-8 md:mt-6">
+        <DiscountModal
+          showModal={showDiscountModal}
+          setShowModal={setShowDiscountModal}
+          user={user}
+          onCancelSubscription={handleCancelSubscription}
         />
-        <Button
-          disabled={isLoading || isCancellingSchedule}
-          onClick={handleLinkToWorkspaceClick}
-          text="Return to workspace"
-        />
+        <h1 className="text-center text-2xl font-semibold lg:text-2xl">
+          Are you sure you want to cancel your subscription?
+        </h1>
+        <p className="text-default-700 text-center text-sm">
+          After you cancel, you’ll still have access until the end of your current
+          billing period. But once it ends, everything you've unlocked will
+          disappear.
+        </p>
+        <div className="flex w-full flex-col gap-2">
+          <Button
+            loading={isCancellingSchedule}
+            disabled={isLoading || isCancellingSchedule}
+            className="border-none bg-red-500 font-semibold text-white"
+            onClick={handleCancelSubscription}
+            text="Cancel Subscription"
+          />
+          <Button
+            disabled={isLoading || isCancellingSchedule}
+            onClick={handleLinkToWorkspaceClick}
+            text="Return to workspace"
+          />
+        </div>
       </div>
-    </div>
+    </SessionProvider>
+  );
+};
+
+export const CancellationFlowModule: FC<
+  Readonly<ICancellationFlowModuleProps>
+> = ({ pageName, sessionId, user }) => {
+  return (
+    <SessionProvider>
+      <CancellationFlowModuleContent pageName={pageName} sessionId={sessionId} user={user} />
+    </SessionProvider>
   );
 };

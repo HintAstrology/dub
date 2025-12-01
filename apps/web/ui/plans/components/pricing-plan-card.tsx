@@ -48,7 +48,7 @@ export const PricingPlanCard: FC<IPricingPlanCardProps> = ({
         <Flex direction="column">
           <Flex direction="row" align="center" gap="2">
             <Text as="span" size="2" weight="bold" className="text-neutral">
-              {plan.name}
+              {plan.label}
             </Text>
             {plan.savings && (
               <Flex
@@ -98,7 +98,7 @@ export const PricingPlanCard: FC<IPricingPlanCardProps> = ({
         <div className="flex flex-row items-center gap-4">
           <div className="flex w-[140px] flex-shrink-0 flex-col justify-center gap-px">
             <span className="text-neutral whitespace-nowrap text-sm font-semibold">
-              {plan.name}
+              {plan.label}
             </span>
             <span className="whitespace-nowrap text-xs text-neutral-800">
               {plan.description}

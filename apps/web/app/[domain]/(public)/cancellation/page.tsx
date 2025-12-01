@@ -1,5 +1,5 @@
 import { checkSubscriptionStatusAuthLess } from "@/lib/actions/check-subscription-status-auth-less";
-import { getSession } from "@/lib/auth";
+import { convertSessionUserToCustomerBody, getSession } from "@/lib/auth";
 import { CancellationFlowModule } from "@/ui/cancellation-flow/cancellation-flow.module";
 import { PageViewedTrackerComponent } from "core/integration/analytic/components/page-viewed-tracker";
 import { redirect } from "next/navigation";
@@ -9,9 +9,14 @@ const pageName = "cancel_flow_or_return";
 const CancellationPage = async () => {
   const authSession = await getSession();
 
+  console.log("authSession", authSession);
+
   if (!authSession?.user) {
     redirect("/cancellation/auth");
   }
+
+  const user = convertSessionUserToCustomerBody(authSession.user);
+  console.log("converted user", user);
 
   const { isSubscribed, isScheduledForCancellation, isCancelled, isDunning } =
     await checkSubscriptionStatusAuthLess(authSession.user.email);
@@ -29,6 +34,7 @@ const CancellationPage = async () => {
       <CancellationFlowModule
         pageName={pageName}
         sessionId={authSession?.user.id!}
+        user={user}
       />
 
       <PageViewedTrackerComponent
