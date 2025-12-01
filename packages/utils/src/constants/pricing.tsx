@@ -127,8 +127,11 @@ export const PLANS = [
       yearly: 0,
     },
     limits: {
-      links: 25,
-      clicks: 1000,
+      // links: 25,
+      // clicks: 1000,
+      // HIDE PAYMENT FLOW FROM DUB_CO, ALLOW UNLIMITED CLICKS
+      links: INFINITY_NUMBER,
+      clicks: INFINITY_NUMBER,
       sales: 0,
       domains: 3,
       tags: 5,
