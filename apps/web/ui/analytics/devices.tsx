@@ -22,7 +22,7 @@ const tabs = [
   { name: "Devices", value: "devices" as const, icon: MobilePhone },
   { name: "Browsers", value: "browsers" as const, icon: Window },
   { name: "OS", value: "os" as const, icon: Cube },
-  { name: "Triggers", value: "triggers" as const, icon: CursorRays },
+  // { name: "Triggers", value: "triggers" as const, icon: CursorRays },
 ];
 
 const EXPAND_LIMIT = 8;
@@ -31,7 +31,7 @@ export default function Devices() {
   const [tab, setTab] = useState<DeviceTabs>("devices");
   const [view, setView] = useState<"pie" | "list">("pie");
   const { queryParams, searchParams } = useRouterStuff();
-  const { selectedTab, saleUnit } = useContext(AnalyticsContext);
+  const { selectedTab, saleUnit, totalEvents } = useContext(AnalyticsContext);
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
   const [showModal, setShowModal] = useState(false);
@@ -240,6 +240,7 @@ export default function Devices() {
                       )}
                       limit={EXPAND_LIMIT}
                       showName={false}
+                      totalCount={totalEvents?.[selectedTab]}
                       controls={
                         <div className="flex gap-3">
                           <div className="flex gap-1 rounded-lg border p-1">

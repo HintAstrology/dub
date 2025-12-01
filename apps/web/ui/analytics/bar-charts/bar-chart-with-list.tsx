@@ -55,6 +55,10 @@ export function BarChartWithList({
     if (unit === "sales" && saleUnit === "saleAmount") {
       return `$${nFormatter(value / 100)}`;
     }
+    // Show exact numbers for 1-999, use K notation for 1000+
+    if (value < 1000) {
+      return value.toString();
+    }
     return nFormatter(value);
   };
 
@@ -101,7 +105,7 @@ export function BarChartWithList({
       onMouseEnter={() => setIsContainerHovered(true)}
       onMouseLeave={() => setIsContainerHovered(false)}
     >
-      <div className={containerClassName || "grid grid-cols-[min(400px,90%)_1fr] overflow-hidden items-start"}>
+      <div className={containerClassName || "grid grid-cols-[min(400px,85%)_1fr] overflow-hidden items-start"}>
         <div className="w-full mt-4 min-w-0 overflow-hidden flex items-center justify-center relative h-fit">
           <ChartContainer config={chartConfig} className={`${chartHeight} w-full -ml-10`} style={{ maxWidth: 'min(100%, 80vw)' }}>
             <BarChart

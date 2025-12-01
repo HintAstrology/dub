@@ -28,17 +28,26 @@ export default function Locations() {
   >("countries");
   const [view, setView] = useState<"pie" | "list">("pie");
   const { queryParams, searchParams } = useRouterStuff();
-  const { selectedTab, saleUnit } = useContext(AnalyticsContext);
+  const { selectedTab, saleUnit, totalEvents } = useContext(AnalyticsContext);
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
 
   // Fetch data for each tab
-  const { data: countriesData } = useAnalyticsFilterOption("countries");
-  const { data: citiesData } = useAnalyticsFilterOption("cities");
-  // const { data: regionsData } = useAnalyticsFilterOption("regions");
-  const { data: continentsData } = useAnalyticsFilterOption("continents");
+  // Exclude the respective filter when fetching data for that tab to show all options
+  const { data: countriesData } = useAnalyticsFilterOption("countries", {
+    filterKey: "country",
+  });
+  const { data: citiesData } = useAnalyticsFilterOption("cities", {
+    filterKey: "city",
+  });
+  // const { data: regionsData } = useAnalyticsFilterOption("regions", {
+  //   filterKey: "region",
+  // });
+  const { data: continentsData } = useAnalyticsFilterOption("continents", {
+    filterKey: "continent",
+  });
 
   // Get data for current tab
   const data =
@@ -264,6 +273,7 @@ export default function Locations() {
                       )}
                       limit={EXPAND_LIMIT}
                       showName={false}
+                      totalCount={totalEvents?.[selectedTab]}
                       onViewAll={() => setShowModal(true)}
                       controls={
                         <div className="flex gap-3">

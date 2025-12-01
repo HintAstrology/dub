@@ -1,7 +1,7 @@
 import { AnalyticsGroupByOptions } from "@/lib/analytics/types";
 import { editQueryString } from "@/lib/analytics/utils";
 import { fetcher } from "@dub/utils";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { AnalyticsContext } from "./analytics-provider";
 
@@ -41,7 +41,11 @@ export function useAnalyticsFilterOption(
 
   const enabled = !options?.cacheOnly || [...cache.keys()].includes(cachePath);
 
-  const { data, isLoading } = useSWR<Record<string, any>[]>(
+  const groupBy = typeof groupByOrParams === "string" 
+    ? groupByOrParams 
+    : groupByOrParams.groupBy;
+
+  const { data, isLoading } = useSWR<Record<string, any>[] | Record<string, any>>(
   enabled ? cachePath : null,
     fetcher,
     {
@@ -49,13 +53,31 @@ export function useAnalyticsFilterOption(
     },
   );
 
+  // When groupBy is "count", the backend returns a single object, not an array
+  const normalizedData = useMemo(() => {
+    if (!data) return null;
+    
+    if (groupBy === "count") {
+      // Wrap single object in array
+      const singleObject = data as Record<string, any>;
+      return [{
+        ...singleObject,
+        count: singleObject[selectedTab] as number | undefined,
+        saleAmount: singleObject.saleAmount as number | undefined,
+      }];
+    }
+    
+    // For other groupBy options, data is already an array
+    const arrayData = data as Record<string, any>[];
+    return arrayData.map((d) => ({
+      ...d,
+      count: d[selectedTab] as number | undefined,
+      saleAmount: d.saleAmount as number | undefined,
+    }));
+  }, [data, groupBy, selectedTab]);
+
   return {
-    data:
-      data?.map((d) => ({
-        ...d,
-        count: d[selectedTab] as number | undefined,
-        saleAmount: d.saleAmount as number | undefined,
-      })) ?? null,
+    data: normalizedData,
     loading: !data || isLoading,
   };
 }

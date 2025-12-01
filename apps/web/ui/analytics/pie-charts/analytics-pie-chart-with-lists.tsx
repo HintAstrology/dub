@@ -37,6 +37,8 @@ interface AnalyticsPieChartWithListsProps {
   copyTooltipText?: string;
   onViewAll?: () => void;
   controls?: ReactNode;
+  showScansCount?: boolean; // If true, show scans count instead of percentages
+  totalCount?: number; // Backend total count to display in chart center
 }
 
 export default function AnalyticsPieChartWithLists({
@@ -49,6 +51,8 @@ export default function AnalyticsPieChartWithLists({
   copyTooltipText,
   onViewAll,
   controls,
+  showScansCount = false,
+  totalCount,
 }: AnalyticsPieChartWithListsProps) {
   const { selectedTab, saleUnit } = useContext(AnalyticsContext);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -75,9 +79,14 @@ export default function AnalyticsPieChartWithLists({
 
   const hasMore = sortedData.length > MAX_VISIBLE_ITEMS;
 
+  // Calculate total from ALL data, not just displayed items
+  // Use backend totalCount if provided, otherwise calculate from data
   const totalValue = useMemo(() => {
-    return displayData.reduce((sum, item) => sum + item.value, 0);
-  }, [displayData]);
+    if (totalCount !== undefined) {
+      return totalCount;
+    }
+    return data.reduce((sum, item) => sum + (item.value || 0), 0);
+  }, [data, totalCount]);
 
   const formatPercentage = (value: number) => {
     return totalValue > 0 ? Math.round((value / totalValue) * 100) : 0;
@@ -195,7 +204,7 @@ export default function AnalyticsPieChartWithLists({
         {controls && <div>{controls}</div>}
       </div>
 
-      {/* Scans List */}
+      {/* Percentage List */}
       <div className="relative h-fit min-w-0">
         <div className="mb-3 flex justify-end">
           <h3 className="text-base font-semibold text-black">Scans</h3>
@@ -203,6 +212,7 @@ export default function AnalyticsPieChartWithLists({
         <TooltipProvider>
           <div className="space-y-1">
             {list1Data.map((item, index) => {
+              const percentage = formatPercentage(item.value);
               const formattedValue = formatValue(item.value);
               // Calculate max length based on available space (approximately 20-25 chars)
               const maxLength = 40;
@@ -259,7 +269,7 @@ export default function AnalyticsPieChartWithLists({
                     )}
                   </div>
                   <span className="text-foreground shrink-0 whitespace-nowrap text-sm font-semibold">
-                    {formattedValue}
+                    {showScansCount ? formattedValue : `${percentage}%`}
                   </span>
                 </div>
               );

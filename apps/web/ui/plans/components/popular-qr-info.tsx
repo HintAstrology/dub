@@ -11,7 +11,7 @@ import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Heading, Text } from "@radix-ui/themes";
 import { Options } from "qr-code-styling/lib/types";
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { QrInfoBadge } from "./qr-info-badge";
 
 interface IPopularQrInfo {
@@ -91,8 +91,28 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
   // Prefer SVG from service, fallback to client-side generated
   const svgString = svgStringFromService || svgStringFromClient;
 
+  // Measure container height to make QR canvas square
+  const qrContainerRef = useRef<HTMLDivElement>(null);
+  const [qrSize, setQrSize] = useState(140);
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (qrContainerRef.current) {
+        const height = qrContainerRef.current.clientHeight;
+        if (height > 0) {
+          // Subtract padding (p-3 = 12px on each side = 24px total)
+          setQrSize(Math.max(100, height - 24));
+        }
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, [mostScannedQR]);
+
   return (
-    <div className="border-border-500 flex flex-col gap-4 rounded-xl border bg-white px-4 py-3 shadow-sm lg:flex-1 lg:gap-6 lg:h-full lg:p-6">
+    <div className="border-border-500 flex flex-col gap-4 rounded-xl border bg-white px-4 py-3 shadow-sm lg:h-full lg:flex-1 lg:gap-6 lg:p-6">
       <div>
         <Heading
           as="h2"
@@ -107,20 +127,20 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
       </div>
 
       {mostScannedQR ? (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:gap-6">
           {/* QR Code Display */}
-          <div className="flex-shrink-0">
+          <div ref={qrContainerRef} className="flex flex-shrink-0 items-center">
             {svgString ? (
-              <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200">
+              <div className="flex h-full w-max items-center justify-center rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200">
                 <QRCanvas
                   svgString={svgString}
-                  width={140}
-                  height={140}
+                  width={qrSize}
+                  height={qrSize}
                   className="p-1"
                 />
               </div>
             ) : (
-              <div className="flex h-[140px] w-[140px] items-center justify-center rounded-lg bg-gray-50 ring-1 ring-gray-200">
+              <div className="flex h-full w-[140px] items-center justify-center rounded-lg bg-gray-50 ring-1 ring-gray-200">
                 <Text size="2" className="text-muted-foreground">
                   Loading...
                 </Text>
@@ -129,7 +149,7 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
           </div>
 
           {/* QR Code Info */}
-          <div className="flex flex-1 flex-col gap-3">
+          <div className="flex flex-1 flex-col justify-between gap-3">
             <div>
               <Text
                 as="p"
@@ -140,9 +160,8 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
               </Text>
               <Text
                 as="p"
-                size={{ initial: "3", lg: "4" }}
-                weight="bold"
-                className="text-foreground"
+                size="1"
+                className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
               >
                 {mostScannedQR.title || "Untitled QR Code"}
               </Text>
@@ -156,43 +175,38 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
               >
                 Type
               </Text>
-              <Text as="p" size="2" weight="medium" className="text-foreground">
+              <Text as="p" size="2" weight="bold" className="text-foreground">
                 {QR_TYPES.find(
                   (item) => (mostScannedQR.qrType || "website") === item.id,
                 )?.label || "Website"}
               </Text>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <div>
-                <Text
-                  as="p"
-                  size="1"
-                  className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
-                >
-                  Scans
-                </Text>
-                <Text
-                  as="p"
-                  size="2"
-                  weight="medium"
-                  className="text-foreground"
-                >
-                  {(mostScannedQR.link?.clicks ?? 0).toLocaleString()}
-                </Text>
-              </div>
-              <div>
-                <Text
-                  as="p"
-                  size="1"
-                  className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
-                >
-                  Status
-                </Text>
-                <QrInfoBadge
-                  mostScannedQR={mostScannedQR}
-                  featuresAccess={featuresAccess}
-                />
-              </div>
+
+            <div>
+              <Text
+                as="p"
+                size="1"
+                className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
+              >
+                Scans
+              </Text>
+              <Text as="p" size="2" weight="bold" className="text-foreground">
+                {(mostScannedQR.link?.clicks ?? 0).toLocaleString()}
+              </Text>
+            </div>
+
+            <div>
+              <Text
+                as="p"
+                size="1"
+                className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
+              >
+                Status
+              </Text>
+              <QrInfoBadge
+                mostScannedQR={mostScannedQR}
+                featuresAccess={featuresAccess}
+              />
             </div>
           </div>
         </div>

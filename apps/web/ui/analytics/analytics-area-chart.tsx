@@ -229,7 +229,7 @@ export default function AnalyticsAreaChart({
     <Card className={cn("flex flex-col gap-4 border-none p-3 sm:p-4 md:p-4")}>
       <div className="flex flex-col gap-4">
         <CardContent className="grow p-0">
-          <div className="dub-scrollbar px-1 -mx-1 flex w-full gap-4 overflow-x-auto py-1">
+          <div className="dub-scrollbar px-1 -mx-1 flex w-full overflow-x-auto py-1 gap-4">
             {statsData.map((stat, index) => {
               const isNumeric =
                 stat.isNumeric &&
@@ -245,14 +245,14 @@ export default function AnalyticsAreaChart({
               return (
                 <div
                   key={index}
-                  className="flex flex-1 min-w-[160px] flex-col gap-2 rounded-lg bg-white p-2 shadow"
+                  className="flex flex-1 min-w-[140px] h-[95px] flex-col justify-between rounded-lg bg-white p-2 shadow"
                 >
                   <span className="text-muted-foreground text-xs font-medium">
                     {stat.title}
                   </span>
                   {isNumeric ? (
                     <>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center ">
                         <Avatar className="size-10 rounded-sm">
                           <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
                             {stat.icon}
@@ -266,7 +266,7 @@ export default function AnalyticsAreaChart({
                           </Tooltip>
                         </div>
                       </div>
-                      <div className="mt-auto flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
                         {isPositive !== undefined &&
                           (isPositive ? (
                             <TrendingUp className="h-3 w-3 text-green-600" />
@@ -293,7 +293,7 @@ export default function AnalyticsAreaChart({
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <Avatar className="size-10 rounded-sm">
                           <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
                             {stat.icon}
@@ -305,7 +305,7 @@ export default function AnalyticsAreaChart({
                           </span>
                         </Tooltip>
                       </div>
-                      <div className="mt-auto">
+                      <div >
                         <span className="text-muted-foreground text-xs">
                           {changeValue}{" "}
                           {index !== statsData.length - 1

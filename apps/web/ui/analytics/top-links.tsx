@@ -41,7 +41,7 @@ export default function TopLinks() {
   const [tab, setTab] = useState<"links" | "urls" | "qrType">("links");
   const [view, setView] = useState<"pie" | "list">("pie");
   const { queryParams, searchParams } = useRouterStuff();
-  const { selectedTab, saleUnit } = useContext(AnalyticsContext);
+  const { selectedTab, saleUnit, totalEvents } = useContext(AnalyticsContext);
   const dataKey = selectedTab === "sales" ? saleUnit : "count";
 
   const [showModal, setShowModal] = useState(false);
@@ -240,7 +240,7 @@ export default function TopLinks() {
         </div>
 
         <Card className="h-[442px] gap-4 overflow-hidden pt-4">
-          <CardContent className="relative overflow-hidden px-6">
+          <CardContent className="p-4 pt-0 relative h-full overflow-hidden px-4">
             {data ? (
               data.length > 0 ? (
                 <>
@@ -301,6 +301,7 @@ export default function TopLinks() {
                       )}
                       limit={EXPAND_LIMIT}
                       showName={false}
+                      totalCount={totalEvents?.[selectedTab]}
                       showCopy={tab !== "qrType"}
                       copyTooltipText={
                         tab === "links" 
