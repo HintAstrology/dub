@@ -12,14 +12,14 @@ interface IQrCodeCardInnerProps {
   qrCode: TQrServerData;
   user: Session["user"];
   featuresAccess: boolean;
-  setShowTrialExpiredModal?: (show: boolean) => void;
+  setShowSubscriptionExpiredModal?: (show: boolean) => void;
 }
 
 export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
   qrCode,
   user,
   featuresAccess,
-  setShowTrialExpiredModal,
+  setShowSubscriptionExpiredModal,
 }) => {
   const currentQrTypeInfo = useMemo(() => {
     return QR_TYPES.find((item) => item.id === qrCode.qrType)!;
@@ -49,7 +49,7 @@ export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
           svgString={svgString}
           currentQrTypeInfo={currentQrTypeInfo}
           featuresAccess={featuresAccess}
-          setShowTrialExpiredModal={setShowTrialExpiredModal}
+          setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
         />
       </div>
       <QrCodeDetailsColumn
@@ -59,7 +59,7 @@ export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
         svgString={svgString}
         currentQrTypeInfo={currentQrTypeInfo}
         featuresAccess={featuresAccess}
-        setShowTrialExpiredModal={setShowTrialExpiredModal}
+        setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
       />
     </>
   );

@@ -11,8 +11,9 @@ import { ShieldAlert } from "@dub/ui/icons";
 import { ICustomerBody } from "core/integration/payment/config";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NewQrProvider } from "./helpers/new-qr-context";
+import { useSession } from 'next-auth/react';
 
 interface WorkspaceQRsClientProps {
   initialQrs: TQrServerData[];
@@ -28,6 +29,12 @@ export default function WorkspaceQRsClient({
   user,
   newQrId,
 }: WorkspaceQRsClientProps) {
+  const { update: updateSession } = useSession();
+
+  useEffect(() => {
+    updateSession();
+  }, []);
+  
   return (
     <UserProvider user={user}>
       <NewQrProvider newQrId={newQrId}>

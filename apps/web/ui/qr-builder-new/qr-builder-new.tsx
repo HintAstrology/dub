@@ -15,6 +15,8 @@ interface QRBuilderNewProps {
   typeToScrollTo?: EQRType | null;
   handleResetTypeToScrollTo?: () => void;
   initialStep?: TStepState;
+  modalHeader?: React.ReactNode;
+  onStepChange?: (step: TStepState) => void;
 }
 
 export const QRBuilderNew = ({
@@ -25,6 +27,8 @@ export const QRBuilderNew = ({
   initialQrData,
   typeToScrollTo,
   handleResetTypeToScrollTo,
+  modalHeader,
+  onStepChange,
 }: QRBuilderNewProps) => {
   return (
     <QrBuilderProvider
@@ -35,9 +39,10 @@ export const QRBuilderNew = ({
       typeToScrollTo={typeToScrollTo}
       handleResetTypeToScrollTo={handleResetTypeToScrollTo}
       initialStep={initialStep}
+      onStepChange={onStepChange}
     >
       <FramePreloadProvider>
-        <QRBuilderWrapper />
+        <QRBuilderWrapper modalHeader={modalHeader} />
       </FramePreloadProvider>
     </QrBuilderProvider>
   );

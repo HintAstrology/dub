@@ -12,10 +12,11 @@ import { EQRType } from "../qr-builder-new/types/qr-type.ts";
 import { CTASection } from "./components/cta-section/cta-section.tsx";
 import { GetQRFeaturesCardsSection } from "./components/get-qr-features-cards/get-qr-features.tsx";
 import { GetQRInfoCardsSection } from "./components/get-qr-info-cards/get-qr-info.tsx";
+import { TPaymentPlan } from 'core/integration/payment/config/payment-config.interface.ts';
 
 interface ILandingSectionsServerProps {
   sessionId: string;
-  handleScrollButtonClick: (type: "1" | "2" | "3", scrollTo?: EQRType) => void;
+  handleScrollButtonClick: (type: "1" | "2" | "3", scrollTo?: EQRType, selectedPlan?: TPaymentPlan) => void;
   handleFeatureClick: (feature: string) => void;
   featureToOpen?: string | null;
 }

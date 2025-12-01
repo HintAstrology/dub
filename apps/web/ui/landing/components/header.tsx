@@ -65,6 +65,17 @@ export const Header: FC<Readonly<IHeaderProps>> = ({ sessionId, authSession }) =
   }, [searchParams.get("start"), handleScrollToQRGenerationBlock]);
 
   const handleOpenLogin = useCallback(() => {
+    trackClientEvents({
+      event: EAnalyticEvents.PAGE_CLICKED,
+      params: {
+        page_name: "landing",
+        content_value: "login",
+        content_group: null,
+        event_category: "nonAuthorized",
+      },
+      sessionId,
+    });
+
     showModal("login");
   }, [showModal]);
 

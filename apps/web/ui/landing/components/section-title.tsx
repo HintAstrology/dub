@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@dub/utils";
 import { Heading } from "@radix-ui/themes";
 import { FC } from "react";

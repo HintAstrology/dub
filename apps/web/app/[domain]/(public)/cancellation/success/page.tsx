@@ -16,8 +16,8 @@ const CancellationSuccessPage = async () => {
   const { isScheduledForCancellation, isCancelled, nextBillingDate } =
     await checkSubscriptionStatusAuthLess(authSession.user.email);
 
-  if (!isScheduledForCancellation) {
-    return redirect("/workspace");
+  if (!isScheduledForCancellation && !isCancelled) {
+    return redirect("/workspaces");
   }
 
   return (

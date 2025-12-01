@@ -1,7 +1,7 @@
 "use client";
 
 import { Session } from "@/lib/auth/utils";
-import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal.tsx";
+import { useSubscriptionExpiredModal } from "@/lib/hooks/use-subscription-expired-modal.tsx";
 import useQrs from "@/lib/swr/use-qrs.ts";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import QrCodeCardPlaceholder from "@/ui/qr-code/components/qr-code-card-placeholder.tsx";
@@ -136,8 +136,8 @@ function QrCodesList({
 
   const [openMenuQrCodeId, setOpenMenuQrCodeId] = useState<string | null>(null);
 
-  const { setShowTrialExpiredModal, TrialExpiredModalCallback } =
-    useTrialExpiredModal();
+  const { setShowSubscriptionExpiredModal, SubscriptionExpiredModalCallback } =
+    useSubscriptionExpiredModal();
 
   const isFiltered = [
     "folderId",
@@ -150,7 +150,7 @@ function QrCodesList({
 
   return (
     <>
-      <TrialExpiredModalCallback />
+      <SubscriptionExpiredModalCallback />
 
       {!qrCodes || qrCodes.length ? (
         <QrCodesListContext.Provider
@@ -166,7 +166,7 @@ function QrCodesList({
                     qrCode={qrCode}
                     featuresAccess={featuresAccess}
                     user={user}
-                    setShowTrialExpiredModal={setShowTrialExpiredModal}
+                    setShowSubscriptionExpiredModal={setShowSubscriptionExpiredModal}
                   />
                 ))
               : // Loading placeholder cards

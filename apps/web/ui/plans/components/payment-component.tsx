@@ -2,7 +2,7 @@
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less.ts";
 import { PricingPlanCard } from "@/ui/plans/components/pricing-plan-card.tsx";
-import { IPricingPlan, PRICING_PLANS } from "@/ui/plans/constants.ts";
+import { IPricingPlan, PRICING_PLANS, SPECIAL_OFFER_PLAN } from "@/ui/plans/constants.ts";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { getSubscriptionRenewalAction } from "core/constants/subscription-plans-weight.ts";
@@ -27,12 +27,18 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const currentSubscriptionPlan = user?.paymentInfo?.subscriptionPlanCode;
+  console.log('currentSubscriptionPlan', currentSubscriptionPlan);
+  const isSpecialOfferPlan = currentSubscriptionPlan === SPECIAL_OFFER_PLAN.paymentPlan;
 
   const [selectedPlan, setSelectedPlan] = useState<IPricingPlan>(
-    PRICING_PLANS.find(
-      (item) => item.paymentPlan === currentSubscriptionPlan,
-    ) || PRICING_PLANS[0],
+    isSpecialOfferPlan
+      ? SPECIAL_OFFER_PLAN
+      : PRICING_PLANS.find(
+        (item) => item.paymentPlan === currentSubscriptionPlan,
+      ) || PRICING_PLANS[0],
   );
+
+  console.log('selectedPlan', selectedPlan);
 
   const { priceForView: totalPriceForView } = getPaymentPlanPrice({
     paymentPlan: selectedPlan.paymentPlan,
@@ -42,7 +48,7 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   const totalChargePrice = getCalculatePriceForView(totalPriceForView, user);
 
   const onChangePlan = (value: string) => {
-    const plan = PRICING_PLANS.find((p) => p.id === value);
+    const plan = [...PRICING_PLANS, SPECIAL_OFFER_PLAN].find((p) => p.id === value);
 
     if (plan) {
       setSelectedPlan(plan);
@@ -91,6 +97,14 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
               isSelected={selectedPlan.id === plan.id}
             />
           ))}
+          {isSpecialOfferPlan && (
+            <PricingPlanCard
+              key={SPECIAL_OFFER_PLAN.id}
+              user={user}
+              plan={SPECIAL_OFFER_PLAN}
+              isSelected={selectedPlan.id === SPECIAL_OFFER_PLAN.id}
+            />
+          )}
         </RadioGroup.Root>
       </div>
       <div className="flex flex-col justify-center gap-2 lg:gap-4">

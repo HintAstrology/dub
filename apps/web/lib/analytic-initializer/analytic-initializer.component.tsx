@@ -6,6 +6,8 @@ import {
   setPeopleAnalytic,
   startSessionRecording,
 } from "core/integration/analytic";
+import { growthBookConfig } from "core/integration/growthbook";
+import { authorizedFlowExperiments, EGBExperiments, publicFlowExperiments } from "core/integration/growthbook/experiments";
 import { useEffect } from "react";
 
 interface IAnalyticInitializerProps {
@@ -46,6 +48,33 @@ export const AnalyticInitializerComponent = ({
       // }
     }
   }, []);
+
+  useEffect(() => {
+      const initExperiments = async () => {
+        const user = authSession?.user
+        const gb = await growthBookConfig();
+        
+        const userId = user?.id || sessionId;
+        await gb.setAttributes({ 
+          id: userId,
+          isAuthorized: !!user,
+        });
+  
+        const experimentsToInit = user 
+          ? authorizedFlowExperiments 
+          : publicFlowExperiments;
+  
+        experimentsToInit.reduce((acc, expKey) => {
+          const value = gb.getFeatureValue(expKey, 'control');
+          acc[expKey] = value;
+          return acc;
+        }, {} as Record<EGBExperiments, string>);
+  
+        gb.destroy();
+      };
+  
+      initExperiments();
+    }, [authSession?.user, sessionId]);
 
   return null;
 };

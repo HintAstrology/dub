@@ -32,7 +32,7 @@ interface QrCodeControlsProps {
   qrCodeStylingInstance: QRCodeStyling | null;
   svgString: string;
   featuresAccess?: boolean;
-  setShowTrialExpiredModal?: (show: boolean) => void;
+  setShowSubscriptionExpiredModal?: (show: boolean) => void;
   user: Session["user"];
 }
 
@@ -41,7 +41,7 @@ export function QrCodeControls({
   qrCodeStylingInstance,
   svgString,
   featuresAccess,
-  setShowTrialExpiredModal,
+  setShowSubscriptionExpiredModal,
   user,
 }: QrCodeControlsProps) {
   const [currentStep, setCurrentStep] = useState<TStepState>(null);
@@ -194,7 +194,7 @@ export function QrCodeControls({
                   setOpenPopover(false);
 
                   if (!featuresAccess) {
-                    setShowTrialExpiredModal?.(true);
+                    setShowSubscriptionExpiredModal?.(true);
                     setOpenPopover(false);
                     return;
                   }
@@ -213,7 +213,7 @@ export function QrCodeControls({
                   setOpenPopover(false);
 
                   if (!featuresAccess) {
-                    setShowTrialExpiredModal?.(true);
+                    setShowSubscriptionExpiredModal?.(true);
                     setOpenPopover(false);
                     return;
                   }
@@ -242,7 +242,7 @@ export function QrCodeControls({
 
                   setOpenPopover(false);
                   if (!featuresAccess) {
-                    setShowTrialExpiredModal?.(true);
+                    setShowSubscriptionExpiredModal?.(true);
                     return;
                   }
 
@@ -261,7 +261,7 @@ export function QrCodeControls({
                   setOpenPopover(false);
 
                   if (!featuresAccess) {
-                    setShowTrialExpiredModal?.(true);
+                    setShowSubscriptionExpiredModal?.(true);
                     return;
                   }
 
@@ -280,7 +280,7 @@ export function QrCodeControls({
                   setOpenPopover(false);
 
                   if (!featuresAccess) {
-                    setShowTrialExpiredModal?.(true);
+                    setShowSubscriptionExpiredModal?.(true);
                     return;
                   }
 
@@ -303,7 +303,7 @@ export function QrCodeControls({
                   setOpenPopover(false);
 
                   if (!featuresAccess) {
-                    setShowTrialExpiredModal?.(true);
+                    setShowSubscriptionExpiredModal?.(true);
                     return;
                   }
 
