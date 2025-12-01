@@ -1,4 +1,4 @@
-import { DubApiError, exceededLimitError } from "@/lib/api/errors";
+import { DubApiError } from "@/lib/api/errors";
 import {
   bulkCreateLinks,
   checkIfLinksHaveTags,
@@ -41,19 +41,21 @@ export const POST = withWorkspace(
     throwIfLinksUsageExceeded(workspace);
 
     const links = bulkCreateLinksBodySchema.parse(await parseRequestBody(req));
-    if (
-      workspace.linksUsage + links.length > workspace.linksLimit &&
-      (workspace.plan === "free" || workspace.plan === "pro")
-    ) {
-      throw new DubApiError({
-        code: "exceeded_limit",
-        message: exceededLimitError({
-          plan: workspace.plan,
-          limit: workspace.linksLimit,
-          type: "links",
-        }),
-      });
-    }
+    // LIMIT Links is disabled for now
+    // We get the default limit values from the Prisma workspace schema.
+    // if (
+    //   workspace.linksUsage + links.length > workspace.linksLimit &&
+    //   (workspace.plan === "free" || workspace.plan === "pro")
+    // ) {
+    //   throw new DubApiError({
+    //     code: "exceeded_limit",
+    //     message: exceededLimitError({
+    //       plan: workspace.plan,
+    //       limit: workspace.linksLimit,
+    //       type: "links",
+    //     }),
+    //   });
+    // }
 
     // check if any of the links have a defined key and the domain + key combination is the same
     const duplicates = links.filter(

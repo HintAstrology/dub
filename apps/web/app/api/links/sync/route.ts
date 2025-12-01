@@ -1,4 +1,3 @@
-import { exceededLimitError } from "@/lib/api/errors";
 import { propagateBulkLinkChanges } from "@/lib/api/links/propagate-bulk-link-changes";
 import { updateLinksUsage } from "@/lib/api/links/update-links-usage";
 import { withWorkspace } from "@/lib/auth";
@@ -37,16 +36,18 @@ export const POST = withWorkspace(
       return new Response("No links created.", { status: 200 });
     }
 
-    if (workspace.linksUsage + unclaimedLinks.length > workspace.linksLimit) {
-      return new Response(
-        exceededLimitError({
-          plan: workspace.plan,
-          limit: workspace.linksLimit,
-          type: "links",
-        }),
-        { status: 403 },
-      );
-    }
+    // LIMIT Links is disabled for now
+    // We get the default limit values from the Prisma workspace schema.
+    // if (workspace.linksUsage + unclaimedLinks.length > workspace.linksLimit) {
+    //   return new Response(
+    //     exceededLimitError({
+    //       plan: workspace.plan,
+    //       limit: workspace.linksLimit,
+    //       type: "links",
+    //     }),
+    //     { status: 403 },
+    //   );
+    // }
 
     const response = await Promise.allSettled([
       prisma.link.updateMany({

@@ -1,11 +1,6 @@
 import { getAnalytics } from "@/lib/analytics/get-analytics";
 import { validDateRangeForPlan } from "@/lib/analytics/utils";
-import {
-  DubApiError,
-  exceededLimitError,
-  handleAndReturnErrorResponse,
-} from "@/lib/api/errors";
-import { PlanProps } from "@/lib/types";
+import { DubApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { ratelimit } from "@/lib/upstash";
 import { analyticsQuerySchema } from "@/lib/zod/schemas/analytics";
 import { prisma } from "@dub/prisma";
@@ -82,16 +77,18 @@ export const GET = async (req: Request) => {
         throwError: true,
       });
 
-      if (workspace && workspace.usage > workspace.usageLimit) {
-        throw new DubApiError({
-          code: "forbidden",
-          message: exceededLimitError({
-            plan: workspace.plan as PlanProps,
-            limit: workspace.usageLimit,
-            type: "clicks",
-          }),
-        });
-      }
+      // LIMIT Clicks is disabled for now
+      // We get the default limit values from the Prisma workspace schema.
+      // if (workspace && workspace.usage > workspace.usageLimit) {
+      //   throw new DubApiError({
+      //     code: "forbidden",
+      //     message: exceededLimitError({
+      //       plan: workspace.plan as PlanProps,
+      //       limit: workspace.usageLimit,
+      //       type: "clicks",
+      //     }),
+      //   });
+      // }
     }
 
     // Rate limit in production
