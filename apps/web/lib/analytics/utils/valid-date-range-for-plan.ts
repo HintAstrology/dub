@@ -1,6 +1,3 @@
-import { getDaysDifference } from "@dub/utils";
-import { DubApiError } from "../../api/errors";
-
 export const validDateRangeForPlan = ({
   plan,
   dataAvailableFrom,
@@ -41,21 +38,21 @@ export const validDateRangeForPlan = ({
   // }
 
   // Pro plan users can only get analytics for 1 year
-  if (
-    plan === "pro" &&
-    start &&
-    getDaysDifference(new Date(start), end || now) > 366
-  ) {
-    if (throwError) {
-      throw new DubApiError({
-        code: "forbidden",
-        message:
-          "You can only get analytics for up to 1 year on a Pro plan. Upgrade to Business to get analytics for longer periods.",
-      });
-    } else {
-      return false;
-    }
-  }
+  // if (
+  //   plan === "pro" &&
+  //   start &&
+  //   getDaysDifference(new Date(start), end || now) > 366
+  // ) {
+  //   if (throwError) {
+  //     throw new DubApiError({
+  //       code: "forbidden",
+  //       message:
+  //         "You can only get analytics for up to 1 year on a Pro plan. Upgrade to Business to get analytics for longer periods.",
+  //     });
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   return true;
 };

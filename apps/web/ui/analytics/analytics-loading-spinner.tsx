@@ -9,6 +9,7 @@ export function AnalyticsLoadingSpinner() {
   const { slug, nextPlan } = useWorkspace();
   const { requiresUpgrade } = useContext(AnalyticsContext);
 
+  // PLANS constant in utils/constants/pricing.tsx is updated to allow unlimited clicks
   return requiresUpgrade ? (
     <div className="flex flex-col items-center justify-center space-y-2">
       <div className="rounded-full bg-neutral-100 p-4">
