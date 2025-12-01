@@ -191,9 +191,9 @@ export function BarChartWithList({
                     if (renderIcon) {
                       return (
                         <foreignObject x={x} y={labelY} width={200} height={24}>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex gap-1 items-end">
                             {iconToRender && <div className="shrink-0">{iconToRender}</div>}
-                            <span className="text-muted-foreground truncate text-xs">
+                            <span className="text-muted-foreground truncate text-xs leading-none">
                               {displayTitle}
                             </span>
                           </div>

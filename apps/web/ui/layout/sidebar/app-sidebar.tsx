@@ -14,8 +14,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useTrialStatus } from "@/lib/contexts/trial-status-context";
-import { useTrialExpiredModal } from "@/lib/hooks/use-trial-expired-modal";
 import { useUser } from "@/ui/contexts/user";
 import { QRBuilderNewModal } from "@/ui/modals/qr-builder-new/qr-builder-modal";
 import { Logo } from "@/ui/shared/logo";
@@ -42,9 +40,6 @@ export function AppSidebar() {
   const user = useUser();
   const { slug } = useParams() as { slug?: string };
   const pathname = usePathname();
-  const { isTrialOver } = useTrialStatus();
-  const { setShowTrialExpiredModal, TrialExpiredModalCallback } =
-    useTrialExpiredModal();
   const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
   const { toggleSidebar, state } = useSidebar();
 
@@ -73,16 +68,11 @@ export function AppSidebar() {
         icon: BarChart3,
         label: "Statistics",
         shortLabel: "Stats",
-        href: isTrialOver ? "#" : (workspaceSlug ? `/${workspaceSlug}/analytics` : '#'),
-        onClick: isTrialOver
-          ? (e: MouseEvent) => {
-              e.preventDefault();
-              setShowTrialExpiredModal?.(true);
-            }
-          : undefined,
+        href: (workspaceSlug ? `/${workspaceSlug}/analytics` : '#'),
+        onClick: undefined,
       },
     ],
-    [workspaceSlug, isTrialOver, setShowTrialExpiredModal],
+    [workspaceSlug],
   );
 
   const isActive = (item: MenuItem) => {
@@ -97,7 +87,6 @@ export function AppSidebar() {
 
   return (
     <>
-      <TrialExpiredModalCallback />
       <QRBuilderNewModal
         showModal={showQRBuilderModal}
         onClose={() => setShowQRBuilderModal(false)}
