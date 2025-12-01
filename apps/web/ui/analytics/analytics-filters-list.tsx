@@ -477,7 +477,7 @@ export function AnalyticsFiltersList() {
             />
             <Button
               variant="outline"
-              text="Reset"
+              text="Clear All"
               onClick={onRemoveAll}
               className="whitespace-nowrap w-max text-gray-400 hover:bg-gray-50"
             />

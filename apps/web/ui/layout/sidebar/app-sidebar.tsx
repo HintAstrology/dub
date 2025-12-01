@@ -56,7 +56,7 @@ export function AppSidebar() {
       {
         icon: CirclePlus,
         label: "Create QR",
-        shortLabel: "Create",
+        shortLabel: "Create QR",
         onClick: (e: MouseEvent) => {
           e.preventDefault();
           setShowQRBuilderModal(true);
@@ -65,7 +65,7 @@ export function AppSidebar() {
       {
         icon: QrCode,
         label: "My QR Codes",
-        shortLabel: "My QRs",
+        shortLabel: "My Codes",
         href: workspaceSlug ? `/${workspaceSlug}` : '#',
         exact: true,
       },
