@@ -185,7 +185,7 @@ export default function Devices() {
         </div>
 
         <Card className="h-[442px] gap-4 overflow-hidden pt-6">
-          <CardContent className="relative overflow-hidden px-6">
+          <CardContent className="p-4 pt-0 relative h-full overflow-hidden px-4">
             {data ? (
               data.length > 0 ? (
                 <>
