@@ -17,12 +17,6 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
   const isAccountPlans = pathname?.startsWith("/account/plans");
   const isAccountBilling = pathname?.startsWith("/account/billing");
 
-  // Determine icon for account pages
-  const getAccountIcon = () => {
-    if (isAccountPlans) return WalletIcon;
-    if (isAccountBilling) return CreditCardIcon;
-    return UserIcon; // Default for account/settings
-  };
 
   // Determine title for account pages
   const getAccountTitle = () => {
@@ -32,7 +26,6 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
   };
 
   if (isAccountSettings || isAccountPlans || isAccountBilling) {
-    const AccountIcon = getAccountIcon();
     
     return (
       <header className={cn(
@@ -51,9 +44,6 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
               <PanelLeftOpen className="h-4 w-4" />
             )}
           </button>
-          <div className="hidden md:flex p-2 text-secondary">
-            <AccountIcon className="h-5 w-5" />
-          </div>
           <h1 className="text-lg font-semibold text-neutral-900">
             {getAccountTitle()}
           </h1>
