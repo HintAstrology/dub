@@ -52,6 +52,9 @@ const getPlanNameByChargePeriodDays = (chargePeriodDays: number) => {
 };
 
 const getEmailTemplate = (prevPlan: string, newPlan: string) => {
+  if (newPlan === "PRICE_RETENTION_OFFER_MONTH") {
+    return CUSTOMER_IO_TEMPLATES.UPGRADE_FROM_MONTHLY;
+  }
   if (newPlan === "PRICE_MONTH_PLAN") {
     return CUSTOMER_IO_TEMPLATES.DOWNGRADE_TO_MONTHLY;
   }
