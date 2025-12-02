@@ -19,7 +19,7 @@ import {
   TrendingUp,
   UsersIcon,
 } from "lucide-react";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useRef, useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
@@ -72,6 +72,37 @@ const chartConfig = {
     label: "Sales",
   },
 } satisfies ChartConfig;
+
+// Component to conditionally show tooltip only when text is truncated
+function TruncatedValue({ value, className }: { value: string; className: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (ref.current) {
+        setIsTruncated(ref.current.scrollWidth > ref.current.clientWidth);
+      }
+    };
+    checkTruncation();
+    window.addEventListener('resize', checkTruncation);
+    return () => window.removeEventListener('resize', checkTruncation);
+  }, [value]);
+
+  const span = (
+    <span ref={ref} className={className}>
+      {value}
+    </span>
+  );
+
+  return isTruncated ? (
+    <Tooltip content={value}>
+      {span}
+    </Tooltip>
+  ) : (
+    span
+  );
+}
 
 export default function AnalyticsAreaChart({
   resource,
@@ -245,7 +276,7 @@ export default function AnalyticsAreaChart({
               return (
                 <div
                   key={index}
-                  className="flex flex-1 min-w-[140px] h-[95px] flex-col justify-between rounded-lg bg-white p-2 shadow"
+                  className="flex flex-1 min-w-[140px] h-[95px] flex-col justify-between rounded-md bg-white p-2 shadow"
                 >
                   <span className="text-muted-foreground text-xs font-medium">
                     {stat.title}
@@ -259,11 +290,10 @@ export default function AnalyticsAreaChart({
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <Tooltip content={stat.value}>
-                            <span className="w-full max-w-[100px] truncate text-sm font-semibold">
-                              {stat.value}
-                            </span>
-                          </Tooltip>
+                          <TruncatedValue
+                            value={stat.value}
+                            className="w-full max-w-[100px] truncate text-sm font-semibold"
+                          />
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -299,11 +329,10 @@ export default function AnalyticsAreaChart({
                             {stat.icon}
                           </AvatarFallback>
                         </Avatar>
-                        <Tooltip content={stat.value}>
-                          <span className="w-full max-w-[100px] truncate text-sm font-bold">
-                            {stat.value}
-                          </span>
-                        </Tooltip>
+                        <TruncatedValue
+                          value={stat.value}
+                          className="w-full max-w-[100px] truncate text-sm font-bold"
+                        />
                       </div>
                       <div >
                         <span className="text-muted-foreground text-xs">

@@ -21,7 +21,8 @@ export const QrCodeCard: FC<Readonly<IQrCodeCardProps>> = ({
     <>
       <CardList.Card
         key={qrCode.id}
-        innerClassName="h-full flex items-center gap-5 sm:gap-8 text-sm"
+        outerClassName="rounded-[20px]"
+        innerClassName="h-full flex items-center gap-5 sm:gap-8 text-sm "
       >
         <QrCodeCardInner
           user={user}

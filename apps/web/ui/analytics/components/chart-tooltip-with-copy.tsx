@@ -55,10 +55,10 @@ export function ChartTooltipWithCopy({
       {(value !== undefined || percentage !== undefined) && (
         <div className="text-xs text-neutral-500 mt-1 ml-4 truncate">
           {value !== undefined && percentage !== undefined
-            ? `${value} Scans (${percentage}%)`
+            ? `${value} Scans (${typeof percentage === 'number' ? percentage.toFixed(1) : percentage}%)`
             : value !== undefined
               ? `${value} Scans`
-              : `${percentage}%`}
+              : `${typeof percentage === 'number' ? percentage.toFixed(1) : percentage}%`}
         </div>
       )}
     </div>

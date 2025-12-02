@@ -239,7 +239,7 @@ export default function TopLinks() {
           </Tabs>
         </div>
 
-        <Card className="h-[442px] gap-4 overflow-hidden pt-4">
+        <Card className="h-[442px] gap-4 overflow-hidden pt-4 rounded-[20px]">
           <CardContent className="p-4 pt-0 relative h-full overflow-hidden px-4">
             {data ? (
               data.length > 0 ? (

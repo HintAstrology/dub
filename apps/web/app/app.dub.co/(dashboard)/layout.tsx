@@ -39,7 +39,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
                 <div className="z-1 mx-auto flex size-full flex-1 flex-col px-4 py-6 sm:px-4">
                   <ConditionalDashboardHeader user={user} />
                   <main className="size-full">{children}</main>
-                <footer className="bg-card shadow rounded-[20px]  p-3 ">
+                <footer className="bg-card shadow rounded-[20px]  p-3 py-5 ">
                   <div className="text-muted-foreground flex items-center justify-center text-sm">
                     © 2024 GetQR. All rights reserved.
                   </div>

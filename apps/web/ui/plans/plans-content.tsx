@@ -3,14 +3,15 @@
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { FAQ_ITEMS_PAYWALL } from "@/ui/landing/components/faq-section/config.tsx";
 import { FAQSection } from "@/ui/landing/components/faq-section/faq-section.tsx";
-import { CustomerSupport } from "@/ui/landing/components/footer/components/customer-support.tsx";
 import { PaymentComponent } from "@/ui/plans/components/payment-component.tsx";
 import { PlansFeatures } from "@/ui/plans/components/plans-features.tsx";
 import { PlansHeading } from "@/ui/plans/components/plans-heading.tsx";
 import { PopularQrInfo } from "@/ui/plans/components/popular-qr-info.tsx";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { ICustomerBody } from "core/integration/payment/config";
+import { Sparkles } from "lucide-react";
 import { FC, useRef } from "react";
+import { CustomerSupport } from "../landing/components/footer/components/customer-support";
 
 interface IPlansContentProps {
   user: ICustomerBody;
@@ -37,7 +38,7 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
   };
 
   return (
-    <div className="flex w-full mb-4 flex-col items-center justify-center gap-4 lg:gap-8">
+    <div className="mb-4 flex w-full flex-col items-center justify-center gap-4 lg:gap-8">
       <PlansHeading featuresAccess={featuresAccess} />
 
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-8">
@@ -61,7 +62,33 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
       </div>
 
       <div className="flex w-full max-w-7xl items-center justify-center pt-8">
-        <CustomerSupport sessionId={sessionId} />
+        <div className="border border-border-500 bg-card group relative w-full overflow-hidden rounded-3xl border shadow-sm transition-shadow">
+          {/* Split background design */}
+          <div className="absolute inset-0" />
+
+          <div className="relative z-10 grid gap-8 p-8 lg:grid-cols-2 lg:items-end ">
+            {/* Left side - Content */}
+            <div className="space-y-6">
+              <div className="bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
+                <Sparkles className="size-4" />
+                <span>We're here to help</span>
+              </div>
+
+              <h3 className="text-foreground text-balance text-3xl font-bold tracking-tight lg:text-4xl">
+                Have questions? Let's chat
+              </h3>
+
+              <p className="text-muted-foreground text-pretty text-base lg:text-lg">
+                Get instant support from our team of experts. We're available
+                around the clock to ensure you have the best experience.
+              </p>
+            </div>
+
+            <div className="w-full flex justify-end">
+              <CustomerSupport sessionId={sessionId} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

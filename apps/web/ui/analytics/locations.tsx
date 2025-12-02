@@ -197,7 +197,7 @@ export default function Locations() {
           </Tabs>
         </div>
 
-        <Card className="h-[442px] gap-4 overflow-hidden pt-4">
+        <Card className="h-[442px] gap-4 overflow-hidden pt-4 rounded-[20px] ">
           <CardContent className="relative h-full overflow-hidden px-4">
             {data ? (
               data.length > 0 ? (

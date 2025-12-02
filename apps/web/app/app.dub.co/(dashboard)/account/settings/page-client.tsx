@@ -129,7 +129,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
               imageSrc={image}
               readFile
               onChange={({ src }) => setImage(src)}
-              content={null}
+              content={<span className="text-xs font-medium">Choose Image</span>}
               maxFileSizeMB={2}
               targetResolution={{ width: 240, height: 240 }}
             />
@@ -163,7 +163,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
                 maxLength={32}
-                className="flex-1"
+                className="p-3 h-12"
                 disabled={status === "loading"}
               />
               {nameChanged && (
@@ -177,7 +177,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
                 </Button>
               )}
             </div>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-sm">
               Max 32 characters. This will be your display name on {APP_NAME}.
             </p>
           </div>
@@ -197,7 +197,7 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
               />
             )}
           </div>
-          <p className="text-muted-foreground text-xs mt-2">
+          <p className="text-muted-foreground text-sm mt-2">
             Your unique account identifier
           </p>
         </div>
@@ -207,4 +207,5 @@ const SettingsPageClient: FC<Readonly<ISettingsPageClientProps>> = ({
 };
 
 export default SettingsPageClient;
+
 

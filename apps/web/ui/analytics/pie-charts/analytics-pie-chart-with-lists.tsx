@@ -60,9 +60,9 @@ export default function AnalyticsPieChartWithLists({
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
-      return `$${nFormatter(value / 100)}`;
+      return `$${nFormatter(value / 100, { digits: 2 })}`;
     }
-    return nFormatter(value);
+    return nFormatter(value, { digits: 2 });
   };
 
   const MAX_VISIBLE_ITEMS = 5;
@@ -89,7 +89,7 @@ export default function AnalyticsPieChartWithLists({
   }, [data, totalCount]);
 
   const formatPercentage = (value: number) => {
-    return totalValue > 0 ? Math.round((value / totalValue) * 100) : 0;
+    return totalValue > 0 ? parseFloat(((value / totalValue) * 100).toFixed(1)) : 0;
   };
 
   const pieChartData = useMemo(() => {
@@ -269,7 +269,7 @@ export default function AnalyticsPieChartWithLists({
                     )}
                   </div>
                   <span className="text-foreground shrink-0 whitespace-nowrap text-sm font-semibold">
-                    {showScansCount ? formattedValue : `${percentage}%`}
+                    {showScansCount ? formattedValue : `${percentage.toFixed(1)}%`}
                   </span>
                 </div>
               );

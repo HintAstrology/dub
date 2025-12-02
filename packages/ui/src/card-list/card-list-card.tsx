@@ -14,9 +14,9 @@ const cardListCardVariants = cva("w-full group/card bg-white", {
   variants: {
     variant: {
       compact:
-        "first-of-type:rounded-t-xl last-of-type:rounded-b-xl first-of-type:border-t border-b border-x data-[hover-state-enabled=true]:hover:bg-neutral-50 transition-colors",
+        "first-of-type:rounded-t-[20px] last-of-type:rounded-b-[20px] first-of-type:border-t border-b border-x data-[hover-state-enabled=true]:hover:bg-neutral-50 transition-colors",
       loose:
-        "border rounded-xl transition-[filter] data-[hover-state-enabled=true]:hover:drop-shadow-card-hover border-border-500",
+        "border rounded-[20px] transition-[filter] data-[hover-state-enabled=true]:hover:drop-shadow-card-hover border-border-500",
     },
   },
 });

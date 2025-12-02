@@ -53,13 +53,13 @@ export function BarChartWithList({
 
   const formatValue = (value: number) => {
     if (unit === "sales" && saleUnit === "saleAmount") {
-      return `$${nFormatter(value / 100)}`;
+      return `$${nFormatter(value / 100, { digits: 2 })}`;
     }
     // Show exact numbers for 1-999, use K notation for 1000+
     if (value < 1000) {
       return value.toString();
     }
-    return nFormatter(value);
+    return nFormatter(value, { digits: 2 });
   };
 
   const displayData = useMemo(() => {
@@ -77,12 +77,16 @@ export function BarChartWithList({
     return visibleBarsData.reduce((sum, item) => sum + item.value, 0);
   }, [visibleBarsData]);
 
+  const formatPercentage = (value: number, total: number) => {
+    return total > 0 ? parseFloat(((value / total) * 100).toFixed(1)) : 0;
+  };
+
   const chartData = useMemo(() => {
     return visibleBarsData.map((item, index) => {
       return {
         sr: visibleBarsData.length - index,
         service: item.title.length > 20 ? `${item.title.slice(0, 20)}...` : item.title,
-        sales: displayTotalValue > 0 ? Math.round((item.value / displayTotalValue) * 100) : 0,
+        sales: formatPercentage(item.value, displayTotalValue),
         fill: chartColors[index % chartColors.length],
         icon: item.icon,
         title: item.title,
@@ -125,7 +129,7 @@ export function BarChartWithList({
                 type="number"
                 dataKey="sales"
                 domain={[0, 100]}
-                tickFormatter={(value) => `${value}%`}
+                tickFormatter={(value) => `${value.toFixed(1)}%`}
                 axisLine={false}
                 tickLine={false}
                 tickMargin={8}

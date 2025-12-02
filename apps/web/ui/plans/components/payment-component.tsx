@@ -2,9 +2,13 @@
 
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less.ts";
 import { PricingPlanCard } from "@/ui/plans/components/pricing-plan-card.tsx";
-import { IPricingPlan, PRICING_PLANS, SPECIAL_OFFER_PLAN } from "@/ui/plans/constants.ts";
+import {
+  IPricingPlan,
+  PRICING_PLANS,
+  SPECIAL_OFFER_PLAN,
+} from "@/ui/plans/constants.ts";
 import * as RadioGroup from "@radix-ui/react-radio-group";
-import { Flex, Heading, Text } from "@radix-ui/themes";
+import { Heading, Text } from "@radix-ui/themes";
 import { getSubscriptionRenewalAction } from "core/constants/subscription-plans-weight.ts";
 import {
   getCalculatePriceForView,
@@ -27,18 +31,19 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const currentSubscriptionPlan = user?.paymentInfo?.subscriptionPlanCode;
-  console.log('currentSubscriptionPlan', currentSubscriptionPlan);
-  const isSpecialOfferPlan = currentSubscriptionPlan === SPECIAL_OFFER_PLAN.paymentPlan;
+  console.log("currentSubscriptionPlan", currentSubscriptionPlan);
+  const isSpecialOfferPlan =
+    currentSubscriptionPlan === SPECIAL_OFFER_PLAN.paymentPlan;
 
   const [selectedPlan, setSelectedPlan] = useState<IPricingPlan>(
     isSpecialOfferPlan
       ? SPECIAL_OFFER_PLAN
       : PRICING_PLANS.find(
-        (item) => item.paymentPlan === currentSubscriptionPlan,
-      ) || PRICING_PLANS[0],
+          (item) => item.paymentPlan === currentSubscriptionPlan,
+        ) || PRICING_PLANS[0],
   );
 
-  console.log('selectedPlan', selectedPlan);
+  console.log("selectedPlan", selectedPlan);
 
   const { priceForView: totalPriceForView } = getPaymentPlanPrice({
     paymentPlan: selectedPlan.paymentPlan,
@@ -48,7 +53,9 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   const totalChargePrice = getCalculatePriceForView(totalPriceForView, user);
 
   const onChangePlan = (value: string) => {
-    const plan = [...PRICING_PLANS, SPECIAL_OFFER_PLAN].find((p) => p.id === value);
+    const plan = [...PRICING_PLANS, SPECIAL_OFFER_PLAN].find(
+      (p) => p.id === value,
+    );
 
     if (plan) {
       setSelectedPlan(plan);
@@ -64,23 +71,18 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   const isCancelled = featuresAccess.status === "cancelled";
 
   return (
-    <Flex
-      direction="column"
-      justify="between"
-      className="border-border-500 gap-4 rounded-lg px-0 py-3 lg:h-full lg:flex-1 lg:gap-[18px] lg:border lg:px-6 lg:py-4"
-    >
+    <div className="border-border-500 flex flex-col justify-between gap-4 rounded-xl border bg-white px-4 py-3 shadow-sm lg:h-full lg:flex-1 lg:gap-6 lg:p-6">
       <div>
         <Heading
           as="h2"
-          align={{ initial: "center", lg: "left" }}
-          size="4"
-          className="text-neutral"
+          align="left"
+          size={{ initial: "3", lg: "5" }}
+          className="text-foreground font-semibold"
         >
           {!featuresAccess.featuresAccess
             ? "Choose your plan"
             : "Update your plan"}
         </Heading>
-        <div className="border-border-500 mt-4 hidden h-px w-full border-t lg:block" />
       </div>
       <div>
         <RadioGroup.Root
@@ -130,6 +132,6 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
           🔒 Secure payment • Cancel anytime • No hidden fees
         </Text>
       </div>
-    </Flex>
+    </div>
   );
 };
