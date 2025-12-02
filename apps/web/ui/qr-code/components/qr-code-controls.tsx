@@ -173,7 +173,7 @@ export function QrCodeControls({
       <Popover
         content={
           <div className="w-full sm:w-48">
-            <div className="grid gap-1 p-2">
+            <div className="grid p-2">
               <Button
                 text="View Statistics"
                 variant="outline"
@@ -183,7 +183,7 @@ export function QrCodeControls({
                   );
                 }}
                 icon={<ChartNoAxesColumn className="size-4" />}
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
               />
               <Button
                 text="Duplicate"
@@ -202,7 +202,7 @@ export function QrCodeControls({
                   setShowDuplicateQRModal(true);
                 }}
                 icon={<Copy className="size-4" />}
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
               />
               <Button
                 text={qrCode.archived ? "Activate" : "Pause"}
@@ -227,7 +227,7 @@ export function QrCodeControls({
                     <CirclePause className="size-4" />
                   )
                 }
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
               />
             </div>
             <div className="w-full px-6">
@@ -250,7 +250,7 @@ export function QrCodeControls({
                   setCurrentStep(1);
                 }}
                 icon={<ArrowRightLeft className="size-4" />}
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
               />
               <Button
                 text="Customize QR"
@@ -269,7 +269,7 @@ export function QrCodeControls({
                   setCurrentStep(3);
                 }}
                 icon={<Palette className="size-4" />}
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
               />
               {/* <Button
                 text="Reset scans"
@@ -293,7 +293,7 @@ export function QrCodeControls({
             <div className="w-full px-6">
               <div className="border-border-500 w-full border-t" />
             </div>
-            <div className="grid gap-1 p-2">
+            <div className="grid px-2 py-1">
               <Button
                 text="Delete"
                 variant="danger-outline"
@@ -310,8 +310,7 @@ export function QrCodeControls({
                   setShowDeleteQRModal(true);
                 }}
                 icon={<Trash2 className="size-4" />}
-                shortcut="X"
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 font-medium"
               />
             </div>
           </div>

@@ -78,6 +78,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
             }
             className={cn(
               "mx-auto flex h-full w-full flex-col justify-center p-4",
+              (!homepageDemo && isTypeStep )&& "pb-10",
               !isTypeStep && " rounded-[20px] bg-white ",
               !homepageDemo || isMobile ? "shadow-none" : "shadow",
             )}

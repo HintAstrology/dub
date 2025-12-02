@@ -119,7 +119,7 @@ export const Footer: FC<Readonly<IFooterProps>> = ({
             <p>2093 Philadelphia Pike #3129, Claymont, DE 19703</p>
           </div>
           <div>
-            <CustomerSupport sessionId={sessionId} />
+            <CustomerSupport sessionId={sessionId} homePageDemo={true} />
           </div>
         </div>
 

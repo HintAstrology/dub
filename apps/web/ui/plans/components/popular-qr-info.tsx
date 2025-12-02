@@ -11,7 +11,7 @@ import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Heading, Text } from "@radix-ui/themes";
 import { Options } from "qr-code-styling/lib/types";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useMemo } from "react";
 import { QrInfoBadge } from "./qr-info-badge";
 
 interface IPopularQrInfo {
@@ -91,28 +91,8 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
   // Prefer SVG from service, fallback to client-side generated
   const svgString = svgStringFromService || svgStringFromClient;
 
-  // Measure container height to make QR canvas square
-  const qrContainerRef = useRef<HTMLDivElement>(null);
-  const [qrSize, setQrSize] = useState(140);
-
-  useEffect(() => {
-    const updateSize = () => {
-      if (qrContainerRef.current) {
-        const height = qrContainerRef.current.clientHeight;
-        if (height > 0) {
-          // Subtract padding (p-3 = 12px on each side = 24px total)
-          setQrSize(Math.max(100, height - 24));
-        }
-      }
-    };
-
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, [mostScannedQR]);
-
   return (
-    <div className="border-border-500 flex flex-col gap-4 rounded-xl border bg-white px-4 py-3 shadow-sm lg:h-full lg:flex-1 lg:gap-6 lg:p-6">
+    <div className="border-border-500  flex flex-col gap-4 rounded-xl border bg-white px-4 py-3 shadow-sm lg:h-full lg:flex-1 lg:gap-6 lg:p-6">
       <div>
         <Heading
           as="h2"
@@ -129,13 +109,14 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
       {mostScannedQR ? (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:gap-6">
           {/* QR Code Display */}
-          <div ref={qrContainerRef} className="flex flex-shrink-0 items-center">
+          <div className="flex flex-shrink-0 items-center">
             {svgString ? (
-              <div className="flex h-full w-max items-center justify-center rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-200">
+              <div
+              className="flex h-full w-max items-center justify-center rounded-lg bg-white ">
                 <QRCanvas
                   svgString={svgString}
-                  width={qrSize}
-                  height={qrSize}
+                  width={186}
+                  height={186}
                   className="p-1"
                 />
               </div>
@@ -158,11 +139,7 @@ export const PopularQrInfo: FC<IPopularQrInfo> = ({
               >
                 QR Name
               </Text>
-              <Text
-                as="p"
-                size="1"
-                className="text-muted-foreground mb-1 font-medium uppercase tracking-wide"
-              >
+              <Text as="p" size="2" weight="bold" className="text-foreground">
                 {mostScannedQR.title || "Untitled QR Code"}
               </Text>
             </div>

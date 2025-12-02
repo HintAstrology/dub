@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDateTooltip } from "@/lib/analytics/format-date-tooltip";
 import { EventType } from "@/lib/analytics/types";
@@ -19,7 +18,7 @@ import {
   TrendingUp,
   UsersIcon,
 } from "lucide-react";
-import { useContext, useMemo, useRef, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
@@ -74,7 +73,13 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 // Component to conditionally show tooltip only when text is truncated
-function TruncatedValue({ value, className }: { value: string; className: string }) {
+function TruncatedValue({
+  value,
+  className,
+}: {
+  value: string;
+  className: string;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -85,8 +90,8 @@ function TruncatedValue({ value, className }: { value: string; className: string
       }
     };
     checkTruncation();
-    window.addEventListener('resize', checkTruncation);
-    return () => window.removeEventListener('resize', checkTruncation);
+    window.addEventListener("resize", checkTruncation);
+    return () => window.removeEventListener("resize", checkTruncation);
   }, [value]);
 
   const span = (
@@ -95,13 +100,7 @@ function TruncatedValue({ value, className }: { value: string; className: string
     </span>
   );
 
-  return isTruncated ? (
-    <Tooltip content={value}>
-      {span}
-    </Tooltip>
-  ) : (
-    span
-  );
+  return isTruncated ? <Tooltip content={value}>{span}</Tooltip> : span;
 }
 
 export default function AnalyticsAreaChart({
@@ -204,42 +203,42 @@ export default function AnalyticsAreaChart({
         isNumeric: true,
       },
       {
-        icon: <LayoutGridIcon className="text-primary size-6 stroke-[1.5]" />,
+        icon: <LayoutGridIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top QR Type",
         value: getQrTypeLabel(stats?.topQrType?.name),
         change: formatStatChange(stats?.topQrType?.percentage),
         isNumeric: false,
       },
       {
-        icon: <SmartphoneIcon className="text-primary size-6 stroke-[1.5]" />,
+        icon: <SmartphoneIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top Device",
         value: stats?.topDevice?.name || "-",
         change: formatStatChange(stats?.topDevice?.percentage),
         isNumeric: false,
       },
       {
-        icon: <ChromeIcon className="text-primary size-6 stroke-[1.5]" />,
+        icon: <ChromeIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top Browser",
         value: stats?.topBrowser?.name || "-",
         change: formatStatChange(stats?.topBrowser?.percentage),
         isNumeric: false,
       },
       {
-        icon: <MonitorIcon className="text-primary size-6 stroke-[1.5]" />,
+        icon: <MonitorIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top OS",
         value: stats?.topOS?.name || "-",
         change: formatStatChange(stats?.topOS?.percentage),
         isNumeric: false,
       },
       {
-        icon: <GlobeIcon className="text-primary size-6 stroke-[1.5]" />,
+        icon: <GlobeIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top Country",
         value: getCountryName(stats?.topCountry?.name),
         change: formatStatChange(stats?.topCountry?.percentage),
         isNumeric: false,
       },
       {
-        icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
+        icon: <TagIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top QR Name",
         value: stats?.topLink?.name || "-",
         change: formatStatChange(undefined, stats?.topLink?.value),
@@ -260,7 +259,7 @@ export default function AnalyticsAreaChart({
     <Card className={cn("flex flex-col gap-4 border-none p-3 sm:p-4 md:p-4")}>
       <div className="flex flex-col gap-4">
         <CardContent className="grow p-0">
-          <div className="dub-scrollbar px-1 -mx-1 flex w-full overflow-x-auto py-1 gap-4">
+          <div className="dub-scrollbar -mx-1 flex w-full gap-4 overflow-x-auto px-1 py-1">
             {statsData.map((stat, index) => {
               const isNumeric =
                 stat.isNumeric &&
@@ -276,19 +275,15 @@ export default function AnalyticsAreaChart({
               return (
                 <div
                   key={index}
-                  className="flex flex-1 min-w-[140px] h-[95px] flex-col justify-between rounded-md bg-white p-2 shadow"
+                  className="flex h-[90px] min-w-[145px] flex-1 flex-col items-start justify-between rounded-md bg-white p-2 shadow"
                 >
-                  <span className="text-muted-foreground text-xs font-medium">
+                  <span className="text-muted-foreground text-xs font-medium leading-none">
                     {stat.title}
                   </span>
                   {isNumeric ? (
                     <>
-                      <div className="flex items-center ">
-                        <Avatar className="size-10 rounded-sm">
-                          <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
-                            {stat.icon}
-                          </AvatarFallback>
-                        </Avatar>
+                      <div className="flex items-center gap-2">
+                        {stat.icon}
                         <div className="flex flex-col">
                           <TruncatedValue
                             value={stat.value}
@@ -315,7 +310,7 @@ export default function AnalyticsAreaChart({
                           {changeValue}
                         </span>
                         {stat.comparisonPeriod && (
-                          <span className="text-muted-foreground text-xs">
+                          <span className="text-muted-foreground text-xs leading-none">
                             {stat.comparisonPeriod}
                           </span>
                         )}
@@ -324,24 +319,16 @@ export default function AnalyticsAreaChart({
                   ) : (
                     <>
                       <div className="flex items-center gap-2">
-                        <Avatar className="size-10 rounded-sm">
-                          <AvatarFallback className="bg-card text-primary shrink-0 rounded-sm">
-                            {stat.icon}
-                          </AvatarFallback>
-                        </Avatar>
+                        {stat.icon}
                         <TruncatedValue
                           value={stat.value}
                           className="w-full max-w-[100px] truncate text-sm font-bold"
                         />
                       </div>
-                      <div >
-                        <span className="text-muted-foreground text-xs">
-                          {changeValue}{" "}
-                          {index !== statsData.length - 1
-                            ? "of all scans"
-                            : null}
-                        </span>
-                      </div>
+                      <span className="text-muted-foreground text-xs leading-none">
+                        {changeValue}{" "}
+                        {index !== statsData.length - 1 ? "of all scans" : null}
+                      </span>
                     </>
                   )}
                 </div>

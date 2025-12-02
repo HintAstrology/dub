@@ -17,21 +17,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const { state, toggleSidebar } = useSidebar();
   const isAnalyticsPage = pathname?.endsWith("/analytics");
   const isQRCodesPage = pathname?.match(/\/[^/]+$/) && !pathname?.includes("/analytics") && !pathname?.includes("/settings") && !pathname?.includes("/account");
-  const isAccountSettingsPage = pathname?.includes("/account/settings");
-  const isAccountPlansPage = pathname?.includes("/account/plans");
-  const isAccountBillingPage = pathname?.includes("/account/billing");
 
-  // Determine which icon to show
-  const getPageIcon = () => {
-    if (isAnalyticsPage) return BarChart3;
-    if (isAccountSettingsPage) return UserIcon;
-    if (isAccountPlansPage) return WalletIcon;
-    if (isAccountBillingPage) return CreditCardIcon;
-    if (isQRCodesPage) return QrCode;
-    return QrCode; // Default icon
-  };
-
-  const PageIcon = getPageIcon();
 
   return (
     <>
@@ -48,9 +34,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             <PanelLeftOpen className="h-4 w-4" />
           )}
         </button>
-        <div className="hidden md:flex p-2 text-secondary">
-          <PageIcon className="h-5 w-5" />
-        </div>
         {isAnalyticsPage && (
           <h1 className="text-lg font-semibold text-neutral-900">
             Statistics

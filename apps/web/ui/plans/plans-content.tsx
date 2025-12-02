@@ -41,7 +41,7 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
     <div className="mb-4 flex w-full flex-col items-center justify-center gap-4 lg:gap-8">
       <PlansHeading featuresAccess={featuresAccess} />
 
-      <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-8">
+      <div className="flex w-full flex-col gap-4 px-4 sm:px-6 lg:flex-row lg:items-stretch lg:gap-8 lg:px-8">
         <PopularQrInfo
           mostScannedQR={mostScannedQR}
           featuresAccess={featuresAccess}
@@ -61,30 +61,22 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
         <FAQSection faqItems={FAQ_ITEMS_PAYWALL} />
       </div>
 
-      <div className="flex w-full max-w-7xl items-center justify-center pt-8">
-        <div className="border border-border-500 bg-card group relative w-full overflow-hidden rounded-3xl border shadow-sm transition-shadow">
-          {/* Split background design */}
-          <div className="absolute inset-0" />
-
-          <div className="relative z-10 grid gap-8 p-8 lg:grid-cols-2 lg:items-end ">
+      <div className="flex w-full max-w-7xl items-center justify-center px-4 pt-8 sm:px-6 lg:px-8">
+        <div className="relative w-full overflow-hidden rounded-3xl p-4 shadow transition-shadow">
+          <div className="relative z-10 flex items-center justify-between gap-4 p-2">
             {/* Left side - Content */}
-            <div className="space-y-6">
-              <div className="bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
-                <Sparkles className="size-4" />
-                <span>We're here to help</span>
-              </div>
-
+            <div className="max-w-[550px] space-y-3">
               <h3 className="text-foreground text-balance text-3xl font-bold tracking-tight lg:text-4xl">
-                Have questions? Let's chat
+                Still have questions?
               </h3>
 
-              <p className="text-muted-foreground text-pretty text-base lg:text-lg">
+              <p className="text-muted-foreground lg:text-lg">
                 Get instant support from our team of experts. We're available
-                around the clock to ensure you have the best experience.
+                around the clock to ensure you have the best experience
               </p>
             </div>
 
-            <div className="w-full flex justify-end">
+            <div className="w-[200px]">
               <CustomerSupport sessionId={sessionId} />
             </div>
           </div>

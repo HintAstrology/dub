@@ -82,7 +82,7 @@ export function SidebarUserDropdown() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg border-0"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={isMobile ? 8 : 16}
@@ -103,21 +103,33 @@ export function SidebarUserDropdown() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => handleNavigate("/account/settings")}>
+              <DropdownMenuItem 
+                onClick={() => handleNavigate("/account/settings")}
+                className="text-gray-700"
+              >
                 <UserIcon className="mr-2 size-4" />
                 My Account
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleNavigate("/account/plans")}>
+              <DropdownMenuItem 
+                onClick={() => handleNavigate("/account/plans")}
+                className="text-gray-700"
+              >
                 <WalletIcon className="mr-2 size-4" />
                 Plans & Payments
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleNavigate("/help", true)}>
+              <DropdownMenuItem 
+                onClick={() => handleNavigate("/help", true)}
+                className="text-gray-700"
+              >
                 <HelpCircle className="mr-2 size-4" />
                 Help Center
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
+            <DropdownMenuItem 
+              onClick={handleSignOut}
+              className="text-gray-700"
+            >
               <LogOutIcon className="mr-2 size-4" />
               Log out
             </DropdownMenuItem>
