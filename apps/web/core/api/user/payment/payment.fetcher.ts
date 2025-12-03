@@ -13,6 +13,7 @@ export const createUserSessionFetcher = async (
   url: string,
   { arg }: { arg?: ICreateSessionBody },
 ) => {
+  console.log("arg", arg);
   const res = await apiInstance.post<ICreateSessionRes>(url, {
     json: arg,
     throwHttpErrors: false,
