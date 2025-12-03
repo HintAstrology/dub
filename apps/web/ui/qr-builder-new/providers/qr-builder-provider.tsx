@@ -335,12 +335,14 @@ export const QrBuilderProvider = ({
       setIsProcessing(true);
 
       try {
+        const fileIdToUse = (dataToSave as any)?.fileId || initialQrData?.fileId || initialState.fileId;
+        
         const builderData: TNewQRBuilderData = {
           qrType: selectedQrType,
           formData: dataToSave,
           customizationData,
           title: dataToSave?.qrName || `${selectedQrType} QR Code`,
-          fileId: (dataToSave as any)?.fileId || initialState.fileId,
+          fileId: fileIdToUse,
         };
 
         await onSaveProp(builderData);
@@ -356,6 +358,7 @@ export const QrBuilderProvider = ({
       customizationData,
       initialState.qrTitle,
       initialState.fileId,
+      initialQrData,
       onSaveProp,
     ],
   );

@@ -440,14 +440,31 @@ export const prepareQRUpdates = async (
     newServerData.logoOptions,
   );
 
-  const destinationChanged = originalQR.link.url !== newServerData.link.url;
   const isWifiQrType = newServerData.qrType === EQRType.WIFI;
-
-  // Check styles changes using deep comparison
-  const stylesChanged = !deepEqual(originalQR.styles, newServerData.styles);
+  
+  const isFileBasedQrType = [EQRType.PDF, EQRType.IMAGE, EQRType.VIDEO].includes(
+    newServerData.qrType as EQRType,
+  );
 
   const hasNewFiles =
     originalQR?.fileId !== newServerData?.fileId && !!newServerData?.fileId;
+
+  const shouldPreserveOriginalUrl = isFileBasedQrType && !hasNewFiles && originalQR.link?.url;
+  
+  const effectiveLinkUrl = shouldPreserveOriginalUrl 
+    ? originalQR.link.url 
+    : newServerData.link.url;
+  
+  const effectiveData = shouldPreserveOriginalUrl 
+    ? originalQR.data 
+    : newServerData.data;
+
+  const destinationChanged = originalQR.link.url !== effectiveLinkUrl;
+
+  const effectiveStyles = shouldPreserveOriginalUrl
+    ? { ...newServerData.styles, data: originalQR.data }
+    : newServerData.styles;
+  const stylesChanged = !deepEqual(originalQR.styles, effectiveStyles);
 
   const hasChanges =
     titleChanged || //
@@ -459,13 +476,13 @@ export const prepareQRUpdates = async (
     hasNewFiles; //
 
   const updateData: UpdateQrProps = {
-    data: isWifiQrType ? newServerData.link.url : newServerData.data,
-    link: { url: newServerData.link.url },
+    data: isWifiQrType ? effectiveLinkUrl : effectiveData,
+    link: { url: effectiveLinkUrl },
     qrType: newBuilderData.qrType,
     ...(titleChanged && { title: newServerData.title }),
     ...(frameOptionsChanged && { frameOptions: newServerData.frameOptions }),
     ...(logoOptionsChanged && { logoOptions: newServerData.logoOptions }),
-    ...(stylesChanged && { styles: newServerData.styles }),
+    ...(stylesChanged && { styles: effectiveStyles }),
     ...(hasNewFiles && { fileId: newServerData.fileId }),
   };
 
