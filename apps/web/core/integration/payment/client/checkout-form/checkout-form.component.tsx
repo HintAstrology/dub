@@ -62,6 +62,7 @@ interface ICheckoutFormComponentProps {
   termsAndConditionsText?: ReactNode;
   isPaidTraffic?: boolean;
   className?: string;
+  payMethodUpdateSession?: boolean;
 }
 
 // component
@@ -88,6 +89,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
     termsAndConditionsText,
     isPaidTraffic,
     className,
+    payMethodUpdateSession,
   } = props;
 
   const checkoutTriggeredRef = useRef(false);
@@ -239,6 +241,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
                     ],
                     countryCode: user?.currency?.countryCode || "",
                   },
+                  payMethodUpdateSession,
                 },
               })
               .then(() => onSessionUpdate?.())
@@ -277,6 +280,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
                     ],
                     countryCode: user?.currency?.countryCode || "",
                   },
+                  payMethodUpdateSession,
                 },
               })
               .then(() => onSessionUpdate?.())
@@ -316,6 +320,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
                     ],
                     countryCode: user?.currency?.countryCode || "",
                   },
+                  payMethodUpdateSession,
                 },
               })
               .then(() => onSessionUpdate?.())

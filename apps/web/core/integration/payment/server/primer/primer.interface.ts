@@ -71,7 +71,8 @@ export interface ICreatePrimerClientSessionRes {
 export interface IUpdatePrimerClientSessionBody
   extends Partial<ICreatePrimerClientSessionBody> {
   clientToken: string;
-  paymentPlan: TPaymentPlan;
+  paymentPlan: TPaymentPlan;  
+  payMethodUpdateSession?: boolean;
 }
 export interface IUpdatePrimerClientSessionRes
   extends ICreatePrimerClientSessionRes {}

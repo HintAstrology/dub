@@ -201,7 +201,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       },
       nationalDocumentId: data.nationalDocumentId,
       first6Digits: data.first6Digits,
-      metadata: { ...data.metadata },
+      metadata: { ...data.metadata  },
     });
 
     if (res?.success) {
@@ -301,6 +301,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       onSessionUpdateError={onSessionUpdateError}
       cardPreferredFlow="EMBEDDED_IN_HOME"
       className="w-full"
+      payMethodUpdateSession={true}
     />
   ) : (
     <LoadingSpinner />

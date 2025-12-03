@@ -40,6 +40,8 @@ const getMetadata = ({
   const headerStore = headers();
   const cookieStore = cookies();
 
+  console.log("payMethodUpdateSession", payMethodUpdateSession);
+
   const { priceForPay } = getPaymentPlanPrice({
     paymentPlan,
     user,
@@ -181,6 +183,8 @@ export const PATCH = async (
   try {
     const body: IUpdatePrimerClientSessionBody = await req.json();
 
+    console.log("session patch body", body);
+
     const metadata = {
       ...body.metadata,
       ...getMetadata({
@@ -189,6 +193,7 @@ export const PATCH = async (
           email: user?.email,
         },
         paymentPlan: initialSubPaymentPlan,
+        payMethodUpdateSession: body.payMethodUpdateSession,
       }),
     };
 
