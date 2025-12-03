@@ -21,9 +21,14 @@ import { QrTypeSelection } from "./qr-type-selection";
 interface QRBuilderInnerProps {
   showOnlyStepper?: boolean;
   hideStepper?: boolean;
+  disableStepNavigation?: boolean;
 }
 
-export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerProps = {}) => {
+export const QRBuilderInner = ({
+  showOnlyStepper,
+  hideStepper,
+  disableStepNavigation = false,
+}: QRBuilderInnerProps = {}) => {
   const {
     isTypeStep,
     isContentStep,
@@ -138,7 +143,7 @@ export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerP
 
   // If only showing stepper, return just that
   if (showOnlyStepper) {
-    return <QRBuilderSteps />;
+    return <QRBuilderSteps disableStepNavigation={disableStepNavigation} />;
   }
 
   return (
@@ -146,7 +151,7 @@ export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerP
       {/* Mobile stepper at the very top */}
       {!isTypeStep && isMobile && !shouldUseDialog && (
         <div className="w-full pb-4">
-          <QRBuilderSteps />
+          <QRBuilderSteps disableStepNavigation={disableStepNavigation} />
         </div>
       )}
 
@@ -159,16 +164,15 @@ export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerP
           <div className="flex w-full flex-col items-start justify-start gap-4">
             {!isTypeStep && !isMobile && !hideStepper && (
               <div className="w-full">
-                <QRBuilderSteps />
+                  <QRBuilderSteps disableStepNavigation={disableStepNavigation} />
               </div>
             )}
-
             {isTypeStep && (
               <Flex
                 gap="4"
                 direction="column"
                 align="start"
-                justify="start"
+                justify="between"
                 className="w-full"
               >
                 <QrTypeSelection
@@ -211,12 +215,14 @@ export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerP
             {
               // "hidden md:flex": isTypeStep && !homepageDemo,
               "!hidden": isTypeStep,
-              "items-start": isCustomizationStep,
+              "items-start": homepageDemo,
             },
           )}
         >
           {!isTypeStep && (
-            <div className="sticky top-20 flex w-full flex-col items-center gap-6">
+            <div className={cn("sticky top-20 flex w-full flex-col items-end gap-6",{
+              "items-center":isCustomizationStep || isMobile,
+            })}>
               {!isCustomizationStep ? (
                 <div className="relative inline-block">
                   <motion.div
@@ -251,7 +257,7 @@ export const QRBuilderInner = ({ showOnlyStepper, hideStepper }: QRBuilderInnerP
                 />
               )}
 
-              {!isMobile && (
+              {!isMobile && homepageDemo && (
                 <div
                   className="w-full"
                   style={{ maxWidth: isCustomizationStep ? "300px" : "270px" }}

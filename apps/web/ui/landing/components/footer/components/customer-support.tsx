@@ -34,7 +34,7 @@ export const CustomerSupport: FC<Readonly<ICustomerSupportProps>> = ({
         "group inline-flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-all",
         homePageDemo
           ? "bg-white border border-gray-100 hover:border-primary hover:bg-primary/5"
-          : "bg-primary/10 border-transparent text-primary hover:bg-primary/40"
+          : "bg-primary/10 border-transparent text-primary hover:bg-primary/40 border border-primary"
       )}
       href="/help"
       target="_blank"

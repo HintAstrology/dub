@@ -31,7 +31,7 @@ export const PricingPlanCard: FC<IPricingPlanCardProps> = ({
 
   return (
     <label
-      className={`flex cursor-pointer flex-row items-center gap-3 rounded-lg border p-3 lg:gap-3.5 lg:px-6 lg:py-3.5 ${
+      className={`flex cursor-pointer flex-row items-center gap-3 rounded-lg border py-4 px-4 lg:gap-3.5 lg:px-6 lg:py-5 ${
         isSelected ? "border-secondary bg-background" : "border-border-500"
       }`}
     >

@@ -62,7 +62,7 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
       </div>
 
       <div className="flex w-full max-w-7xl items-center justify-center px-4 pt-8 sm:px-6 lg:px-8">
-        <div className="relative w-full overflow-hidden rounded-3xl p-4 shadow transition-shadow">
+        <div className="relative w-full overflow-hidden rounded-3xl p-4 border border-border-500">
           <div className="relative z-10 flex items-center justify-between gap-4 p-2">
             {/* Left side - Content */}
             <div className="max-w-[550px] space-y-3">

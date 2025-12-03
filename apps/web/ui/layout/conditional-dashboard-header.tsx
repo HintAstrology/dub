@@ -16,6 +16,7 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
   const isAccountSettings = pathname?.startsWith("/account/settings");
   const isAccountPlans = pathname?.startsWith("/account/plans");
   const isAccountBilling = pathname?.startsWith("/account/billing");
+  const isConstructorPage = pathname === "/constructor";
 
 
   // Determine title for account pages
@@ -25,7 +26,7 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
     return "My Account";
   };
 
-  if (isAccountSettings || isAccountPlans || isAccountBilling) {
+  if (isAccountSettings || isAccountPlans || isAccountBilling || isConstructorPage) {
     
     return (
       <header className={cn(
@@ -45,7 +46,7 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
             )}
           </button>
           <h1 className="text-lg font-semibold text-neutral-900">
-            {getAccountTitle()}
+            {isConstructorPage ? "Create QR Code" : getAccountTitle()}
           </h1>
         </div>
       </header>

@@ -15,14 +15,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useUser } from "@/ui/contexts/user";
-import { QRBuilderNewModal } from "@/ui/modals/qr-builder-new/qr-builder-modal";
 import { Logo } from "@/ui/shared/logo";
 import QRIcon from "@/ui/shared/icons/qr";
 import { cn } from "@dub/utils";
 import { QrCode, Plus, BarChart3, CirclePlus, PanelLeft, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
-import { MouseEvent, useMemo, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { MouseEvent, useMemo } from "react";
 import { SidebarUserDropdown } from "./sidebar-user-dropdown";
 import type { LucideIcon } from "lucide-react";
 
@@ -40,7 +39,7 @@ export function AppSidebar() {
   const user = useUser();
   const { slug } = useParams() as { slug?: string };
   const pathname = usePathname();
-  const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
+  const router = useRouter();
   const { toggleSidebar, state } = useSidebar();
 
   // Use slug from params, or fall back to user's default workspace
@@ -52,10 +51,8 @@ export function AppSidebar() {
         icon: CirclePlus,
         label: "Create QR",
         shortLabel: "Create QR",
-        onClick: (e: MouseEvent) => {
-          e.preventDefault();
-          setShowQRBuilderModal(true);
-        },
+        href: "/constructor",
+        onClick: undefined,
       },
       {
         icon: QrCode,
@@ -87,11 +84,6 @@ export function AppSidebar() {
 
   return (
     <>
-      <QRBuilderNewModal
-        showModal={showQRBuilderModal}
-        onClose={() => setShowQRBuilderModal(false)}
-        user={user!}
-      />
       <Sidebar
           variant="floating"
           collapsible="icon"

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useQrBuilderContext } from "../contexts";
@@ -112,6 +112,7 @@ export const DownloadButton = () => {
     >
       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {buttonText}
+      {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
     </Button>
   );
 };

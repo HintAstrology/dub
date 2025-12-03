@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getSession } from "@/lib/auth";
 import { ConditionalDashboardHeader } from "@/ui/layout/conditional-dashboard-header";
+import { ConditionalFooter } from "@/ui/layout/conditional-footer";
 import { QRProviderWrapper } from "@/ui/layout/qr-provider-wrapper";
 import { AppSidebar } from "@/ui/layout/sidebar/app-sidebar";
 import { UserProvider } from "@/ui/contexts/user";
@@ -39,11 +40,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
                 <div className="z-1 mx-auto flex size-full flex-1 flex-col px-4 py-6 sm:px-4">
                   <ConditionalDashboardHeader user={user} />
                   <main className="size-full">{children}</main>
-                <footer className="bg-card shadow rounded-[20px]  p-3 py-5 ">
-                  <div className="text-muted-foreground flex items-center justify-center text-sm">
-                    © 2024 GetQR. All rights reserved.
-                  </div>
-                </footer>
+                  <ConditionalFooter />
                 </div>
               </SidebarProvider>
             </div>

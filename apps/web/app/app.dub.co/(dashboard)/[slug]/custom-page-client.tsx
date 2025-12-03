@@ -3,7 +3,7 @@
 import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
 import { Session } from "@/lib/auth/utils";
 import { UserProvider } from "@/ui/contexts/user";
-import { CreateQRButton, QRBuilderNewModal } from "@/ui/modals/qr-builder-new";
+import { CreateQRButton } from "@/ui/modals/qr-builder-new";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import QrCodesContainer from "@/ui/qr-code/qr-codes-container.tsx";
 import { Button } from "@dub/ui";
@@ -11,7 +11,7 @@ import { ShieldAlert } from "@dub/ui/icons";
 import { ICustomerBody } from "core/integration/payment/config";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { NewQrProvider } from "./helpers/new-qr-context";
 import { useSession } from 'next-auth/react';
 
@@ -58,15 +58,9 @@ function WorkspaceQRs({
   user: Session["user"];
 }) {
   const router = useRouter();
-  const [showQRBuilderModal, setShowQRBuilderModal] = useState(false);
 
   return (
     <>
-      <QRBuilderNewModal
-        showModal={showQRBuilderModal}
-        onClose={() => setShowQRBuilderModal(false)}
-        user={user}
-      />
 
       <div className="flex w-full flex-col gap-y-3">
         {!featuresAccess.isSubscribed && (
@@ -117,7 +111,7 @@ function WorkspaceQRs({
         CreateQrCodeButton={
           featuresAccess
             ? () => (
-                <CreateQRButton onClick={() => setShowQRBuilderModal(true)} />
+                <CreateQRButton onClick={() => router.push("/constructor")} />
               )
             : () => <></>
         }

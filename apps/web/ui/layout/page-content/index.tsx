@@ -30,7 +30,7 @@ export function PageContent({
   return (
     <div
       className={cn(
-        "bg-neutral-100 md:bg-white",
+        "bg-neutral-100 md:bg-white size-full",
         (hasTitle || hasDescription) && "md:mt-6 md:py-3",
         className,
       )}

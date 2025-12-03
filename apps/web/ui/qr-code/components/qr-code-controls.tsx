@@ -3,7 +3,6 @@ import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useArchiveQRModal } from "@/ui/modals/archive-qr-modal.tsx";
 import { useDeleteQRModal } from "@/ui/modals/delete-qr-modal.tsx";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal.tsx";
-import { TStepState } from "@/ui/qr-builder-new/types/context";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { QrCodesListContext } from "@/ui/qr-code/qr-codes-container.tsx";
 import { Button, Popover } from "@dub/ui";
@@ -22,9 +21,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useDuplicateQRModal } from "../../modals/duplicate-qr-modal";
-import { QRBuilderNewModal } from "../../modals/qr-builder-new";
 import { ThreeDots } from "../../shared/icons";
 
 interface QrCodeControlsProps {
@@ -44,8 +42,6 @@ export function QrCodeControls({
   setShowSubscriptionExpiredModal,
   user,
 }: QrCodeControlsProps) {
-  const [currentStep, setCurrentStep] = useState<TStepState>(null);
-  const [showEditQRModal, setShowEditQRModal] = useState(false);
 
   const { domain, key } = qrCode.link;
   const { slug } = useWorkspace();
@@ -140,25 +136,12 @@ export function QrCodeControls({
     });
   };
 
-  const onCloseEditQRModal = () => {
-    setShowEditQRModal(false);
-    setCurrentStep(null);
-  };
-
   return (
     <div className="flex flex-col-reverse items-end justify-end gap-2 lg:flex-row lg:items-center">
       <DuplicateQRModal />
       <QRPreviewModal />
       <ArchiveQRModal />
       <DeleteLinkModal />
-
-      <QRBuilderNewModal
-        showModal={showEditQRModal}
-        onClose={onCloseEditQRModal}
-        user={user}
-        qrCode={qrCode}
-        initialStep={currentStep}
-      />
 
       <Button
         onClick={onDownloadButtonClick}
@@ -183,7 +166,7 @@ export function QrCodeControls({
                   );
                 }}
                 icon={<ChartNoAxesColumn className="size-4" />}
-                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
+                className="h-8 w-full justify-start px-2 text-sm text-gray-700"
               />
               <Button
                 text="Duplicate"
@@ -202,7 +185,7 @@ export function QrCodeControls({
                   setShowDuplicateQRModal(true);
                 }}
                 icon={<Copy className="size-4" />}
-                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
+                className="h-8 w-full justify-start px-2 text-sm text-gray-700"
               />
               <Button
                 text={qrCode.archived ? "Activate" : "Pause"}
@@ -227,10 +210,10 @@ export function QrCodeControls({
                     <CirclePause className="size-4" />
                   )
                 }
-                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
+                className="h-8 w-full justify-start px-2 text-sm text-gray-700"
               />
             </div>
-            <div className="w-full px-6">
+            <div className="w-full">
               <div className="border-border-500 w-full border-t" />
             </div>
             <div className="grid gap-1 p-2">
@@ -246,11 +229,10 @@ export function QrCodeControls({
                     return;
                   }
 
-                  setShowEditQRModal(true);
-                  setCurrentStep(1);
+                  router.push(`/constructor?qrId=${qrCode.id}&step=1`);
                 }}
                 icon={<ArrowRightLeft className="size-4" />}
-                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
+                className="h-8 w-full justify-start px-2 text-sm text-gray-700"
               />
               <Button
                 text="Customize QR"
@@ -265,11 +247,10 @@ export function QrCodeControls({
                     return;
                   }
 
-                  setShowEditQRModal(true);
-                  setCurrentStep(3);
+                  router.push(`/constructor?qrId=${qrCode.id}&step=3`);
                 }}
                 icon={<Palette className="size-4" />}
-                className="h-8 w-full justify-start px-2 font-medium text-sm text-gray-700"
+                className="h-8 w-full justify-start px-2 text-sm text-gray-700"
               />
               {/* <Button
                 text="Reset scans"
@@ -287,10 +268,10 @@ export function QrCodeControls({
                   setShowResetScansModal(true);
                 }}
                 icon={<RotateCcw className="size-4" />}
-                className="h-9 w-full justify-start px-2 font-medium"
+                className="h-9 w-full justify-start px-2 "
               /> */}
             </div>
-            <div className="w-full px-6">
+            <div className="w-full">
               <div className="border-border-500 w-full border-t" />
             </div>
             <div className="grid px-2 py-1">
@@ -310,7 +291,7 @@ export function QrCodeControls({
                   setShowDeleteQRModal(true);
                 }}
                 icon={<Trash2 className="size-4" />}
-                className="h-8 w-full justify-start px-2 font-medium"
+                className="h-8 w-full justify-start px-2 "
               />
             </div>
           </div>

@@ -20,7 +20,6 @@ const PlansPage: NextPage = async () => {
 
   const mostScannedQR = await getMostScannedQr(sessionUser.id);
 
-  console.log(mostScannedQR,'mostScannedQR');
   return (
     <>
       <PageContent>

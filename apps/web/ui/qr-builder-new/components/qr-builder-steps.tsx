@@ -3,14 +3,18 @@ import { useMediaQuery } from "@dub/ui";
 import { Edit3Icon, LayoutGridIcon, PaletteIcon } from "lucide-react";
 import Stepper from "./stepper";
 
-export const QRBuilderSteps = () => {
-  const { builderStep, handleChangeStep, isFileUploading, isFileProcessing } =
+interface QRBuilderStepsProps {
+  disableStepNavigation?: boolean;
+}
+
+export const QRBuilderSteps = ({ disableStepNavigation = false }: QRBuilderStepsProps = {}) => {
+  const { builderStep, handleChangeStep, isFileUploading, isFileProcessing, homepageDemo } =
     useQrBuilderContext();
 
   const { isMobile } = useMediaQuery();
 
-  // Disable step navigation while files are uploading or processing
-  const isDisabled = isFileUploading || isFileProcessing;
+  // Disable step navigation while files are uploading or processing, or if explicitly disabled
+  const isDisabled = isFileUploading || isFileProcessing || disableStepNavigation;
 
   return (
     <Stepper
@@ -32,7 +36,7 @@ export const QRBuilderSteps = () => {
           icon: PaletteIcon,
         },
       ]}
-      onStepClick={handleChangeStep}
+      onStepClick={disableStepNavigation ? undefined : handleChangeStep}
       disabled={isDisabled}
     />
   );
