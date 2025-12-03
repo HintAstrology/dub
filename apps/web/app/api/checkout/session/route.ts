@@ -21,18 +21,22 @@ import {
   updateUserCookieService,
 } from "core/services/cookie/user-session.service.ts";
 import { getUserIp } from "core/util/user-ip.util.ts";
+import { getSession } from '@/lib/auth';
 
 const paymentService = new PaymentService();
 
 const trialPaymentPlan: TPaymentPlan = "PRICE_TRIAL_MONTH_PLAN";
 const initialSubPaymentPlan: TPaymentPlan = "PRICE_MONTH_PLAN";
+const minPrice: TPaymentPlan = "MIN_PRICE";
 
 const getMetadata = ({
   user,
   paymentPlan,
+  isAuthed,
 }: {
   user: ICustomerBody;
   paymentPlan: TPaymentPlan;
+  isAuthed: boolean;
 }) => {
   const headerStore = headers();
   const cookieStore = cookies();
@@ -48,7 +52,7 @@ const getMetadata = ({
 
     //**** for analytics ****//
     email: user!.email!,
-    flow_type: "web_onboarding",
+    flow_type: isAuthed ? 'card_update' : 'web_onboarding',
     locale: "en",
     mixpanel_user_id:
       user.id || cookieStore.get(ECookieArg.SESSION_ID)?.value || null,
@@ -74,6 +78,7 @@ const getMetadata = ({
 // set user session
 export const POST = async (req: NextRequest) => {
   const { user } = await getUserCookieService();
+  const authSession = await getSession();
 
   if (!user?.paymentInfo?.customerId) {
     return NextResponse.json(
@@ -82,11 +87,13 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
+  const isAuthed = !!authSession?.user.id;
+
   try {
     const body = await req.json();
 
     const { priceForPay } = getPaymentPlanPrice({
-      paymentPlan: trialPaymentPlan,
+      paymentPlan: isAuthed ? minPrice : trialPaymentPlan,
       user,
     });
 
@@ -96,7 +103,8 @@ export const POST = async (req: NextRequest) => {
       ...body.metadata,
       ...getMetadata({
         user,
-        paymentPlan: initialSubPaymentPlan,
+        paymentPlan: isAuthed ? minPrice : initialSubPaymentPlan,
+        isAuthed,
       }),
     };
 
@@ -166,6 +174,8 @@ export const PATCH = async (
   req: NextRequest,
 ): Promise<NextResponse<IDataRes>> => {
   const { user } = await getUserCookieService();
+  const authSession = await getSession();
+  const isAuthed = !!authSession?.user.id;
 
   if (!user?.id || !user?.email) {
     return NextResponse.json(
@@ -185,6 +195,7 @@ export const PATCH = async (
           email: user?.email,
         },
         paymentPlan: initialSubPaymentPlan,
+        isAuthed,
       }),
     };
 
