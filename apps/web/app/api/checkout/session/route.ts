@@ -40,6 +40,8 @@ const getMetadata = ({
   const headerStore = headers();
   const cookieStore = cookies();
 
+  console.log("payMethodUpdateSession", payMethodUpdateSession);
+
   const { priceForPay } = getPaymentPlanPrice({
     paymentPlan,
     user,
