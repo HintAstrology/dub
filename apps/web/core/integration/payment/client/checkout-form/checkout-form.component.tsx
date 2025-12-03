@@ -56,9 +56,12 @@ interface ICheckoutFormComponentProps {
   handleOpenCardDetailsForm?: () => void;
   onBeforePaymentCreate?: (paymentMethodType: string) => void;
   onPaymentAttempt?: () => void;
+  onSessionUpdate?: () => void;
+  onSessionUpdateError?: (error: IPrimerClientError) => void;
   cardPreferredFlow?: CardPreferredFlow;
   termsAndConditionsText?: ReactNode;
   isPaidTraffic?: boolean;
+  className?: string;
 }
 
 // component
@@ -79,9 +82,12 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
     handleOpenCardDetailsForm,
     onBeforePaymentCreate,
     onPaymentAttempt,
+    onSessionUpdate,
+    onSessionUpdateError,
     cardPreferredFlow = "DEDICATED_SCENE",
     termsAndConditionsText,
     isPaidTraffic,
+    className,
   } = props;
 
   const checkoutTriggeredRef = useRef(false);
@@ -179,7 +185,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
           isActive: true,
         };
 
-        if (!isCheckedRef.current) {
+        if (termsAndConditionsText && !isCheckedRef.current) {
           errorMessage.message = "You must agree to the terms and conditions.";
           handleError(errorMessage);
 
@@ -216,24 +222,27 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
               },
             });
 
-            await apiInstance.patch("checkout/session", {
-              json: {
-                clientToken,
-                paymentPlan,
-                currencyCode: user?.currency?.currencyCard,
-                amount: priceForPay,
-                order: {
-                  lineItems: [
-                    {
-                      itemId: uuidV4(),
-                      amount: priceForPay,
-                      quantity: 1,
-                    },
-                  ],
-                  countryCode: user?.currency?.countryCode || "",
+            await apiInstance
+              .patch("checkout/session", {
+                json: {
+                  clientToken,
+                  paymentPlan,
+                  currencyCode: user?.currency?.currencyCard,
+                  amount: priceForPay,
+                  order: {
+                    lineItems: [
+                      {
+                        itemId: uuidV4(),
+                        amount: priceForPay,
+                        quantity: 1,
+                      },
+                    ],
+                    countryCode: user?.currency?.countryCode || "",
+                  },
                 },
-              },
-            });
+              })
+              .then(() => onSessionUpdate?.())
+              .catch((error) => onSessionUpdateError?.(error));
           }
 
           if (
@@ -251,24 +260,27 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
               },
             });
 
-            await apiInstance.patch("checkout/session", {
-              json: {
-                clientToken,
-                paymentPlan,
-                currencyCode: user?.currency?.currencyPaypal,
-                amount: priceForPay,
-                order: {
-                  lineItems: [
-                    {
-                      itemId: uuidV4(),
-                      amount: priceForPay,
-                      quantity: 1,
-                    },
-                  ],
-                  countryCode: user?.currency?.countryCode || "",
+            await apiInstance
+              .patch("checkout/session", {
+                json: {
+                  clientToken,
+                  paymentPlan,
+                  currencyCode: user?.currency?.currencyPaypal,
+                  amount: priceForPay,
+                  order: {
+                    lineItems: [
+                      {
+                        itemId: uuidV4(),
+                        amount: priceForPay,
+                        quantity: 1,
+                      },
+                    ],
+                    countryCode: user?.currency?.countryCode || "",
+                  },
                 },
-              },
-            });
+              })
+              .then(() => onSessionUpdate?.())
+              .catch((error) => onSessionUpdateError?.(error));
           }
 
           if (
@@ -287,24 +299,27 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
               },
             });
 
-            await apiInstance.patch("checkout/session", {
-              json: {
-                clientToken,
-                paymentPlan,
-                currencyCode: user?.currency?.currencyWallet,
-                amount: priceForPay,
-                order: {
-                  lineItems: [
-                    {
-                      itemId: uuidV4(),
-                      amount: priceForPay,
-                      quantity: 1,
-                    },
-                  ],
-                  countryCode: user?.currency?.countryCode || "",
+            await apiInstance
+              .patch("checkout/session", {
+                json: {
+                  clientToken,
+                  paymentPlan,
+                  currencyCode: user?.currency?.currencyWallet,
+                  amount: priceForPay,
+                  order: {
+                    lineItems: [
+                      {
+                        itemId: uuidV4(),
+                        amount: priceForPay,
+                        quantity: 1,
+                      },
+                    ],
+                    countryCode: user?.currency?.countryCode || "",
+                  },
                 },
-              },
-            });
+              })
+              .then(() => onSessionUpdate?.())
+              .catch((error) => onSessionUpdateError?.(error));
           }
 
           debugUtil({
@@ -460,7 +475,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
   // return
   return (
     <>
-      <div style={{ display: "grid", gridAutoFlow: "row", zIndex: 0 }}>
+      <div style={{ display: "grid", gridAutoFlow: "row", zIndex: 0 }} className={className}>
         <div
           className="w-full text-left"
           id="checkout-container"
@@ -522,7 +537,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
         )}
       </div>
 
-      {checkoutInstance && !isPaidTraffic && (
+      {termsAndConditionsText && checkoutInstance && !isPaidTraffic && (
         <div className="group flex gap-2">
           <Checkbox
             id="terms-and-conditions"
@@ -539,7 +554,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
         </div>
       )}
 
-      {checkoutInstance && isPaidTraffic ? termsAndConditionsText : null}
+      {termsAndConditionsText && checkoutInstance && isPaidTraffic ? termsAndConditionsText : null}
     </>
   );
 };

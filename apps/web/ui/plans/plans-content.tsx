@@ -44,7 +44,7 @@ export const PlansContent: FC<Readonly<IPlansContentProps>> = ({
           handleScroll={handleScrollToPayment}
         />
 
-        <div ref={paymentSectionRef}>
+        <div ref={paymentSectionRef} className="lg:min-w-[512px] lg:max-w-[512px]">
           <PaymentComponent user={user} featuresAccess={featuresAccess} />
         </div>
 

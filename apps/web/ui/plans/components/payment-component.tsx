@@ -11,9 +11,12 @@ import {
   ICustomerBody,
   TPaymentPlan,
 } from "core/integration/payment/config";
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { UpdateSubscriptionFlow } from "./update-subscription-flow.tsx";
 import { getSubscriptionRenewalAction } from 'core/constants/subscription-plans-weight.ts';
+import { Button } from "@dub/ui";
+import { UpdatePaymentDetails } from './update-payment-details/update-payment-details.tsx';
+import { ChevronLeft } from 'lucide-react';
 
 interface IPaymentComponentProps {
   user: ICustomerBody;
@@ -25,6 +28,7 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   featuresAccess,
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showUpdatePaymentDetailsForm, setShowUpdatePaymentDetailsForm] = useState(false);
 
   const currentSubscriptionPlan = user?.paymentInfo?.subscriptionPlanCode;
   console.log('currentSubscriptionPlan', currentSubscriptionPlan);
@@ -63,6 +67,15 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   const isCurrentPlan = currentSubscriptionPlan === selectedPlan.paymentPlan;
   const isCancelled = featuresAccess.status === "cancelled";
 
+  const headingText = useMemo(() => {
+    if (showUpdatePaymentDetailsForm) {
+      return "Update your payment method";
+    }
+    return !featuresAccess.featuresAccess
+      ? "Choose your plan"  
+      : "Update your plan";
+  }, [showUpdatePaymentDetailsForm, featuresAccess.featuresAccess]);
+
   return (
     <Flex
       direction="column"
@@ -74,59 +87,86 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
         size="4"
         className="text-neutral"
       >
-        {!featuresAccess.featuresAccess
-          ? "Choose your plan"
-          : "Update your plan"}
+        {headingText}
       </Heading>
 
       <div className="border-border-500 hidden h-px w-full border-t lg:block" />
 
-      <div className="flex flex-col justify-center gap-2 lg:gap-4">
-        <RadioGroup.Root
-          value={selectedPlan.id}
-          onValueChange={onChangePlan}
-          className="flex flex-col gap-2"
-          disabled={isProcessing}
-        >
-          {PRICING_PLANS.map((plan) => (
-            <PricingPlanCard
-              key={plan.id}
-              user={user}
-              plan={plan}
-              isSelected={selectedPlan.id === plan.id}
-            />
-          ))}
-          {isSpecialOfferPlan && (
-            <PricingPlanCard
-              key={SPECIAL_OFFER_PLAN.id}
-              user={user}
-              plan={SPECIAL_OFFER_PLAN}
-              isSelected={selectedPlan.id === SPECIAL_OFFER_PLAN.id}
-            />
-          )}
-        </RadioGroup.Root>
-
-        <Text as="p" size="1" className="text-neutral-800 text-center">
-          {(!isCurrentPlan || isCancelled) && `You'll be charged ${totalChargePrice} ${renewalAction === "upgrade" || isCancelled ? "today" : "at the start of the new billing period"}.`}
-          {renewalAction === "upgrade" || isCancelled ? " " : <br />}Renews every{" "}
-          {selectedPlan.name.toLowerCase()}. Cancel anytime.
-        </Text>
-
-        <div>
-          <UpdateSubscriptionFlow
+      {showUpdatePaymentDetailsForm ? (
+        <div className="flex flex-col justify-center items-center gap-2">
+          <UpdatePaymentDetails
             user={user}
-            currentSubscriptionPlan={currentSubscriptionPlan}
-            selectedPlan={selectedPlan}
-            isProcessing={isProcessing}
-            setIsProcessing={setIsProcessing}
             featuresAccess={featuresAccess}
+            setShowForm={setShowUpdatePaymentDetailsForm}
+          />
+          <Button
+            className="block"
+            variant="secondary"
+            loading={isProcessing}
+            text={
+              <div className="flex items-center justify-center gap-1">
+                <ChevronLeft className="size-4 inline" />
+                Back
+              </div>
+            }
+            onClick={() => setShowUpdatePaymentDetailsForm(value => !value)}
           />
         </div>
+      ) : (
+        <div className="flex flex-col justify-center gap-2 lg:gap-4">
+          <RadioGroup.Root
+            value={selectedPlan.id}
+            onValueChange={onChangePlan}
+            className="flex flex-col gap-2"
+            disabled={isProcessing}
+          >
+            {PRICING_PLANS.map((plan) => (
+              <PricingPlanCard
+                key={plan.id}
+                user={user}
+                plan={plan}
+                isSelected={selectedPlan.id === plan.id}
+              />
+            ))}
+            {isSpecialOfferPlan && (
+              <PricingPlanCard
+                key={SPECIAL_OFFER_PLAN.id}
+                user={user}
+                plan={SPECIAL_OFFER_PLAN}
+                isSelected={selectedPlan.id === SPECIAL_OFFER_PLAN.id}
+              />
+            )}
+          </RadioGroup.Root>
 
-        <Text as="p" size="1" className="text-center text-neutral-800">
-          🔒 Secure payment • Cancel anytime • No hidden fees
-        </Text>
-      </div>
+          <Text as="p" size="1" className="text-neutral-800 text-center">
+            {(!isCurrentPlan || isCancelled) && `You'll be charged ${totalChargePrice} ${renewalAction === "upgrade" || isCancelled ? "today" : "at the start of the new billing period"}.`}
+            {renewalAction === "upgrade" || isCancelled ? " " : <br />}Renews every{" "}
+            {selectedPlan.name.toLowerCase()}. Cancel anytime.
+          </Text>
+
+          <div className="flex flex-col gap-2">
+            <UpdateSubscriptionFlow
+              user={user}
+              currentSubscriptionPlan={currentSubscriptionPlan}
+              selectedPlan={selectedPlan}
+              isProcessing={isProcessing}
+              setIsProcessing={setIsProcessing}
+              featuresAccess={featuresAccess}
+            />
+            <Button
+              className="block"
+              variant="secondary"
+              loading={isProcessing}
+              text="Update payment details"
+              onClick={() => setShowUpdatePaymentDetailsForm(value => !value)}
+            />
+          </div>
+
+          <Text as="p" size="1" className="text-center text-neutral-800">
+            🔒 Secure payment • Cancel anytime • No hidden fees
+          </Text>
+        </div>
+      )}
     </Flex>
   );
 };
