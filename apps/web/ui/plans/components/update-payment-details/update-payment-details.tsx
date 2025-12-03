@@ -300,6 +300,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       onSessionUpdate={onSessionUpdate}
       onSessionUpdateError={onSessionUpdateError}
       cardPreferredFlow="EMBEDDED_IN_HOME"
+      className="w-full"
     />
   ) : (
     <LoadingSpinner />

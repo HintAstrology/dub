@@ -61,6 +61,7 @@ interface ICheckoutFormComponentProps {
   cardPreferredFlow?: CardPreferredFlow;
   termsAndConditionsText?: ReactNode;
   isPaidTraffic?: boolean;
+  className?: string;
 }
 
 // component
@@ -86,6 +87,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
     cardPreferredFlow = "DEDICATED_SCENE",
     termsAndConditionsText,
     isPaidTraffic,
+    className,
   } = props;
 
   const checkoutTriggeredRef = useRef(false);
@@ -473,7 +475,7 @@ const CheckoutFormComponent: FC<ICheckoutFormComponentProps> = (props) => {
   // return
   return (
     <>
-      <div style={{ display: "grid", gridAutoFlow: "row", zIndex: 0 }}>
+      <div style={{ display: "grid", gridAutoFlow: "row", zIndex: 0 }} className={className}>
         <div
           className="w-full text-left"
           id="checkout-container"
