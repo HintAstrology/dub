@@ -81,6 +81,9 @@ export function getBrowserIcon(
   if (browserLower === "safari" || browserLower === "mobile safari") {
     return <Compass className={iconClassName} />;
   }
+  if (browserLower === "chrome" || browserLower === "chromium") {
+    return <ChromeIcon className={iconClassName} />;
+  }
   return <GlobeIcon className={iconClassName} />;
 }
 

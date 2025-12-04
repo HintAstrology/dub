@@ -8,8 +8,11 @@ import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
 import {
   Earth,
-  LayoutGridIcon,
+  Globe,
+  LayoutDashboard,
+  MonitorCog,
   MonitorIcon,
+  MonitorSmartphone,
   QrCodeIcon,
   TagIcon,
   TrendingDown,
@@ -19,11 +22,8 @@ import {
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
-import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
-import { Icon } from "@iconify/react";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
-import { getBrowserIcon, getDeviceIcon } from "./icon-helpers";
 import {
   getDataKey,
   getYAxisConfig,
@@ -44,6 +44,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { getBrowserIcon } from "./icon-helpers";
 
 const DEMO_DATA = [
   180, 230, 320, 305, 330, 290, 340, 310, 380, 360, 270, 360, 280, 270, 350,
@@ -204,23 +205,16 @@ export default function AnalyticsAreaChart({
         isNumeric: true,
       },
       {
-        icon: (() => {
-          const qrTypeInfo = ANALYTICS_QR_TYPES_DATA.find(
-            (type) => type.id === stats?.topQrType?.name,
-          );
-          return qrTypeInfo ? (
-            <Icon icon={qrTypeInfo.icon} className="text-primary size-8" />
-          ) : (
-            <LayoutGridIcon className="text-primary size-8 stroke-[1.5]" />
-          );
-        })(),
+        icon: <LayoutDashboard className="text-primary size-8 stroke-[1.5]" />,
         title: "Top QR Type",
         value: getQrTypeLabel(stats?.topQrType?.name),
         change: formatStatChange(stats?.topQrType?.percentage),
         isNumeric: false,
       },
       {
-        icon: getDeviceIcon(stats?.topDevice?.name),
+        icon: (
+          <MonitorSmartphone className="text-primary size-8 stroke-[1.5]" />
+        ),
         title: "Top Device",
         value: stats?.topDevice?.name || "-",
         change: formatStatChange(stats?.topDevice?.percentage),
@@ -234,14 +228,14 @@ export default function AnalyticsAreaChart({
         isNumeric: false,
       },
       {
-        icon: <MonitorIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: <MonitorCog className="text-primary size-8 stroke-[1.5]" />,
         title: "Top OS",
         value: stats?.topOS?.name || "-",
         change: formatStatChange(stats?.topOS?.percentage),
         isNumeric: false,
       },
       {
-        icon: <Earth className="text-primary size-8 stroke-[1.5]" />,
+        icon: <Globe className="text-primary size-8 stroke-[1.5]" />,
         title: "Top Country",
         value: getCountryName(stats?.topCountry?.name),
         change: formatStatChange(stats?.topCountry?.percentage),
