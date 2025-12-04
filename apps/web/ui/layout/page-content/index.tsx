@@ -39,7 +39,7 @@ export function PageContent({
    
       <div
         className={cn(
-          "bg-white max-md:rounded-t-[16px",
+          "bg-white max-md:rounded-t-[16px]",
           contentWrapperClassName,
         )}
       >

@@ -165,7 +165,7 @@ export const QRBuilderInner = ({
         gap={{ initial: "4", md: "6" }}
         className="items-stretch"
       >
-        <div className="flex w-full flex-col justify-between gap-4">
+        <div className="flex w-full flex-col justify-between gap-4 ">
           <div className="flex w-full flex-col items-start justify-start gap-4">
             {!isTypeStep && !isMobile && !hideStepper && (
               <div className="w-full">
@@ -217,16 +217,17 @@ export const QRBuilderInner = ({
 
         <div
           className={cn(
-            "relative h-auto shrink-0 basis-1/3 items-start justify-center rounded-lg md:flex",
+            "relative h-auto shrink-0  items-start justify-center rounded-lg md:flex",
             {
               // "hidden md:flex": isTypeStep && !homepageDemo,
               "!hidden": isTypeStep,
-              "items-start": homepageDemo,
+              "items-start basis-1/3": homepageDemo,
+              "max-w-[300px]": !homepageDemo && !isMobile,
             },
           )}
         >
           {!isTypeStep && (
-            <div className={cn("sticky top-20 flex w-full flex-col items-end gap-6",{
+            <div className={cn("sticky top-20 flex w-max flex-col items-end gap-6",{
               "items-center":isCustomizationStep || isMobile,
             })}>
               {!isCustomizationStep ? (

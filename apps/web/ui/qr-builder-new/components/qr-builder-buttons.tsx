@@ -163,7 +163,9 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
         {/* Right side: Create/Download button */}
         <div className="flex-1 flex justify-end">
           {isCustomizationStep ? (
-            <div className="w-full max-w-[200px]">
+            <div className={cn("w-full max-w-[200px]",{
+              "max-w-[270px]": !isMobile || !homepageDemo,
+            })}>
               <DownloadButton />
             </div>
           ) : (
@@ -172,7 +174,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
               variant="default"
               size="lg"
               className={cn(
-                "bg-secondary hover:bg-secondary/90 text-white w-full max-w-[200px] min-w-[200px]",
+                "bg-secondary hover:bg-secondary/90 text-white w-full max-w-[270px] min-w-[200px]",
                 {
                   "opacity-50 cursor-not-allowed": isProcessing,
                 },

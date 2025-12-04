@@ -7,7 +7,7 @@ import { Tooltip } from "@dub/ui";
 import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
 import {
-  GlobeIcon,
+  Earth,
   LayoutGridIcon,
   MonitorIcon,
   QrCodeIcon,
@@ -241,7 +241,7 @@ export default function AnalyticsAreaChart({
         isNumeric: false,
       },
       {
-        icon: <GlobeIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: <Earth className="text-primary size-8 stroke-[1.5]" />,
         title: "Top Country",
         value: getCountryName(stats?.topCountry?.name),
         change: formatStatChange(stats?.topCountry?.percentage),
