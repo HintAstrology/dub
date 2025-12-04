@@ -52,6 +52,7 @@ export const QRBuilderInner = ({
     isFileProcessing,
     handleBack,
     handleContinue,
+    handleCancel,
     builderStep,
     isFormValid,
     setBuilderStep,
@@ -201,6 +202,7 @@ export const QRBuilderInner = ({
                 step={builderStep || 1}
                 onBack={handleBack}
                 onContinue={handleContinue}
+                onCancel={handleCancel}
                 isEdit={isEditMode}
                 isProcessing={isProcessing}
                 isFileUploading={isFileUploading}
@@ -371,6 +373,7 @@ export const QRBuilderInner = ({
                     step={builderStep || 1}
                     onBack={handleBack}
                     onContinue={handleContinue}
+                    onCancel={handleCancel}
                     isEdit={isEditMode}
                     isProcessing={isProcessing}
                     isFileUploading={isFileUploading}

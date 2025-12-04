@@ -1,13 +1,13 @@
 import { Session } from "@/lib/auth";
 import { useQRContentEditor } from "@/ui/modals/qr-content-editor";
-import { LINKED_QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
+import { LINKED_QR_TYPES, QR_TYPES } from "@/ui/qr-builder-new/constants/get-qr-config";
 import { getDisplayContent } from "@/ui/qr-builder-new/helpers/qr-data-handlers";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { EQRType } from "@/ui/qr-builder-new/types/qr-type";
 import { Tooltip } from "@dub/ui";
 import { cn, getPrettyUrl } from "@dub/utils/src";
 import { Icon } from "@iconify/react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 export const QRCardDetails = memo(
   ({
@@ -23,6 +23,11 @@ export const QRCardDetails = memo(
   }) => {
     const displayContent = getDisplayContent(qrCode);
     const qrType = qrCode.qrType as EQRType;
+
+    const qrTypeLabel = useMemo(() => {
+      const typeInfo = QR_TYPES.find((item) => item.id === qrType);
+      return typeInfo?.label || "QR";
+    }, [qrType]);
 
     const { setShowQRContentEditorModal, QRContentEditorModal } =
       useQRContentEditor({ qrCode, user });
@@ -68,7 +73,7 @@ export const QRCardDetails = memo(
               </span>
             )}
 
-            <Tooltip content="Edit" delayDuration={150}>
+            <Tooltip content={`Edit ${qrTypeLabel}`} delayDuration={150}>
               <div className="shrink-0 p-1">
                 <Icon
                   icon="uil:edit"

@@ -95,6 +95,7 @@ export interface IQrBuilderContextType {
   // Buttons
   handleContinue: () => Promise<void>;
   handleBack: () => void;
+  handleCancel: () => void;
 
   // Refs
   contentStepRef: RefObject<QRContentStepRef>;

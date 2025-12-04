@@ -7,12 +7,7 @@ import { Tooltip } from "@dub/ui";
 import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
 import {
-  ChromeIcon,
-  GlobeIcon,
-  LayoutGridIcon,
-  MonitorIcon,
   QrCodeIcon,
-  SmartphoneIcon,
   TagIcon,
   TrendingDown,
   TrendingUp,
@@ -23,6 +18,13 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
+import {
+  getBrowserIcon,
+  getCountryIcon,
+  getDeviceIcon,
+  getOSIcon,
+  getQrTypeIcon,
+} from "./icon-helpers";
 import {
   getDataKey,
   getYAxisConfig,
@@ -203,35 +205,35 @@ export default function AnalyticsAreaChart({
         isNumeric: true,
       },
       {
-        icon: <LayoutGridIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: getQrTypeIcon(stats?.topQrType?.name),
         title: "Top QR Type",
         value: getQrTypeLabel(stats?.topQrType?.name),
         change: formatStatChange(stats?.topQrType?.percentage),
         isNumeric: false,
       },
       {
-        icon: <SmartphoneIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: getDeviceIcon(stats?.topDevice?.name),
         title: "Top Device",
         value: stats?.topDevice?.name || "-",
         change: formatStatChange(stats?.topDevice?.percentage),
         isNumeric: false,
       },
       {
-        icon: <ChromeIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: getBrowserIcon(stats?.topBrowser?.name),
         title: "Top Browser",
         value: stats?.topBrowser?.name || "-",
         change: formatStatChange(stats?.topBrowser?.percentage),
         isNumeric: false,
       },
       {
-        icon: <MonitorIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: getOSIcon(stats?.topOS?.name),
         title: "Top OS",
         value: stats?.topOS?.name || "-",
         change: formatStatChange(stats?.topOS?.percentage),
         isNumeric: false,
       },
       {
-        icon: <GlobeIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: getCountryIcon(stats?.topCountry?.name),
         title: "Top Country",
         value: getCountryName(stats?.topCountry?.name),
         change: formatStatChange(stats?.topCountry?.percentage),

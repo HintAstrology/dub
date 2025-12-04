@@ -1,7 +1,7 @@
 "use client";
 
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { DashboardHeader } from "./dashboard-header";
 import { cn } from "@dub/utils";
 import { UserIcon, WalletIcon, CreditCardIcon, PanelLeftOpen, PanelLeftClose } from "lucide-react";
@@ -12,11 +12,13 @@ interface ConditionalDashboardHeaderProps {
 
 export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { state, toggleSidebar } = useSidebar();
   const isAccountSettings = pathname?.startsWith("/account/settings");
   const isAccountPlans = pathname?.startsWith("/account/plans");
   const isAccountBilling = pathname?.startsWith("/account/billing");
   const isConstructorPage = pathname === "/constructor";
+  const qrId = searchParams?.get("qrId");
 
 
   // Determine title for account pages
@@ -24,6 +26,11 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
     if (isAccountPlans) return "Plans & Payments";
     if (isAccountBilling) return "Billing";
     return "My Account";
+  };
+
+  // Determine title for constructor page
+  const getConstructorTitle = () => {
+    return qrId ? "Edit QR Code" : "Create QR Code";
   };
 
   if (isAccountSettings || isAccountPlans || isAccountBilling || isConstructorPage) {
@@ -46,7 +53,7 @@ export function ConditionalDashboardHeader({ user }: ConditionalDashboardHeaderP
             )}
           </button>
           <h1 className="text-lg font-semibold text-neutral-900">
-            {isConstructorPage ? "Create QR Code" : getAccountTitle()}
+            {isConstructorPage ? getConstructorTitle() : getAccountTitle()}
           </h1>
         </div>
       </header>

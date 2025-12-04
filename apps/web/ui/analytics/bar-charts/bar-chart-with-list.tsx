@@ -129,7 +129,7 @@ export function BarChartWithList({
                 type="number"
                 dataKey="sales"
                 domain={[0, 100]}
-                tickFormatter={(value) => `${value.toFixed(1)}%`}
+                tickFormatter={(value) => `${Math.round(value)}%`}
                 axisLine={false}
                 tickLine={false}
                 tickMargin={8}
@@ -191,7 +191,6 @@ export function BarChartWithList({
                     const iconElement = dataEntry?.icon;
                     const iconToRender = renderIcon ? renderIcon(iconElement, displayTitle) : null;
 
-                    // If renderIcon is provided, use foreignObject for HTML rendering
                     if (renderIcon) {
                       return (
                         <foreignObject x={x} y={labelY} width={200} height={24}>

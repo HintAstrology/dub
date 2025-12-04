@@ -1,7 +1,7 @@
 import useWorkspace from "@/lib/swr/use-workspace.ts";
 import { useShareDashboardModal } from "@/ui/modals/share-dashboard-modal.tsx";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
-import { CardList, CursorRays, useMediaQuery } from "@dub/ui";
+import { CardList, CursorRays, Tooltip, useMediaQuery } from "@dub/ui";
 import { cn, currencyFormatter, nFormatter } from "@dub/utils";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
@@ -58,35 +58,37 @@ export function QRCardAnalyticsBadge({
         <>
           <ShareDashboardModal />
 
-          <Link
-            href={`/${slug}/analytics?domain=${domain}&key=${key}&interval=${plan === "free" ? "30d" : plan === "pro" ? "1y" : "all"}`}
-            className={cn(
-              "bg-secondary-100 text-secondary w-fit overflow-hidden rounded-md border border-neutral-200/10 p-0.5 text-sm transition-colors",
-              variant === "loose" ? "hover:bg-neutral-100" : "hover:bg-white",
-            )}
-          >
-            <div className="hidden items-center gap-0.5 sm:flex">
-              {stats.map(({ id: tab, value }) => (
-                <div
-                  key={tab}
-                  className={cn(
-                    "flex items-center gap-2 whitespace-nowrap rounded-md px-1 py-px transition-colors",
-                  )}
-                >
-                  <Icon
-                    icon="streamline:graph"
-                    className="text-secondary hidden h-[14px] w-[14px] lg:block"
-                  />
-                  <span>
-                    {tab === "sales"
-                      ? currencyFormatter(value / 100)
-                      : nFormatter(value)}
-                    {stats.length === 1 && " scans"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Link>
+          <Tooltip content="Show QR statistics" delayDuration={150}>
+            <Link
+              href={`/${slug}/analytics?domain=${domain}&key=${key}&interval=${plan === "free" ? "30d" : plan === "pro" ? "1y" : "all"}`}
+              className={cn(
+                "bg-secondary-100 text-secondary w-fit overflow-hidden rounded-md border border-neutral-200/10 p-0.5 text-sm transition-colors",
+                variant === "loose" ? "hover:bg-neutral-100" : "hover:bg-white",
+              )}
+            >
+              <div className="hidden items-center gap-0.5 sm:flex">
+                {stats.map(({ id: tab, value }) => (
+                  <div
+                    key={tab}
+                    className={cn(
+                      "flex items-center gap-2 whitespace-nowrap rounded-md px-1 py-px transition-colors",
+                    )}
+                  >
+                    <Icon
+                      icon="streamline:graph"
+                      className="text-secondary hidden h-[14px] w-[14px] lg:block"
+                    />
+                    <span>
+                      {tab === "sales"
+                        ? currencyFormatter(value / 100)
+                        : nFormatter(value)}
+                      {stats.length === 1 && " scans"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Link>
+          </Tooltip>
         </>
       )}
     </div>

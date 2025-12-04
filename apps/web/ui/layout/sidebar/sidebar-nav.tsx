@@ -220,7 +220,7 @@ function NavItem({ item }: { item: NavItemType | NavSubItemType }) {
         onPointerLeave={() => setHovered(false)}
         onClick={handleClick}
         className={cn(
-          "hover:bg-border-100 active:bg-secondary-100 group flex items-center gap-2.5 rounded-md p-2 text-sm leading-none text-neutral-600 transition-[background-color,color,font-weight] duration-75",
+          "hover:bg-gray-100 active:bg-secondary-100 group flex items-center gap-2.5 rounded-md p-2 text-sm leading-none text-neutral-600 transition-[background-color,color,font-weight] duration-75",
           "outline-none focus-visible:ring-2 focus-visible:ring-black/50",
           isActive &&
             !items &&

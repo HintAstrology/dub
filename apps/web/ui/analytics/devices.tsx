@@ -14,6 +14,7 @@ import { useContext, useState } from "react";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
 import DeviceIcon from "./components/device-icon";
+import { getDeviceIcon } from "./icon-helpers";
 import AnalyticsPieChartWithLists from "./pie-charts/analytics-pie-chart-with-lists";
 import { BarChartWithList } from "./bar-charts";
 import { useAnalyticsFilterOption } from "./utils";
@@ -72,13 +73,16 @@ export default function Devices() {
     return (
       tabData
         ?.map((d) => ({
-          icon: (
-            <DeviceIcon
-              display={d[singularTabName]}
-              tab={tabValue}
-              className="h-4 w-4"
-            />
-          ),
+          icon:
+            tabValue === "devices" ? (
+              getDeviceIcon(d[singularTabName], "h-4 w-max")
+            ) : (
+              <DeviceIcon
+                display={d[singularTabName]}
+                tab={tabValue}
+                className="h-4 w-max"
+              />
+            ),
           title:
             tabValue === "triggers"
               ? TRIGGER_DISPLAY[d.trigger]
@@ -227,7 +231,16 @@ export default function Devices() {
                         )}
                         limit={EXPAND_LIMIT}
                         onViewAll={() => setShowModal(true)}
-                        renderIcon={(iconElement) => iconElement}
+                        renderIcon={(iconElement) => {
+                          if (iconElement) {
+                            return (
+                              <div className="flex items-center justify-end h-4 w-max shrink-0 [&>*]:h-4 [&>*]:w-max [&>img]:h-4 [&>img]:w-auto [&>img]:object-contain [&>svg]:h-4 [&>svg]:w-max">
+                                {iconElement}
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
                       />
                     </>
                   ) : (

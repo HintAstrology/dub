@@ -12,6 +12,41 @@ import {
   Watch,
 } from "@dub/ui/icons";
 
+// Use jsDelivr CDN with Simple Icons for consistently sized icons
+// Simple Icons are all 24x24 viewBox, so they scale consistently
+const getSimpleIcon = (icon: string) => {
+  return `https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${icon}.svg`;
+};
+
+// Map browser names to Simple Icons names (used in jsDelivr CDN)
+const browserIconMap: Record<string, string> = {
+  chrome: "googlechrome",
+  firefox: "firefox",
+  edge: "microsoftedge",
+  safari: "safari",
+  opera: "opera",
+  brave: "brave",
+  vivaldi: "vivaldi",
+  samsung: "samsunginternet",
+  yandex: "yandex",
+  uc: "ucbrowser",
+};
+
+// Map OS names to Simple Icons names (used in jsDelivr CDN)
+const osIconMap: Record<string, string> = {
+  "mac os": "macos",
+  "macos": "macos",
+  ios: "ios",
+  windows: "windows",
+  android: "android",
+  linux: "linux",
+  ubuntu: "ubuntu",
+  debian: "debian",
+  fedora: "fedora",
+  centos: "centos",
+  redhat: "redhat",
+};
+
 export default function DeviceIcon({
   display,
   tab,
@@ -44,12 +79,28 @@ export default function DeviceIcon({
     } else if (display === "Safari" || display === "Mobile Safari") {
       return <Safari className={className} />;
     } else {
+      const iconKey = display.toLowerCase();
+      const simpleIcon = browserIconMap[iconKey];
+      
+      if (simpleIcon) {
+        return (
+          <BlurImage
+            src={getSimpleIcon(simpleIcon)}
+            alt={display}
+            width={16}
+            height={16}
+            className={className}
+          />
+        );
+      }
+      
+      // Fallback to original source if not found in map
       return (
         <BlurImage
-          src={`https://faisalman.github.io/ua-parser-js/images/browsers/${display.toLowerCase()}.png`}
+          src={`https://faisalman.github.io/ua-parser-js/images/browsers/${iconKey}.png`}
           alt={display}
-          width={20}
-          height={20}
+          width={16}
+          height={16}
           className={className}
         />
       );
@@ -58,23 +109,39 @@ export default function DeviceIcon({
     if (display === "Mac OS") {
       return (
         <BlurImage
-          src="https://assets.dub.co/misc/icons/macos.png"
+          src={getSimpleIcon("macos")}
           alt={display}
-          width={20}
-          height={20}
-          className="h-4 w-4"
+          width={16}
+          height={16}
+          className={className}
         />
       );
     } else if (display === "iOS") {
-      return <Apple className="-ml-1 h-5 w-5" />;
+      return <Apple className={className} />;
     } else {
+      const iconKey = display.toLowerCase();
+      const simpleIcon = osIconMap[iconKey];
+      
+      if (simpleIcon) {
+        return (
+          <BlurImage
+            src={getSimpleIcon(simpleIcon)}
+            alt={display}
+            width={16}
+            height={16}
+            className={className}
+          />
+        );
+      }
+      
+      // Fallback to original source if not found in map
       return (
         <BlurImage
-          src={`https://faisalman.github.io/ua-parser-js/images/os/${display.toLowerCase()}.png`}
+          src={`https://faisalman.github.io/ua-parser-js/images/os/${iconKey}.png`}
           alt={display}
-          width={30}
-          height={20}
-          className="h-4 w-5"
+          width={16}
+          height={16}
+          className={className}
         />
       );
     }
@@ -89,8 +156,8 @@ export default function DeviceIcon({
       <BlurImage
         src={`https://faisalman.github.io/ua-parser-js/images/companies/default.png`}
         alt={display}
-        width={20}
-        height={20}
+        width={16}
+        height={16}
         className={className}
       />
     );

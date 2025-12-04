@@ -10,6 +10,7 @@ interface IQrBuilderButtonsProps {
   step: number;
   onBack: () => void;
   onContinue: () => Promise<void>;
+  onCancel?: () => void;
   maxStep?: number;
   minStep?: number;
   className?: string;
@@ -30,6 +31,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
   step,
   onBack,
   onContinue,
+  onCancel,
   maxStep = 3,
   minStep = 1,
   className,
@@ -86,6 +88,9 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
     return "Customize QR";
   }, [isFileUploading, isFileProcessing]);
 
+  // Show Cancel button on step 1 instead of disabled Back button
+  const showCancelOnStep1 = useConstructorLayout && step === 1 && onCancel;
+
   if (useConstructorLayout) {
     return (
       <Flex
@@ -93,27 +98,40 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
         display={display}
         className={cn("w-full gap-2", className)}
       >
-        {/* Left side: Back and Customize buttons */}
+        {/* Left side: Back/Cancel and Customize buttons */}
         <Flex gap="2" className="flex-1">
-          <Button
-            variant="outline"
-            size="lg"
-            className={cn(
-              "border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 bg-white md:gap-2",
-              {
-                "border-neutral-400 text-neutral-400": isProcessing,
-              },
-            )}
-            disabled={step <= minStep || isProcessing}
-            onClick={onBack}
-          >
-            <ChevronLeft
-              className={cn("h-4 w-4", {
-                "text-neutral-400": isProcessing,
-              })}
-            />
-            <span className="hidden md:inline">Back</span>
-          </Button>
+          {showCancelOnStep1 ? (
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 bg-white md:gap-2"
+              disabled={isProcessing}
+              onClick={onCancel}
+            >
+              <span className="hidden md:inline">Cancel</span>
+              <span className="md:hidden">Cancel</span>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="lg"
+              className={cn(
+                "border-secondary text-secondary hover:bg-secondary/10 flex min-w-0 shrink gap-1 bg-white md:gap-2",
+                {
+                  "border-neutral-400 text-neutral-400": isProcessing,
+                },
+              )}
+              disabled={step <= minStep || isProcessing}
+              onClick={onBack}
+            >
+              <ChevronLeft
+                className={cn("h-4 w-4", {
+                  "text-neutral-400": isProcessing,
+                })}
+              />
+              <span className="hidden md:inline">Back</span>
+            </Button>
+          )}
 
           {/* Show Customize button on content step */}
           {isContentStep && (
@@ -122,7 +140,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
               variant="outline"
               size="lg"
               className={cn(
-                "border-secondary text-secondary hover:bg-secondary/10 bg-white",
+                "border-secondary text-secondary hover:bg-secondary/10 bg-white flex items-center gap-1 md:gap-2 min-w-[200px]",
                 {
                   "border-neutral-400 text-neutral-400": isProcessing,
                 },
@@ -137,6 +155,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {customizeButtonText()}
+              <ChevronRight className="h-4 w-4" />
             </Button>
           )}
         </Flex>
@@ -153,7 +172,7 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
               variant="default"
               size="lg"
               className={cn(
-                "bg-secondary hover:bg-secondary/90 text-white w-full max-w-[200px]",
+                "bg-secondary hover:bg-secondary/90 text-white w-full max-w-[200px] min-w-[200px]",
                 {
                   "opacity-50 cursor-not-allowed": isProcessing,
                 },

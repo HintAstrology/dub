@@ -5,7 +5,7 @@ import { useDeleteQRModal } from "@/ui/modals/delete-qr-modal.tsx";
 import { useQRPreviewModal } from "@/ui/modals/qr-preview-modal.tsx";
 import { TQrServerData } from "@/ui/qr-builder-new/types/qr-server-data";
 import { QrCodesListContext } from "@/ui/qr-code/qr-codes-container.tsx";
-import { Button, Popover } from "@dub/ui";
+import { Button, Popover, Tooltip } from "@dub/ui";
 import { Download } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { trackClientEvents } from "core/integration/analytic";
@@ -143,31 +143,33 @@ export function QrCodeControls({
       <ArchiveQRModal />
       <DeleteLinkModal />
 
-      <Button
-        onClick={onDownloadButtonClick}
-        variant="secondary"
-        className={cn(
-          "h-8 w-8 px-1.5 outline-none transition-all duration-200",
-          "border-transparent data-[state=open]:border-neutral-200/40 data-[state=open]:ring-neutral-200/40 sm:group-hover/card:data-[state=closed]:border-neutral-200/10",
-          "border-border-500 border lg:border-none",
-        )}
-        icon={<Download className="h-5 w-5 shrink-0" />}
-      />
+      <Tooltip content="Download QR" delayDuration={150}>
+        <Button
+          onClick={onDownloadButtonClick}
+          variant="secondary"
+          className={cn(
+            "h-8 w-8 px-1.5 outline-none transition-all duration-200",
+            "border-transparent data-[state=open]:border-neutral-200/40 data-[state=open]:ring-neutral-200/40 sm:group-hover/card:data-[state=closed]:border-neutral-200/10",
+            "border-border-500 border lg:border-none",
+          )}
+          icon={<Download className="h-5 w-5 shrink-0" />}
+        />
+      </Tooltip>
       <Popover
         content={
           <div className="w-full sm:w-48">
             <div className="grid p-2">
-              <Button
-                text="View Statistics"
-                variant="outline"
-                onClick={() => {
-                  router.push(
-                    `/${slug}/analytics?domain=${domain}&key=${key}&interval=all`,
-                  );
-                }}
-                icon={<ChartNoAxesColumn className="size-4" />}
-                className="h-8 w-full justify-start px-2 text-sm text-gray-700"
-              />
+                <Button
+                  text="View Statistics"
+                  variant="outline"
+                  onClick={() => {
+                    router.push(
+                      `/${slug}/analytics?domain=${domain}&key=${key}&interval=all`,
+                    );
+                  }}
+                  icon={<ChartNoAxesColumn className="size-4" />}
+                  className="h-8 w-full justify-start px-2 text-sm text-gray-700"
+                />
               <Button
                 text="Duplicate"
                 variant="outline"

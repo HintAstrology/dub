@@ -38,6 +38,7 @@ interface QrBuilderProviderProps {
   handleResetTypeToScrollTo?: () => void;
   initialStep?: TStepState;
   onStepChange?: (step: TStepState) => void;
+  onCancel?: () => void;
 }
 
 // Provider component
@@ -51,6 +52,7 @@ export const QrBuilderProvider = ({
   handleResetTypeToScrollTo,
   initialStep,
   onStepChange,
+  onCancel: onCancelProp,
 }: QrBuilderProviderProps) => {
   const user = useUser();
   const { isMobile } = useMediaQuery();
@@ -315,6 +317,28 @@ export const QrBuilderProvider = ({
     // Scroll on mobile - Commented out to prevent scroll on step change
     // handleScroll();
   }, [builderStep, handleChangeStep, homepageDemo, user, sessionId]);
+
+  const handleCancel = useCallback(() => {
+    if (isEdit && onCancelProp) {
+      toast.success("Successfully cancelled");
+      onCancelProp();
+    } else {
+      setBuilderStep(1);
+      setSelectedQrType(null);
+      setHoveredQRType(null);
+      setTypeSelectionError("");
+      setFormData(null);
+      setCurrentFormValues({});
+      setDestinationData(null);
+      setCustomizationData(initialState.customizationData);
+      setCustomizationActiveTab("Frame");
+      setIsFormValid(true);
+      setIsProcessing(false);
+      setIsFileUploading(false);
+      setIsFileProcessing(false);
+      toast.success("Successfully cancelled");
+    }
+  }, [isEdit, onCancelProp, initialState.customizationData]);
 
   // Methods
   const onSave = useCallback(
@@ -588,6 +612,7 @@ export const QrBuilderProvider = ({
     //Buttons
     handleBack,
     handleContinue,
+    handleCancel,
 
     // Refs
     contentStepRef,

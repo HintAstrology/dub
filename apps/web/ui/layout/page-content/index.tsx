@@ -35,46 +35,11 @@ export function PageContent({
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-4">
-          <NavButton />
-          {(hasTitle || hasDescription) && (
-            <div>
-              {hasTitle && (
-                <div className="flex items-center gap-2">
-                  {titleBackButtonLink && (
-                    <Link
-                      href={titleBackButtonLink}
-                      className="rounded-lg p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-                    >
-                      <ChevronLeft className="size-5" />
-                    </Link>
-                  )}
-                  <h1 className="text-xl font-semibold leading-7 text-neutral-900 md:text-2xl">
-                    {title}
-                  </h1>
-                </div>
-              )}
-              {hasDescription && (
-                <p className="mt-1 hidden text-base text-neutral-500 md:block">
-                  {description}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-        {titleControls && (
-          <div className="hidden md:block">{titleControls}</div>
-        )}
-        <div className="flex items-center gap-4 md:hidden">
-          {/*{!hideReferButton && <ReferButton />}*/}
-          {/*<HelpButtonRSC />*/}
-          <UserDropdown />
-        </div>
-      </div>
+   
+   
       <div
         className={cn(
-          "bg-white max-md:rounded-t-[16px]",
+          "bg-white max-md:rounded-t-[16px",
           contentWrapperClassName,
         )}
       >

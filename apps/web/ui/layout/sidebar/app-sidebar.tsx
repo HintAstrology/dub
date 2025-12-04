@@ -211,8 +211,9 @@ export function AppSidebar() {
                           isActive={isActive(item)}
                           className={cn(
                             "transition-colors",
-                            isActive(item) &&
-                              "bg-primary/10 text-primary hover:bg-primary/15 font-medium",
+                            isActive(item)
+                              ? "bg-primary/10 text-primary hover:bg-primary/15 font-medium"
+                              : "hover:bg-gray-100",
                           )}
                           onClick={item.onClick}
                           tooltip={item.label}

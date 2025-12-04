@@ -43,7 +43,7 @@ export const QRCardTitle: FC<IQRCardTitle> = ({
         <span className="text-neutral min-w-0 truncate font-bold lg:font-medium lg:text-neutral-500">
           {displayValue}
         </span>
-        <Tooltip content="Rename" delayDuration={150}>
+        <Tooltip content="Rename QR" delayDuration={150}>
           <div className="shrink-0 p-1">
             <Icon
               icon="uil:edit"

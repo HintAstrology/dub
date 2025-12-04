@@ -19,6 +19,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
     qrBuilderContentWrapperRef,
     handleBack,
     handleContinue,
+    handleCancel,
     isEditMode,
     isProcessing,
     isFileUploading,
@@ -96,6 +97,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
             step={builderStep || 1}
             onBack={handleBack}
             onContinue={isTypeStep ? async () => {} : handleContinue}
+            onCancel={handleCancel}
             isEdit={isEditMode}
             isProcessing={isProcessing}
             isFileUploading={isFileUploading}
@@ -180,6 +182,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
                   step={builderStep || 1}
                   onBack={handleBack}
                   onContinue={handleContinue}
+                  onCancel={handleCancel}
                   isEdit={isEditMode}
                   isProcessing={isProcessing}
                   isFileUploading={isFileUploading}
@@ -242,6 +245,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
             step={builderStep || 1}
             onBack={handleBack}
             onContinue={handleContinue}
+            onCancel={handleCancel}
             isEdit={isEditMode}
             isProcessing={isProcessing}
             isFileUploading={isFileUploading}
