@@ -137,7 +137,6 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {customizeButtonText()}
-              {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
             </Button>
           )}
         </Flex>
@@ -171,7 +170,6 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create QR Code
-              {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
             </Button>
           )}
         </div>
@@ -239,7 +237,6 @@ export const QrBuilderButtons: FC<IQrBuilderButtonsProps> = ({
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {buttonText}
-          {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
         </Button>
       ) : null}
     </Flex>

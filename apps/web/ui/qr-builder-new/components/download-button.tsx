@@ -112,7 +112,6 @@ export const DownloadButton = () => {
     >
       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {buttonText}
-      {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
     </Button>
   );
 };

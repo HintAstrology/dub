@@ -39,11 +39,9 @@ export const CreateQRContent: FC<CreateQRContentProps> = ({
     async (data: TNewQRBuilderData) => {
       try {
         if (qrCode) {
-          // Update existing QR
           await updateQR(data);
           router.push(`/?qrId=${qrCode.id}`);
         } else {
-          // Create new QR
           const result = await createQr(data, undefined, user);
           if (result && result.createdQr) {
             router.push(`/?qrId=${result.createdQr.id}`);
@@ -57,7 +55,7 @@ export const CreateQRContent: FC<CreateQRContentProps> = ({
   );
 
   return (
-    <div className="flex h-[calc(100vh-85px)] overflow-hidden  w-full flex-col">
+    <div className="flex h-[calc(100vh-85px)] border border-border-500 rounded-[20px] overflow-hidden  w-full flex-col">
       <QRBuilderNew
         homepageDemo={false}
         sessionId={user.id!}

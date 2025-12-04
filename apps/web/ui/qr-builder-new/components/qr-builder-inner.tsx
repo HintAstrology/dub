@@ -143,7 +143,11 @@ export const QRBuilderInner = ({
 
   // If only showing stepper, return just that
   if (showOnlyStepper) {
-    return <QRBuilderSteps disableStepNavigation={disableStepNavigation} />;
+    return (
+      <div className="w-[90%] mx-auto">
+        <QRBuilderSteps disableStepNavigation={disableStepNavigation} />
+      </div>
+    );
   }
 
   return (

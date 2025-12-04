@@ -41,17 +41,14 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
     defaultData: "https://getqr.com/qr-complete-setup",
   });
 
-  // For constructor page (homepageDemo = false, no modalHeader) and desktop only
-  // Show fixed stepper at top and buttons at bottom
   if (!homepageDemo && !isMobile && !modalHeader) {
     return (
       <div className="flex h-full w-full flex-col">
         {/* Fixed stepper at top */}
-        <div className="flex-shrink-0 bg-primary/10 rounded-t-[20px] px-6 py-4 w-full">
+        <div className="flex-shrink-0 border-b border-border-500 rounded-t-[20px] px-6 py-4 w-full">
           <QRBuilderInner showOnlyStepper disableStepNavigation={isTypeStep} />
         </div>
 
-        {/* Scrollable content area */}
         <div className={cn(
           "flex-1 overflow-y-auto min-h-0",
           isTypeStep && "flex items-center justify-center"
@@ -94,7 +91,7 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
         </div>
 
         {/* Fixed buttons at bottom */}
-        <div className="flex-shrink-0 bg-primary/10 rounded-b-[20px] px-6 py-4 w-full">
+        <div className="flex-shrink-0 border-t border-border-500 rounded-b-[20px] px-6 py-4 w-full">
           <QrBuilderButtons
             step={builderStep || 1}
             onBack={handleBack}
