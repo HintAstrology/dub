@@ -67,7 +67,7 @@ export function QRBuilderNewModal({
 
   const handleSaveQR = async (data: TNewQRBuilderData) => {
     setIsProcessing(true);
-    console.log("handleSaveQR qrCode", qrCode);
+
     try {
       if (qrCode) {
         await updateQR(data);
