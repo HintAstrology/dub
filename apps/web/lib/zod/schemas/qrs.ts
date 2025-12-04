@@ -14,6 +14,7 @@ export const createQrBodySchema = z.object({
     "video",
     "feedback",
     "email",
+    "vcard",
   ]),
   title: z.string().optional(),
   description: z.string().max(280).optional(),

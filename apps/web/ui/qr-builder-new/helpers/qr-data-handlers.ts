@@ -91,6 +91,50 @@ export const qrTypeDataEncoders = {
     }
     return "";
   },
+
+  [EQRType.VCARD]: (values: Record<string, any>) => {
+    const {
+      firstName = "",
+      lastName = "",
+      phone = "",
+      mobile = "",
+      work = "",
+      fax = "",
+      company = "",
+      role = "",
+      website = "",
+      email = "",
+      street = "",
+      city = "",
+      state = "",
+      zip = "",
+      country = "",
+    } = values;
+
+    const lines: string[] = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `N:${lastName};${firstName};;;`,
+      `FN:${firstName} ${lastName}`,
+    ];
+
+    if (company) lines.push(`ORG:${company}`);
+    if (role) lines.push(`TITLE:${role}`);
+    if (phone) lines.push(`TEL;TYPE=HOME:${phone}`);
+    if (mobile) lines.push(`TEL;TYPE=CELL:${mobile}`);
+    if (work) lines.push(`TEL;TYPE=WORK:${work}`);
+    if (fax) lines.push(`TEL;TYPE=FAX:${fax}`);
+    if (email) lines.push(`EMAIL:${email}`);
+    if (website) lines.push(`URL:${website}`);
+
+    if (street || city || state || zip || country) {
+      lines.push(`ADR:;;${street};${city};${state};${zip};${country}`);
+    }
+
+    lines.push("END:VCARD");
+
+    return lines.join("\n");
+  },
 };
 
 // Data parsers - convert QR code data string back to form values
@@ -206,6 +250,66 @@ export const qrTypeDataParsers = {
       return {};
     }
   },
+
+  [EQRType.VCARD]: (data: string): Record<string, any> => {
+    const result: Record<string, any> = {
+      firstName: "",
+      lastName: "",
+      phone: "",
+      mobile: "",
+      work: "",
+      fax: "",
+      company: "",
+      role: "",
+      website: "",
+      email: "",
+      street: "",
+      city: "",
+      state: "",
+      zip: "",
+      country: "",
+    };
+
+    if (!data.startsWith("BEGIN:VCARD")) {
+      return result;
+    }
+
+    const lines = data.split(/\r?\n/);
+
+    for (const line of lines) {
+      if (line.startsWith("N:")) {
+        const parts = line.substring(2).split(";");
+        result.lastName = parts[0] || "";
+        result.firstName = parts[1] || "";
+      } else if (line.startsWith("ORG:")) {
+        result.company = line.substring(4);
+      } else if (line.startsWith("TITLE:")) {
+        result.role = line.substring(6);
+      } else if (line.startsWith("TEL;TYPE=HOME:")) {
+        result.phone = line.substring(14);
+      } else if (line.startsWith("TEL;TYPE=CELL:")) {
+        result.mobile = line.substring(14);
+      } else if (line.startsWith("TEL;TYPE=WORK:")) {
+        result.work = line.substring(14);
+      } else if (line.startsWith("TEL;TYPE=FAX:")) {
+        result.fax = line.substring(13);
+      } else if (line.startsWith("EMAIL:")) {
+        result.email = line.substring(6);
+      } else if (line.startsWith("URL:")) {
+        result.website = line.substring(4);
+      } else if (line.startsWith("ADR:")) {
+        const parts = line.substring(4).split(";");
+        // ADR format: PO Box;Extended;Street;City;State;Zip;Country
+        result.street = parts[2] || "";
+        result.city = parts[3] || "";
+        result.state = parts[4] || "";
+        result.zip = parts[5] || "";
+        result.country = parts[6] || "";
+      }
+    }
+
+    return result;
+  },
 };
 
 // Helper function to encode form data for a specific QR type
@@ -291,6 +395,14 @@ export const getDisplayContent = (qrCode: TQrServerData): string => {
       }
 
       return data;
+
+    case EQRType.VCARD:
+      // Try to extract the full name from vCard data
+      const fnMatch = data.match(/FN:(.+)/);
+      if (fnMatch) {
+        return fnMatch[1];
+      }
+      return "Business Card";
 
     case EQRType.WEBSITE:
     case EQRType.APP_LINK:

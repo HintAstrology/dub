@@ -5,6 +5,7 @@ export const QR_NAME_PLACEHOLDERS = {
   IMAGE: "My QR Code",
   PDF: "My QR Code",
   VIDEO: "My QR Code",
+  VCARD: "My QR Code",
 } as const;
 
 export const QR_INPUT_PLACEHOLDERS = {
@@ -14,6 +15,22 @@ export const QR_INPUT_PLACEHOLDERS = {
     "Hi GetQR team! 👋 I saw your awesome QR code platform and I'd love to start using it for my restaurant. Digital menus sound perfect — physical ones are just sooo outdated! Can you help me get set up?",
   WIFI_NETWORK_NAME: "MamaMiaHotspot",
   WIFI_PASSWORD: "ExtraToppings123",
+  // vCard placeholders
+  VCARD_FIRST_NAME: "John",
+  VCARD_LAST_NAME: "Doe",
+  VCARD_PHONE: "+1 234 567 890",
+  VCARD_MOBILE: "+1 234 567 891",
+  VCARD_WORK: "+1 234 567 892",
+  VCARD_FAX: "+1 234 567 893",
+  VCARD_COMPANY: "Acme Inc.",
+  VCARD_ROLE: "Software Engineer",
+  VCARD_WEBSITE: "https://example.com",
+  VCARD_EMAIL: "john.doe@example.com",
+  VCARD_STREET: "123 Main Street",
+  VCARD_CITY: "New York",
+  VCARD_STATE: "NY",
+  VCARD_ZIP: "10001",
+  VCARD_COUNTRY: "United States",
 } as const;
 
 export const QR_FILE_TITLES = {
@@ -31,4 +48,7 @@ export const QR_DEMO_DEFAULTS = {
   IMAGE_PLACEHOLDER: "Place for Your Image",
   PDF_PLACEHOLDER: "Place for Your PDF",
   VIDEO_PLACEHOLDER: "Place for Your Video",
+  VCARD_FIRST_NAME: "John",
+  VCARD_LAST_NAME: "Doe",
+  VCARD_PHONE: "",
 } as const;

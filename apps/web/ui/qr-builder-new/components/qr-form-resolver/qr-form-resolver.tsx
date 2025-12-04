@@ -11,6 +11,7 @@ import { EQRType } from "../../types/qr-type";
 import {
   ImageForm,
   PdfForm,
+  VcardForm,
   VideoForm,
   WebsiteForm,
   WhatsAppForm,
@@ -105,6 +106,14 @@ export const QrFormResolver = forwardRef<QRFormRef, QRFormResolverProps>(
       ),
       [EQRType.FEEDBACK]: (
         <WebsiteForm
+          ref={ref as any}
+          onSubmit={onSubmit}
+          defaultValues={defaultValues}
+          contentOnly={contentOnly}
+        />
+      ),
+      [EQRType.VCARD]: (
+        <VcardForm
           ref={ref as any}
           onSubmit={onSubmit}
           defaultValues={defaultValues}
