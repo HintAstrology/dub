@@ -189,7 +189,7 @@ export const QrBuilderProvider = ({
       // Validate form before moving forward from step 2
       if (builderStep === 2 && newStep > 2 && contentStepRef.current) {
         const isValid = await contentStepRef.current.validateForm();
-        
+
         if (!isValid) {
           // toast.error("Please fill in all required fields correctly");
           return;
@@ -256,7 +256,15 @@ export const QrBuilderProvider = ({
         sessionId: sessionId || user?.id,
       });
     },
-    [selectedQrType, formData, isFormValid, homepageDemo, user, sessionId, builderStep],
+    [
+      selectedQrType,
+      formData,
+      isFormValid,
+      homepageDemo,
+      user,
+      sessionId,
+      builderStep,
+    ],
   );
 
   const handleSelectQRType = useCallback(
@@ -331,6 +339,17 @@ export const QrBuilderProvider = ({
         toast.error("Save functionality not configured");
         return;
       }
+
+      trackClientEvents({
+        event: EAnalyticEvents.PAGE_CLICKED,
+        params: {
+          page_name: homepageDemo ? "landing" : "dashboard",
+          content_value: homepageDemo ? "download" : isEdit ? "save" : "create",
+          content_group: isContentStep ? "complete_content" : "customize_qr",
+          event_category: homepageDemo ? "nonAuthorized" : "Authorized",
+        },
+        sessionId,
+      });
 
       setIsProcessing(true);
 

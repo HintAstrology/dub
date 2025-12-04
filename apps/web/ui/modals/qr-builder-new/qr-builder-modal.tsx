@@ -124,10 +124,16 @@ export function QRBuilderNewModal({
       )}
       {/* On mobile, render header directly; on desktop, pass as prop for fixed layout */}
       {isMobile && modalHeaderContent}
-      <div className={cn(
-        isMobile ? "p-4 flex-1 min-h-0" : "",
-        !isMobile && isStep1 ? "flex flex-col" : !isMobile ? "h-full flex flex-col min-h-0" : ""
-      )}>
+      <div
+        className={cn(
+          isMobile ? "min-h-0 flex-1 p-4" : "",
+          !isMobile && isStep1
+            ? "flex flex-col"
+            : !isMobile
+              ? "flex h-full min-h-0 flex-col"
+              : "",
+        )}
+      >
         <QRBuilderNew
           initialStep={initialStep}
           initialQrData={qrCode}

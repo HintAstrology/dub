@@ -103,7 +103,7 @@ export const QRTabs: FC<
         >
           <QrTabsTitle />
           <QRBuilderNew
-            homepageDemo={true}
+            homepageDemo
             sessionId={sessionId}
             onSave={handleNewBuilderDownload}
             typeToScrollTo={typeToScrollTo}
