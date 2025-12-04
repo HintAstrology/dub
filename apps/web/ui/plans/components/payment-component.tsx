@@ -79,7 +79,7 @@ export const PaymentComponent: FC<Readonly<IPaymentComponentProps>> = ({
   return (
     <Flex
       direction="column"
-      className="border-border-500 gap-4 rounded-lg px-0 py-3 lg:flex-1 lg:gap-[18px] lg:border lg:px-6 lg:py-4"
+      className="border-border-500 gap-4 rounded-lg px-0 py-3 lg:flex-1 lg:gap-[18px] lg:border lg:px-6 lg:py-4 lg:min-h-[480px]"
     >
       <Heading
         as="h2"

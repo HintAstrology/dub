@@ -282,28 +282,31 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     });
   };
 
-  return clientToken ? (
-    <CheckoutFormComponent
-      locale="en"
-      theme="light"
-      user={transformedUser as ICustomerBody}
-      submitBtn={{
-        text: "Update Payment Method",
-      }}
-      paymentPlan={paymentPlanForUpdate}
-      handleCheckoutError={handleCheckoutError}
-      handleCheckoutSuccess={handleCheckoutSuccess}
-      handleOpenCardDetailsForm={handleOpenCardDetailsForm}
-      onPaymentMethodSelected={onPaymentMethodTypeClick}
-      onBeforePaymentCreate={onPaymentMethodTypeOpen}
-      onPaymentAttempt={onPaymentAttempt}
-      onSessionUpdate={onSessionUpdate}
-      onSessionUpdateError={onSessionUpdateError}
-      cardPreferredFlow="EMBEDDED_IN_HOME"
-      className="w-full"
-      payMethodUpdateSession={true}
-    />
-  ) : (
-    <LoadingSpinner />
+  return (
+    <div className="flex items-center justify-center min-h-[88px] w-full">
+      {clientToken ? (
+        <CheckoutFormComponent
+          locale="en"
+          theme="light"
+          user={transformedUser as ICustomerBody}
+          submitBtn={{
+            text: "Update Payment Method",
+          }}
+          paymentPlan={paymentPlanForUpdate}
+          handleCheckoutError={handleCheckoutError}
+          handleCheckoutSuccess={handleCheckoutSuccess}
+          handleOpenCardDetailsForm={handleOpenCardDetailsForm}
+          onPaymentMethodSelected={onPaymentMethodTypeClick}
+          onBeforePaymentCreate={onPaymentMethodTypeOpen}
+          onPaymentAttempt={onPaymentAttempt}
+          onSessionUpdate={onSessionUpdate}
+          onSessionUpdateError={onSessionUpdateError}
+          className="w-full"
+          payMethodUpdateSession={true}
+        />
+      ) : (
+        <LoadingSpinner />
+      )}
+    </div>
   );
 };
