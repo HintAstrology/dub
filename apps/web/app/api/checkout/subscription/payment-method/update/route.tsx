@@ -1,44 +1,53 @@
-import { IUpdateSubscriptionPaymentMethodBody } from 'core/api/user/subscription/subscription.interface';
-import { getPrimerPaymentInfo, getPrimerPaymentMethodToken, PaymentService } from 'core/integration/payment/server';
-import { IDataRes } from 'core/interfaces/common.interface';
-import { getUserCookieService, updateUserCookieService } from 'core/services/cookie/user-session.service';
-import { NextRequest, NextResponse } from 'next/server';
+import { checkFeaturesAccessAuthLess } from "@/lib/actions/check-features-access-auth-less";
 import { prisma } from "@dub/prisma";
-import { checkFeaturesAccessAuthLess } from '@/lib/actions/check-features-access-auth-less';
-import { ICustomerBody } from 'core/integration/payment/config';
+import { IUpdateSubscriptionPaymentMethodBody } from "core/api/user/subscription/subscription.interface";
+import { ICustomerBody } from "core/integration/payment/config";
+import {
+  getPrimerPaymentInfo,
+  getPrimerPaymentMethodToken,
+  PaymentService,
+} from "core/integration/payment/server";
+import { IDataRes } from "core/interfaces/common.interface";
+import {
+  getUserCookieService,
+  updateUserCookieService,
+} from "core/services/cookie/user-session.service";
+import { NextRequest, NextResponse } from "next/server";
 
 const paymentService = new PaymentService();
 
 // update payment method
-export async function POST(request: NextRequest): Promise<NextResponse<IDataRes>> {
+export async function POST(
+  request: NextRequest,
+): Promise<NextResponse<IDataRes>> {
   const body: IUpdateSubscriptionPaymentMethodBody = await request.json();
 
   const { user } = await getUserCookieService();
 
   if (!body || !body.customerId) {
     return NextResponse.json(
-      { success: false, error: 'User not found by customerId' },
+      { success: false, error: "User not found by customerId" },
       { status: 400 },
     );
   }
 
   if (!body || !body.email) {
     return NextResponse.json(
-      { success: false, error: 'User not found by email' },
+      { success: false, error: "User not found by email" },
       { status: 400 },
     );
   }
 
   if (!body.payment?.orderId || !body.payment?.id) {
     return NextResponse.json(
-      { success: false, error: 'Payment info not found' },
+      { success: false, error: "Payment info not found" },
       { status: 400 },
     );
   }
 
   if (!user?.id) {
     return NextResponse.json(
-      { success: false, error: 'User not found' },
+      { success: false, error: "User not found" },
       { status: 400 },
     );
   }
@@ -62,7 +71,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<IDataRes>
 
     if (!userDataFromDB) {
       return NextResponse.json(
-        { success: false, error: 'User not found by email' },
+        { success: false, error: "User not found by email" },
         { status: 400 },
       );
     }
@@ -71,7 +80,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<IDataRes>
 
     const featuresAccess = await checkFeaturesAccessAuthLess(userDataFromDB.id);
 
-    const paymentInfo = await getPrimerPaymentInfo({ paymentId: body.payment.id });
+    const paymentInfo = await getPrimerPaymentInfo({
+      paymentId: body.payment.id,
+    });
     const lastAddedToken = await getPrimerPaymentMethodToken({
       customerId: body.customerId,
     })!;
@@ -92,7 +103,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<IDataRes>
         ...paymentData?.currency,
         currencyForPay: body.payment.currencyCode,
       },
-      toxic: riskData?.type === 'toxic',
+      toxic: riskData?.type === "toxic",
       paymentInfo: {
         ...paymentData?.paymentInfo,
         customerId: userDataFromDB.id,
@@ -120,9 +131,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<IDataRes>
 
     return NextResponse.json({
       success: true,
-      data: { toxic: riskData?.type === 'toxic' },
+      data: { toxic: riskData?.type === "toxic" },
     });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error?.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error?.message },
+      { status: 500 },
+    );
   }
 }

@@ -1,18 +1,32 @@
-'use client';
+"use client";
 
-import { FeaturesAccess } from '@/lib/actions/check-features-access-auth-less';
-import { LoadingSpinner } from '@dub/ui';
-import { Payment } from '@primer-io/checkout-web';
-import { useCreateUserSessionMutation } from 'core/api/user/payment/payment.hook';
-import { useUpdateSubscriptionPaymentMethodQuery } from 'core/api/user/subscription/subscription.hook';
-import { trackClientEvents } from 'core/integration/analytic';
-import { EAnalyticEvents } from 'core/integration/analytic/interfaces/analytic.interface';
-import { CheckoutFormComponent, ICheckoutFormSuccess, IPrimerClientError } from 'core/integration/payment/client';
-import { getPaymentPlanPrice, ICustomerBody, TPaymentPlan } from 'core/integration/payment/config';
-import { getCurrenciesData } from 'core/services/currencies/currencies.service';
-import { generateCheckoutFormPaymentEvents } from 'core/services/events/checkout-form-events.service';
-import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { FeaturesAccess } from "@/lib/actions/check-features-access-auth-less";
+import { LoadingSpinner } from "@dub/ui";
+import { Payment } from "@primer-io/checkout-web";
+import { useCreateUserSessionMutation } from "core/api/user/payment/payment.hook";
+import { useUpdateSubscriptionPaymentMethodQuery } from "core/api/user/subscription/subscription.hook";
+import { trackClientEvents } from "core/integration/analytic";
+import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
+import {
+  CheckoutFormComponent,
+  ICheckoutFormSuccess,
+  IPrimerClientError,
+} from "core/integration/payment/client";
+import {
+  getPaymentPlanPrice,
+  ICustomerBody,
+  TPaymentPlan,
+} from "core/integration/payment/config";
+import { generateCheckoutFormPaymentEvents } from "core/services/events/checkout-form-events.service";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { toast } from "sonner";
 
 interface Props {
   user: ICustomerBody;
@@ -73,7 +87,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
             params: {
               customer_id: user?.id,
               email: user!.email!,
-              flow_type: 'payment_method',
+              flow_type: "payment_method",
               error_code: error?.code,
               error_message: error?.message,
             },
@@ -97,7 +111,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     },
   };
 
-  const paymentPlanForUpdate: TPaymentPlan = 'MIN_PRICE';
+  const paymentPlanForUpdate: TPaymentPlan = "MIN_PRICE";
   const { priceForPay: minimalPriceForUpdate } = getPaymentPlanPrice({
     paymentPlan: paymentPlanForUpdate,
     user: transformedUser,
@@ -109,9 +123,9 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     trackClientEvents({
       event: EAnalyticEvents.PAGE_CLICKED,
       params: {
-        page_name: 'paymentDetails',
+        page_name: "paymentDetails",
         content_value: paymentMethodType,
-        event_category: 'AppPurchase',
+        event_category: "AppPurchase",
         event_type: null,
       },
       sessionId: user?.id,
@@ -121,16 +135,16 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
   const onPaymentMethodTypeOpen = (paymentMethodType: string) => {
     paymentTypeRef.current = paymentMethodType;
 
-    if (paymentMethodType.includes('CARD')) {
+    if (paymentMethodType.includes("CARD")) {
       return;
     }
 
     trackClientEvents({
       event: EAnalyticEvents.ELEMENT_OPENED,
       params: {
-        page_name: 'paymentDetails',
+        page_name: "paymentDetails",
         element_name: paymentMethodType,
-        event_category: 'AppPurchase',
+        event_category: "AppPurchase",
         event_type: null,
       },
       sessionId: user?.id,
@@ -141,9 +155,9 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     trackClientEvents({
       event: EAnalyticEvents.PAGE_CLICKED,
       params: {
-        page_name: 'paymentDetails',
-        content_value: 'card',
-        event_category: 'AppPurchase',
+        page_name: "paymentDetails",
+        content_value: "card",
+        event_category: "AppPurchase",
         event_type: null,
       },
       sessionId: user?.id,
@@ -151,9 +165,9 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     trackClientEvents({
       event: EAnalyticEvents.ELEMENT_OPENED,
       params: {
-        page_name: 'paymentDetails',
-        element_name: 'CardDetails',
-        event_category: 'AppPurchase',
+        page_name: "paymentDetails",
+        element_name: "CardDetails",
+        event_category: "AppPurchase",
         event_type: null,
       },
       sessionId: user?.id,
@@ -176,14 +190,14 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     generateCheckoutFormPaymentEvents({
       user: transformedUser,
       data: eventData,
-      flowType: 'card_update',
+      flowType: "card_update",
       planCode: paymentPlanForUpdate,
       amount: minimalPriceForUpdate,
-      stage: 'error',
+      stage: "error",
       toxic: user?.toxic,
       paymentType: paymentTypeRef.current!,
       subscriptionId: featuresAccess.subscriptionId,
-      additionalParams: { event_category: 'AppPurchase', event_type: null },
+      additionalParams: { event_category: "AppPurchase", event_type: null },
     });
   };
 
@@ -201,27 +215,24 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       },
       nationalDocumentId: data.nationalDocumentId,
       first6Digits: data.first6Digits,
-      metadata: { ...data.metadata  },
+      metadata: { ...data.metadata },
     });
 
-    if (res?.success) {
+    if (!res?.success) {
       generateCheckoutFormPaymentEvents({
         user: transformedUser,
         data: {
           ...data,
           ...res,
         },
-        flowType: 'card_update',
+        flowType: "card_update",
         planCode: paymentPlanForUpdate,
         amount: minimalPriceForUpdate,
-        stage: 'success',
+        stage: "error",
         toxic: user?.toxic,
         subscriptionId: featuresAccess.subscriptionId,
-        additionalParams: { event_category: 'AppPurchase', event_type: null },
+        additionalParams: { event_category: "AppPurchase", event_type: null },
       });
-
-      setShowForm(false);
-      toast.success('Your payment details were updated successfully.', { duration: 10000 });
 
       return;
     }
@@ -229,15 +240,23 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
     generateCheckoutFormPaymentEvents({
       user: transformedUser,
       data,
-      flowType: 'card_update',
+      flowType: "card_update",
       planCode: paymentPlanForUpdate,
       amount: minimalPriceForUpdate,
-      stage: 'success',
+      stage: "success",
       paymentType: data.paymentType,
       toxic: res?.data?.toxic,
       subscriptionId: featuresAccess.subscriptionId,
-      additionalParams: { event_category: 'AppPurchase', event_type: null },
+      additionalParams: { event_category: "AppPurchase", event_type: null },
     });
+
+    setShowForm(false);
+
+    toast.success("Your payment details were updated successfully.", {
+      duration: 10000,
+    });
+
+    return;
 
     // router.push(EClientRoutes.APP_REPORTS);
   };
@@ -245,14 +264,14 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
   const onPaymentAttempt = () => {
     generateCheckoutFormPaymentEvents({
       user: transformedUser,
-      stage: 'attempt',
+      stage: "attempt",
       amount: minimalPriceForUpdate,
-      flowType: 'card_update',
+      flowType: "card_update",
       planCode: paymentPlanForUpdate,
       paymentType: paymentTypeRef.current!,
       toxic: user?.toxic,
       subscriptionId: featuresAccess.subscriptionId,
-      additionalParams: { event_category: 'AppPurchase', event_type: null },
+      additionalParams: { event_category: "AppPurchase", event_type: null },
     });
   };
 
@@ -262,7 +281,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       params: {
         customer_id: user?.id,
         email: user?.email,
-        flow_type: 'payment_method',
+        flow_type: "payment_method",
       },
       sessionId: user?.id,
     });
@@ -274,7 +293,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
       params: {
         customer_id: user?.id,
         email: user?.email,
-        flow_type: 'payment_method',
+        flow_type: "payment_method",
         error_code: error?.code,
         error_message: error?.message,
       },
@@ -283,7 +302,7 @@ export const UpdatePaymentDetails: FC<Readonly<Props>> = ({
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[88px] w-full">
+    <div className="flex min-h-[88px] w-full items-center justify-center">
       {clientToken ? (
         <CheckoutFormComponent
           locale="en"
