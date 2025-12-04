@@ -68,10 +68,15 @@ export const DownloadButton = () => {
       const formValues = contentStepRef.current.getValues();
       setFormData(formValues as any);
       
-      if (await checkSessionAndCreateQr(formValues)) {
+      if (!isEditMode && await checkSessionAndCreateQr(formValues)) {
         return;
       }
       await onSave(formValues as any);
+      return;
+    }
+
+    if (isEditMode) {
+      await onSave();
       return;
     }
 
@@ -80,7 +85,7 @@ export const DownloadButton = () => {
     }
     // Directly save/create the QR code without navigating steps
     await onSave();
-  }, [isContentStep, contentStepRef, setFormData, onSave, formData, selectedQrType, customizationData]);
+  }, [isContentStep, contentStepRef, setFormData, onSave, formData, selectedQrType, customizationData, isEditMode]);
 
   const getButtonText = useCallback(() => {
     if (isFileUploading) return "Uploading...";
