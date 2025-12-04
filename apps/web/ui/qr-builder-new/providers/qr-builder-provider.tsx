@@ -3,6 +3,7 @@ import { QRContentStepRef } from "@/ui/qr-builder-new/components/qr-content-step
 import { useMediaQuery } from "@dub/ui";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface.ts";
+import { useRouter } from "next/navigation";
 import {
   ReactNode,
   useCallback,
@@ -54,6 +55,7 @@ export const QrBuilderProvider = ({
   onStepChange,
   onCancel: onCancelProp,
 }: QrBuilderProviderProps) => {
+  const router = useRouter();
   const user = useUser();
   const { isMobile } = useMediaQuery();
   const isEdit = !!initialQrData;
@@ -319,26 +321,8 @@ export const QrBuilderProvider = ({
   }, [builderStep, handleChangeStep, homepageDemo, user, sessionId]);
 
   const handleCancel = useCallback(() => {
-    if (isEdit && onCancelProp) {
-      toast.success("Successfully cancelled");
-      onCancelProp();
-    } else {
-      setBuilderStep(1);
-      setSelectedQrType(null);
-      setHoveredQRType(null);
-      setTypeSelectionError("");
-      setFormData(null);
-      setCurrentFormValues({});
-      setDestinationData(null);
-      setCustomizationData(initialState.customizationData);
-      setCustomizationActiveTab("Frame");
-      setIsFormValid(true);
-      setIsProcessing(false);
-      setIsFileUploading(false);
-      setIsFileProcessing(false);
-      toast.success("Successfully cancelled");
-    }
-  }, [isEdit, onCancelProp, initialState.customizationData]);
+    router.push("/");
+  }, [router]);
 
   // Methods
   const onSave = useCallback(

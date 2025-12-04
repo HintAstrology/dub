@@ -55,12 +55,8 @@ export const CreateQRContent: FC<CreateQRContentProps> = ({
   );
 
   const handleCancel = useCallback(() => {
-    if (qrCode) {
-      router.push(`/`);
-    } else {
-      router.back();
-    }
-  }, [router, qrCode]);
+    router.push("/");
+  }, [router]);
 
   return (
     <div className="flex h-[calc(100vh-85px)] p-1 md:p-0 md:border md:border-border-500 rounded-[20px] overflow-hidden w-full flex-col">

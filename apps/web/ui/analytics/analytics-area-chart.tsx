@@ -7,6 +7,9 @@ import { Tooltip } from "@dub/ui";
 import { cn, currencyFormatter, fetcher, nFormatter } from "@dub/utils";
 import { subDays } from "date-fns";
 import {
+  GlobeIcon,
+  LayoutGridIcon,
+  MonitorIcon,
   QrCodeIcon,
   TagIcon,
   TrendingDown,
@@ -16,15 +19,11 @@ import {
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
+import { ANALYTICS_QR_TYPES_DATA } from "../qr-builder-new/constants/get-qr-config";
+import { Icon } from "@iconify/react";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
-import {
-  getBrowserIcon,
-  getCountryIcon,
-  getDeviceIcon,
-  getOSIcon,
-  getQrTypeIcon,
-} from "./icon-helpers";
+import { getBrowserIcon, getDeviceIcon } from "./icon-helpers";
 import {
   getDataKey,
   getYAxisConfig,
@@ -205,7 +204,16 @@ export default function AnalyticsAreaChart({
         isNumeric: true,
       },
       {
-        icon: getQrTypeIcon(stats?.topQrType?.name),
+        icon: (() => {
+          const qrTypeInfo = ANALYTICS_QR_TYPES_DATA.find(
+            (type) => type.id === stats?.topQrType?.name,
+          );
+          return qrTypeInfo ? (
+            <Icon icon={qrTypeInfo.icon} className="text-primary size-8" />
+          ) : (
+            <LayoutGridIcon className="text-primary size-8 stroke-[1.5]" />
+          );
+        })(),
         title: "Top QR Type",
         value: getQrTypeLabel(stats?.topQrType?.name),
         change: formatStatChange(stats?.topQrType?.percentage),
@@ -226,21 +234,21 @@ export default function AnalyticsAreaChart({
         isNumeric: false,
       },
       {
-        icon: getOSIcon(stats?.topOS?.name),
+        icon: <MonitorIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top OS",
         value: stats?.topOS?.name || "-",
         change: formatStatChange(stats?.topOS?.percentage),
         isNumeric: false,
       },
       {
-        icon: getCountryIcon(stats?.topCountry?.name),
+        icon: <GlobeIcon className="text-primary size-8 stroke-[1.5]" />,
         title: "Top Country",
         value: getCountryName(stats?.topCountry?.name),
         change: formatStatChange(stats?.topCountry?.percentage),
         isNumeric: false,
       },
       {
-        icon: <TagIcon className="text-primary size-8 stroke-[1.5]" />,
+        icon: <TagIcon className="text-primary size-6 stroke-[1.5]" />,
         title: "Top QR Name",
         value: stats?.topLink?.name || "-",
         change: formatStatChange(undefined, stats?.topLink?.value),

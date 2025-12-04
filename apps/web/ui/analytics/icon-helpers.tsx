@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import {
   ChromeIcon,
+  Compass,
   Gamepad2,
   GlobeIcon,
   LayoutGridIcon,
@@ -20,7 +21,7 @@ import DeviceIcon from "./components/device-icon";
  */
 export function getDeviceIcon(
   deviceName: string | undefined,
-  className: string = "h-4 w-max",
+  className: string = "h-8 w-max",
 ): React.ReactNode {
   const iconClassName = `text-primary ${className} stroke-[1.5]`;
 
@@ -64,19 +65,23 @@ export function getQrTypeIcon(
 }
 
 /**
- * Get browser icon based on browser name
+ * Get browser icon based on browser name using Lucide icons
  */
 export function getBrowserIcon(
   browserName: string | undefined,
-  className: string = "text-primary size-7",
+  className: string = "text-primary size-8",
 ): React.ReactNode {
+  const iconClassName = `${className} stroke-[1.5]`;
+  
   if (!browserName) {
-    return <ChromeIcon className={`${className} stroke-[1.5]`} />;
+    return <ChromeIcon className={iconClassName} />;
   }
 
-  return (
-    <DeviceIcon display={browserName} tab="browsers" className={className} />
-  );
+  const browserLower = browserName.toLowerCase();
+  if (browserLower === "safari" || browserLower === "mobile safari") {
+    return <Compass className={iconClassName} />;
+  }
+  return <ChromeIcon className={iconClassName} />;
 }
 
 /**
