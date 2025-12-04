@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Session } from "@/lib/auth";
+import { trackClientEvents } from "core/integration/analytic";
+import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import { Loader2 } from "lucide-react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -41,6 +43,17 @@ export const DownloadButton = () => {
     const user = (existingSession?.user as Session["user"]) || undefined;
 
     if (existingSession?.user) {
+      trackClientEvents({
+        event: EAnalyticEvents.PAGE_CLICKED,
+        params: {
+          page_name: "landing",
+          content_value: "download",
+          content_group: isContentStep ? "complete_content" : "customize_qr",
+          event_category: "Authorized",
+        },
+        sessionId: user?.id,
+      });
+
       setIsCreating(true);
 
       const data = formValues || (formData as any);
