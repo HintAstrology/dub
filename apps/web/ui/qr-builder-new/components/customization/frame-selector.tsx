@@ -198,7 +198,7 @@ export const FrameSelector: FC<FrameSelectorProps> = ({
                   }
                 }}
                 maxLength={MAX_FRAME_TEXT_LENGTH}
-                disabled={disabled}
+                disabled={disabled || selectedFrame?.disableFrameText}
               />
             </Flex>
 
@@ -234,7 +234,7 @@ export const FrameSelector: FC<FrameSelectorProps> = ({
                 label="Text Colour"
                 value={currentFrameTextColor}
                 onChange={handleFrameTextColorChange}
-                disabled={disabled}
+                disabled={disabled || selectedFrame?.disableFrameText}
               />
               <AnimatePresence>
                 {frameTextColor !== null &&
