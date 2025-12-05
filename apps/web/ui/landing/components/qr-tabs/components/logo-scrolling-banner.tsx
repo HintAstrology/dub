@@ -24,7 +24,7 @@ const newsLogos: Array<{
 
 export const LogoScrollingBanner = () => {
   return (
-    <section className="w-full overflow-hidden pt-12 pb-6 md:pt-12 md:py-6">
+    <section className="w-full overflow-hidden py-10">
       <div className="relative mx-auto max-w-7xl">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[rgb(248,252,252)] to-transparent sm:w-32" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[rgb(248,252,252)] to-transparent sm:w-32" />

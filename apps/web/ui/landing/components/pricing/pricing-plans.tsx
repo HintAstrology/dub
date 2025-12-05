@@ -26,7 +26,7 @@ export const PricingSection: FC<IPricingSectionProps> = ({
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(0);
 
   return (
-    <section id="pricing" className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
+    <section id="pricing" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8  ">
       <div className="mb-12 flex flex-col items-center justify-center gap-3">
         <SectionTitle
           titleFirstPart={"Start 7-Day Trial Today, Upgrade when You Need"}
