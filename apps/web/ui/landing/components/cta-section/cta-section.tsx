@@ -17,7 +17,7 @@ export const CTASection: FC<ICTASectionProps> = ({
   handleScrollButtonClick,
 }) => {
   return (
-    <section className="relative py-6 lg:py-14">
+    <section className="relative py-6 lg:py-10">
       <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 ">
         <Card className="group border-none shadow relative overflow-hidden rounded-3xl pt-6">
 

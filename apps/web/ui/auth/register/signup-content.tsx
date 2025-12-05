@@ -36,7 +36,7 @@ function SignUpStep({ sessionId, authModal = false }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
         className={cn("bg-neutral-50 px-4 py-8 sm:px-16", {
-          "px-0 py-0 sm:px-0": authModal,
+          "bg-transparent px-0 pt-8 pb-0 sm:px-0": authModal,
         })}
       >
         <SignUpForm sessionId={sessionId} methods={["email", "google"]} />

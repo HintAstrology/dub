@@ -50,8 +50,8 @@ export function LoginContent({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className={cn("bg-neutral-50 px-4 py-8 sm:px-16", {
-            "px-0 py-4 pb-0 sm:px-0": authModal,
+          className={cn("px-4 py-8 sm:px-16", {
+            "px-0 pb-4 pb-0 sm:px-0": authModal,
           })}
         >
           <LoginForm

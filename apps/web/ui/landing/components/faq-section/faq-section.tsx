@@ -36,7 +36,11 @@ export const FAQSection: FC<IFaqSectionProps> = ({ faqItems }) => {
 
       <Accordion type="single" collapsible className="w-full">
         {faqItems.map((item, index) => (
-          <AccordionItem key={index} value={`item-${index}`}>
+          <AccordionItem 
+            key={index} 
+            value={`item-${index}`}
+            className={index === faqItems.length - 1 ? "border-b-0" : ""}
+          >
             <AccordionTrigger className="text-left text-lg">
               {item.title}
             </AccordionTrigger>

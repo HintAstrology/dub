@@ -4,7 +4,6 @@ import { LoginContent } from "@/ui/auth/login/login-content";
 import { ERegistrationStep } from "@/ui/auth/register/constants";
 import { SignUpContent } from "@/ui/auth/register/signup-content";
 import AuthLines from "@/ui/shared/icons/auth-lines";
-import { Logo } from "@/ui/shared/logo";
 import { useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -43,7 +42,7 @@ export function AuthModal({
   setAuthType,
 }: AuthModalProps) {
   const { isMobile } = useMediaQuery();
-  
+
   const handleClose = useCallback(() => {
     setShowAuthModal(false);
   }, [setShowAuthModal]);
@@ -120,7 +119,7 @@ export function AuthModal({
             "fixed z-[10001] flex flex-col overflow-hidden bg-neutral-50 focus:outline-none",
             isMobile
               ? "inset-0 h-dvh w-full p-0 pt-4 [&_input]:!text-[16px] [&_textarea]:!text-[16px]"
-              : "border-border-500 left-[50%] top-[50%] w-[90%] max-w-[420px] -translate-x-[50%] -translate-y-[50%] rounded-xl border p-0 pt-4 shadow-xl"
+              : "border-border-500 left-[50%] top-[50%] w-[90%] max-w-[420px] -translate-x-[50%] -translate-y-[50%] rounded-xl border p-0 pt-4 shadow-xl",
           )}
         >
           <div className={cn("flex w-full flex-col", isMobile && "h-full")}>
@@ -149,17 +148,27 @@ export function AuthModal({
               </Dialog.Close>
             )}
 
-            <div className={cn("flex flex-col", isMobile && "flex-1 justify-center")}>
+            <div
+              className={cn(
+                "flex flex-col",
+                isMobile && "flex-1 justify-center",
+              )}
+            >
               {/* Header with logo and close button */}
-              <div className={cn("relative flex items-center justify-center pb-8", isMobile ? "px-4" : "px-8")}>
-                <Logo className="justify-center gap-3" />
-                
+              <div
+                className={cn(
+                  "relative flex items-center justify-center pb-4",
+                  isMobile ? "px-4" : "px-8",
+                )}
+              >
+                {/* <Logo className="justify-center gap-3" /> */}
+
                 {!isMobile && (
                   <Dialog.Close asChild>
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="group absolute right-8 rounded-full p-2 text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none active:bg-neutral-200"
+                      className="group absolute right-4 top-0 p-0.5 rounded-full text-neutral-500 transition-all duration-75 hover:bg-neutral-100 focus:outline-none"
                     >
                       <X className="h-5 w-5" />
                     </button>
@@ -168,22 +177,27 @@ export function AuthModal({
               </div>
 
               {/* Title and subtitle */}
-              <div className={cn("relative pb-8 text-center", isMobile ? "px-4" : "px-8")}>
-            <motion.div
-              key={authType}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h3 className="text-2xl font-semibold text-neutral-900">
-                {authType === "login" ? "Welcome Back" : "Create account"}
-              </h3>
-              <p className="mt-1.5 text-base text-neutral-400">
-                {authType === "login"
-                  ? "Please enter your details to sign in"
-                  : "To download your QR code instantly"}
-              </p>
-            </motion.div>
+              <div
+                className={cn(
+                  "relative text-center",
+                  isMobile ? "px-4" : "px-8",
+                )}
+              >
+                <motion.div
+                  key={authType}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h3 className="text-2xl font-semibold text-neutral-900">
+                    {authType === "login" ? "Welcome Back" : "Create account"}
+                  </h3>
+                  <p className="mt-2 leading-none text-base text-neutral-400">
+                    {authType === "login"
+                      ? "Please enter your details to sign in"
+                      : "To download your QR code instantly"}
+                  </p>
+                </motion.div>
               </div>
 
               <AnimatePresence>
@@ -198,7 +212,7 @@ export function AuthModal({
                       isMobile ? "mx-4" : "mx-8",
                       messageType === "success"
                         ? "text-primary bg-primary-300 border-primary border"
-                        : "border border-red-100 bg-red-50 text-red-700"
+                        : "border border-red-100 bg-red-50 text-red-700",
                     )}
                   >
                     <div className="flex items-center">
@@ -215,42 +229,44 @@ export function AuthModal({
                 )}
               </AnimatePresence>
 
-              <div className={cn("relative pb-8 pt-0", isMobile ? "px-4" : "px-8")}>
-            <AnimatePresence mode="wait">
-              {authType === "login" ? (
-                <motion.div
-                  key="login"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LoginContent
-                    authModal
-                    sessionId={sessionId}
-                    setAuthModalMessage={setAuthModalMessage}
-                    switchAuthType={switchAuthType}
-                    handleClose={handleClose}
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="signup"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <SignUpContent
-                    authModal
-                    sessionId={sessionId}
-                    setAuthModalMessage={setAuthModalMessage}
-                    onStepChange={updateStep}
-                    switchAuthType={switchAuthType}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+              <div
+                className={cn("relative pb-8 pt-0", isMobile ? "px-4" : "px-8")}
+              >
+                <AnimatePresence mode="wait">
+                  {authType === "login" ? (
+                    <motion.div
+                      key="login"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <LoginContent
+                        authModal
+                        sessionId={sessionId}
+                        setAuthModalMessage={setAuthModalMessage}
+                        switchAuthType={switchAuthType}
+                        handleClose={handleClose}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="signup"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <SignUpContent
+                        authModal
+                        sessionId={sessionId}
+                        setAuthModalMessage={setAuthModalMessage}
+                        onStepChange={updateStep}
+                        switchAuthType={switchAuthType}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <AnimatePresence>
