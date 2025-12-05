@@ -33,10 +33,23 @@ export const QrCodeCardInner: FC<Readonly<IQrCodeCardInnerProps>> = ({
     );
   }, [qrCode]);
 
+  const shouldUseRawData =
+    qrCode.qrType === EQRType.WIFI || qrCode.qrType === EQRType.VCARD;
+
+  const getRawData = () => {
+    if (qrCode.qrType === EQRType.VCARD) {
+      if (qrCode.data?.startsWith("BEGIN:VCARD")) {
+        return qrCode.data;
+      }
+
+      return (qrCode.styles as any)?.data || qrCode.data;
+    }
+    return qrCode.data;
+  };
+
   const { qrCode: qrCodeStylingInstance, svgString } = useQRCodeStyling({
     customizationData,
-    defaultData:
-      qrCode.qrType === EQRType.WIFI ? qrCode.data : qrCode.link.shortLink,
+    defaultData: shouldUseRawData ? getRawData() : qrCode.link.shortLink,
   });
 
   return (

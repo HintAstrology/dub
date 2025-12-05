@@ -1,5 +1,6 @@
 export * from "./base";
 export * from "./file";
+export * from "./vcard";
 export * from "./website";
 export * from "./whatsapp";
 export * from "./wifi";

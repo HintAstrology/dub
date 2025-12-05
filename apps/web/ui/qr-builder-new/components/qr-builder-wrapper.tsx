@@ -58,41 +58,43 @@ export const QRBuilderWrapper = ({ modalHeader }: QRBuilderWrapperProps) => {
 
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto">
-          <motion.div
-            ref={qrBuilderContentWrapperRef}
-            key={`builder-step-${builderStep}`}
-            initial={
-              isGoingBack
-                ? { opacity: 1, y: 0, scale: 1 }
-                : { opacity: 0, y: 0, scale: 1 }
-            }
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={
-              isGoingBack
-                ? { duration: 0 }
-                : {
-                    duration: 0.3,
-                    ease: [0.4, 0, 0.2, 1],
-                    opacity: { duration: 0.2 },
-                  }
-            }
-            className={cn(
-              "mx-auto flex h-full w-full flex-col justify-center p-4",
-              !isTypeStep && " rounded-[20px] bg-white ",
-              !homepageDemo || isMobile ? "shadow-none" : "shadow",
-            )}
-          >
-            <div className="relative">
-              <div
-                className={cn(
-                  "flex w-full flex-col items-stretch justify-between gap-4 p-6 md:gap-6",
-                  isTypeStep && "p-0",
-                )}
-              >
-                <QRBuilderInner hideStepper={!isTypeStep} />
+          <div className="flex min-h-full flex-col items-center justify-center">
+            <motion.div
+              ref={qrBuilderContentWrapperRef}
+              key={`builder-step-${builderStep}`}
+              initial={
+                isGoingBack
+                  ? { opacity: 1, y: 0, scale: 1 }
+                  : { opacity: 0, y: 0, scale: 1 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={
+                isGoingBack
+                  ? { duration: 0 }
+                  : {
+                      duration: 0.3,
+                      ease: [0.4, 0, 0.2, 1],
+                      opacity: { duration: 0.2 },
+                    }
+              }
+              className={cn(
+                "mx-auto flex w-full flex-col p-4",
+                !isTypeStep && " rounded-[20px] bg-white ",
+                !homepageDemo || isMobile ? "shadow-none" : "shadow",
+              )}
+            >
+              <div className="relative">
+                <div
+                  className={cn(
+                    "flex w-full flex-col items-stretch justify-between gap-4 p-6 md:gap-6",
+                    isTypeStep && "p-0",
+                  )}
+                >
+                  <QRBuilderInner hideStepper={!isTypeStep} />
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Fixed buttons for steps 2 and 3 */}

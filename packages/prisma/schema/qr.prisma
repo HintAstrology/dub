@@ -9,6 +9,7 @@ enum QRType {
   video
   feedback
   email
+  vcard
 }
 
 model Qr {

@@ -1,6 +1,7 @@
 import { EQRType } from "../../types/qr-type";
 import { QRCodeDemoImage } from "./demos/image";
 import { QRCodeDemoPDF } from "./demos/pdf";
+import { QRCodeDemoVcard } from "./demos/vcard";
 import { QRCodeDemoVideo } from "./demos/video";
 import { QRCodeDemoWebsite } from "./demos/website";
 import { QRCodeDemoWhatsapp } from "./demos/whatsapp";
@@ -47,5 +48,9 @@ export const QRCodeDemoMap: Record<EQRType, QRCodeDemoConfig> = {
   [EQRType.FEEDBACK]: {
     Component: QRCodeDemoWebsite,
     propsKeys: ["websiteLink"],
+  },
+  [EQRType.VCARD]: {
+    Component: QRCodeDemoVcard,
+    propsKeys: ["firstName", "lastName", "phone"],
   },
 };

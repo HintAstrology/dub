@@ -3,6 +3,7 @@ import QrFeedbackFull from "@/ui/landing/assets/png/get-qr-feedback-full.png";
 import QrImagesFull from "@/ui/landing/assets/png/get-qr-images-full.png";
 import QrPDFFull from "@/ui/landing/assets/png/get-qr-pdf-full.png";
 import QrSocialFull from "@/ui/landing/assets/png/get-qr-social-full.png";
+import QrVcardFull from "@/ui/landing/assets/png/get-qr-social-full.png";
 import QrVideosFull from "@/ui/landing/assets/png/get-qr-videos-full.png";
 import QrWebsiteFull from "@/ui/landing/assets/png/get-qr-website-full.png";
 import QrWhatsappFull from "@/ui/landing/assets/png/get-qr-whatsapp-full.png";
@@ -37,6 +38,7 @@ export const QR_Icons = {
   [EQRType.SOCIAL]: "solar:add-circle-broken",
   [EQRType.APP_LINK]: "meteor-icons:link",
   [EQRType.FEEDBACK]: "hugeicons:bubble-chat-favourite",
+  [EQRType.VCARD]: "lucide:book-user",
 };
 
 export const QR_TYPES: QRType[] = [
@@ -138,6 +140,17 @@ export const QR_TYPES: QRType[] = [
       "Get valuable feedback in seconds! Use a QR code to collect customer insights instantly—helping you improve your business and enhance the customer experience.",
     yourContentColumnTitle: "Your Link",
     scrollTo: EQRType.WEBSITE,
+  },
+  {
+    id: EQRType.VCARD,
+    label: "vCard",
+    info: "Share a digital business card",
+    icon: "lucide:book-user",
+    img: QrVcardFull,
+    content:
+      "Share your contact details effortlessly! Use a QR code to let people save your business card to their phone with a single scan—perfect for networking, events, and professional connections.",
+    yourContentColumnTitle: "Your Contact",
+    scrollTo: EQRType.VCARD,
   },
 ];
 

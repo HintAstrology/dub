@@ -289,19 +289,19 @@ export const SUGGESTED_LOGOS: IStyleOption[] = [
     id: "logo-linkedin",
     type: "linkedin",
     icon: LinkedInLogoIcon,
-    relevantFor: [EQRType.SOCIAL, EQRType.WEBSITE],
+    relevantFor: [EQRType.SOCIAL, EQRType.WEBSITE, EQRType.VCARD],
   },
   {
     id: "logo-location",
     type: "location",
     icon: LocationLogoIcon,
-    relevantFor: [EQRType.WEBSITE],
+    relevantFor: [EQRType.WEBSITE, EQRType.VCARD],
   },
   {
     id: "logo-mail",
     type: "mail",
     icon: MailLogoIcon,
-    relevantFor: [EQRType.WEBSITE, EQRType.FEEDBACK],
+    relevantFor: [EQRType.WEBSITE, EQRType.FEEDBACK, EQRType.VCARD],
   },
   {
     id: "logo-paypal",

@@ -16,6 +16,7 @@ import {
   TImageQRFormData,
   TPdfQRFormData,
   TSocialQRFormData,
+  TVcardQRFormData,
   TVideoQRFormData,
   TWebsiteQRFormData,
   TWhatsappQRFormData,
@@ -32,7 +33,8 @@ export type TQRFormData =
   | TVideoQRFormData
   | TSocialQRFormData
   | TAppLinkQRFormData
-  | TFeedbackQRFormData;
+  | TFeedbackQRFormData
+  | TVcardQRFormData;
 
 export interface IQrBuilderContextType {
   // States

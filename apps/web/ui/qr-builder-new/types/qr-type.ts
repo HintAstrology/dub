@@ -8,4 +8,5 @@ export enum EQRType {
   WIFI = "wifi",
   APP_LINK = "app",
   FEEDBACK = "feedback",
+  VCARD = "vcard",
 }

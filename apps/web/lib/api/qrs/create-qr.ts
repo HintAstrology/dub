@@ -19,11 +19,15 @@ export async function createQr(
   linkId: string,
   userId: string | null,
 ) {
+
+  const shouldStoreRawData =
+    qrType === EQRType.WIFI || qrType === EQRType.VCARD;
+
   const qr = await prisma.qr.create({
     data: {
       id: createId({ prefix: "qr_" }),
       qrType,
-      data: qrType === EQRType.WIFI ? data : url,
+      data: shouldStoreRawData ? data : url,
       title,
       description,
       styles: styles as any,
