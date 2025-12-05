@@ -26,6 +26,7 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 
 const FORMAT_OPTIONS = [
   { id: "svg", label: "SVG" },
@@ -61,6 +62,7 @@ function QRPreviewModal({
   const [selectedFormat, setSelectedFormat] = useState<TDownloadFormat>("svg");
 
   const { downloadQrCode } = useQrDownload(qrCodeStylingInstance);
+  const { triggerCloseEditModal } = useNewQrContext();
 
   const isWelcomeModal = searchParams.has("onboarded") || isNewQr;
   const [canShare, setCanShare] = useState(false);
@@ -74,6 +76,7 @@ function QRPreviewModal({
           del: ["onboarded"],
         });
       }
+      triggerCloseEditModal?.();
     }
   };
 
@@ -336,8 +339,9 @@ export function useQRPreviewModal(data: {
   svgString: string;
   qrCodeId?: string;
   user: Session["user"];
+  onClose?: () => void;
 }) {
-  const { qrCodeStylingInstance, svgString = "", qrCodeId, user } = data;
+  const { qrCodeStylingInstance, svgString = "", qrCodeId, user, onClose } = data;
   const [showQRPreviewModal, setShowQRPreviewModal] = useState(false);
   const [isNewQr, setIsNewQr] = useState(false);
 
@@ -366,6 +370,7 @@ export function useQRPreviewModal(data: {
     svgString,
     user,
     isNewQr,
+    onClose,
   ]);
 
   return {

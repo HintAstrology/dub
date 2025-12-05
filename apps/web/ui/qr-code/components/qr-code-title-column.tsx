@@ -14,7 +14,7 @@ import { Text } from "@radix-ui/themes";
 import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { useSearchParams } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { QRStatusBadge } from "./qr-status-badge/qr-status-badge";
 
 interface IQrCodeTitleColumnProps {
@@ -38,9 +38,13 @@ export function QrCodeTitleColumn({
 }: IQrCodeTitleColumnProps) {
   const { createdAt } = qrCode ?? {};
 
-  const { newQrId, setNewQrId } = useNewQrContext();
+  const { newQrId, setNewQrId, triggerCloseEditModal } = useNewQrContext();
   const searchParams = useSearchParams();
   const { queryParams } = useRouterStuff();
+
+  const handlePreviewModalClose = useCallback(() => {
+    triggerCloseEditModal?.();
+  }, [qrCode.id, triggerCloseEditModal]);
 
   const { QRPreviewModal, setShowQRPreviewModal, handleOpenNewQr } =
     useQRPreviewModal({
@@ -48,6 +52,7 @@ export function QrCodeTitleColumn({
       svgString,
       qrCodeId: qrCode.id,
       user,
+      onClose: handlePreviewModalClose,
     });
 
   useEffect(() => {
