@@ -177,7 +177,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
             tab.id === "logo" ? logoSelector : null;
 
           return (
-            <TabsContent key={tab.id} value={tab.label} className="mt-4">
+            <TabsContent key={tab.id} value={tab.label} className="mt-4 !overflow-visible">
               {selectorContent}
             </TabsContent>
           );
@@ -232,7 +232,7 @@ export const QRCustomization: FC<QRCustomizationProps> = ({
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="pt-2 ">
+            <AccordionContent className="pt-2">
               {selectorContent}
             </AccordionContent>
           </AccordionItem>
