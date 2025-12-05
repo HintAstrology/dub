@@ -9,6 +9,7 @@ import { QrCodesListContext } from "@/ui/qr-code/qr-codes-container.tsx";
 import { Button, Popover } from "@dub/ui";
 import { Download } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
+import { useNewQrContext } from "app/app.dub.co/(dashboard)/[slug]/helpers/new-qr-context";
 import { trackClientEvents } from "core/integration/analytic";
 import { EAnalyticEvents } from "core/integration/analytic/interfaces/analytic.interface";
 import {
@@ -22,7 +23,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import QRCodeStyling from "qr-code-styling";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useDuplicateQRModal } from "../../modals/duplicate-qr-modal";
 import { QRBuilderNewModal } from "../../modals/qr-builder-new";
 import { ThreeDots } from "../../shared/icons";
@@ -51,6 +52,8 @@ export function QrCodeControls({
   const { slug } = useWorkspace();
 
   const router = useRouter();
+  
+  const { registerCloseEditModal, unregisterCloseEditModal } = useNewQrContext();
 
   const { openMenuQrCodeId, setOpenMenuQrCodeId } =
     useContext(QrCodesListContext);
@@ -72,11 +75,27 @@ export function QrCodeControls({
     qrCode,
     user,
   });
+
+  const onCloseEditQRModal = useCallback(() => {
+    setShowEditQRModal(false);
+    setCurrentStep(null);
+  }, []);
+  
+  useEffect(() => {
+    if (qrCode.id) {
+      registerCloseEditModal?.(qrCode.id, onCloseEditQRModal);
+      return () => {
+        unregisterCloseEditModal?.(qrCode.id);
+      };
+    }
+  }, [qrCode.id, onCloseEditQRModal, registerCloseEditModal, unregisterCloseEditModal]);
+
   const { QRPreviewModal, setShowQRPreviewModal } = useQRPreviewModal({
     qrCodeStylingInstance,
     svgString,
     qrCodeId: qrCode.id,
     user,
+    onClose: onCloseEditQRModal,
   });
 
   const onDownloadButtonClick = () => {
@@ -138,11 +157,6 @@ export function QrCodeControls({
       },
       sessionId: user?.id,
     });
-  };
-
-  const onCloseEditQRModal = () => {
-    setShowEditQRModal(false);
-    setCurrentStep(null);
   };
 
   return (
