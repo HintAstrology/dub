@@ -59,7 +59,7 @@ export const LandingSectionsServer = ({
       {/* <CTASection handleScrollButtonClick={handleScrollButtonClick} /> */}
 
       {/* 9. FAQ */}
-      <div className="py-10 w-full">
+      <div className="pt-12 pb-8 w-full">
       <FAQSection faqItems={FAQ_ITEMS_HOMEPAGE} />
       </div>
 

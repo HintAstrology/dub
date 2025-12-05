@@ -2145,7 +2145,7 @@ export const REGIONS: { [key: string]: string } = {
   "PG-WPD": "Western",
   "PG-WHM": "Western Highlands",
   "PY-16": "Alto Paraguay",
-  "PY-10": "Alto Paraná",
+  "pt-12": "Alto Paraná",
   "PY-13": "Amambay",
   "PY-ASU": "Asunción",
   "PY-19": "Boquerón",

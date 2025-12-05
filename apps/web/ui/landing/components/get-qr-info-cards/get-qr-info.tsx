@@ -7,7 +7,7 @@ import { GET_QR_CARDS } from "./config.ts";
 
 export const GetQRInfoCardsSection: FC = () => {
   return (
-    <section className="py-10">
+    <section className="pt-12 pb-8 mt-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8  ">
         <div className="mb-12 flex flex-col items-center justify-center gap-3">
           <SectionTitle

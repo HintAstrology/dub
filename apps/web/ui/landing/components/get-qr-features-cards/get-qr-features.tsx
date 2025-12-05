@@ -14,7 +14,7 @@ export const GetQRFeaturesCardsSection: FC<
   GetQRFeaturesCardsSectionProps
 > = () => {
   return (
-    <section id="features" className="relative overflow-hidden py-10">
+    <section id="features" className="relative overflow-hidden pt-12 pb-8">
       {/* Background gradient effects */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="bg-primary/5 absolute left-1/4 top-0 h-96 w-96 rounded-full blur-3xl" />
