@@ -49,14 +49,13 @@ export default function AnalyticsExport() {
         openPopover={openPopover}
         setOpenPopover={setOpenPopover}
       >
-        <Button
-          variant="default"
-          size="default"
-          className="bg-chart-1 hover:bg-chart-1/90 text-white"
+        {/* <Button
+          className="bg-gray-100 hover:bg-gray-200 text-gray-900 text-base font-medium transition-all shadow-none duration-200 border-0"
+          size="lg"
           onClick={() => setOpenPopover(!openPopover)}
         >
           Export data
-        </Button>
+        </Button> */}
    
       </Popover>
     </div>
